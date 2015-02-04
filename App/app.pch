@@ -1,0 +1,61 @@
+//
+// Prefix header for all source files of the 'RPPhotos' target in the 'RPPhotos' project
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_3_0
+#warning "This project uses features only available in iOS SDK 3.0 and later."
+#endif
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import "AppDelegate.h"
+
+#import "Utility.h"
+#import "KVNProgress.h"
+#import "NSObject+Motis.h"
+#endif
+
+
+//信息
+#define kMESSAGE_TYPE @"messageType"
+#define kMESSAGE_FROM @"messageFrom"
+#define kMESSAGE_TO @"messageTo"
+#define kMESSAGE_CONTENT @"messageContent"
+#define kMESSAGE_DATE @"messageDate"
+#define kMESSAGE_ID @"messageId"
+
+#define LOADIMAGE(file,ext) [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:file ofType:ext]];
+
+#define PATH_OF_DOCUMENT    [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+
+#define COLOR(R,G,B,A) [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:A]
+
+#ifdef DEBUG
+#define debugLog(...)    NSLog(__VA_ARGS__)
+#define debugMethod()    NSLog(@"%s", __func__)
+#define debugError()     NSLog(@"Error at %s Line:%d", __func__, __LINE__)
+#define DLog(fmt, ...)   NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
+#else
+#define debugLog(...)
+#define debugMethod()
+#define debugError()
+#define DLog(...)
+#endif
+
+#define iPhone47 ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(640, 960), [[UIScreen mainScreen] currentMode].size) : NO)
+#define iPhone46 ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(640, 920), [[UIScreen mainScreen] currentMode].size) : NO)
+#define iPhone57 ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(640, 1136), [[UIScreen mainScreen] currentMode].size) : NO)
+#define iPhone56 ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(640, 1096), [[UIScreen mainScreen] currentMode].size) : NO)
+#define iPhone6 ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(750, 1334), [[UIScreen mainScreen] currentMode].size) : NO)
+#define iPhone6Plus ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(828, 1472), [[UIScreen mainScreen] currentMode].size) : NO)
+
+#define SafeRelease(__v) (__v = nil);
+
+#define LOADVC(string) [[NSClassFromString(string) alloc]initWithNibName:string bundle:nil];
+
+#define Platform [[[UIDevice currentDevice] systemVersion] floatValue]
+
+

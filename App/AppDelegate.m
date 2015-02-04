@@ -7,6 +7,9 @@
 //
 
 #import "AppDelegate.h"
+#import <SMS_SDK/SMS_SDK.h>
+#import "WQInitVC.h"
+
 
 @interface AppDelegate ()
 
@@ -14,12 +17,53 @@
 
 @implementation AppDelegate
 
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
-    return YES;
++ (AppDelegate *)shareIntance {
+    return (AppDelegate *)[[UIApplication sharedApplication] delegate];
 }
 
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [application setStatusBarStyle:UIStatusBarStyleLightContent];
+    //短信
+    [SMS_SDK registerApp:@"46c880df3c3f" withSecret:@"e5d8a4bb450b2e2f2076bffdf57b2ec7"];
+    [SMS_SDK enableAppContactFriends:NO];
+    
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+    
+    WQInitVC *initVC = LOADVC(@"WQInitVC");
+    self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
+    self.window.rootViewController = self.navControl;
+    
+    [self setupNavbarUI];
+    
+    [self.window makeKeyAndVisible];
+    return YES;
+}
+#pragma mark - 导航栏设置
+- (void)setupNavbarUI {
+    UINavigationBar *navBar = self.navControl.navigationBar;
+    if ([navBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
+        [navBar setBackgroundImage:[Utility imageFileNamed:@"navBar.png"] forBarMetrics:UIBarMetricsDefault];
+    }else {
+        UIImageView *imageView = (UIImageView *)[navBar viewWithTag:10];
+        if (imageView == nil) {
+            imageView = [[UIImageView alloc] initWithImage:
+                         [Utility imageFileNamed:@"navBar.png"]];
+            [imageView setTag:10];
+            [navBar insertSubview:imageView atIndex:0];
+            SafeRelease(imageView);
+        }
+    }
+    
+    navBar.titleTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil];
+    
+    
+    if (Platform>=7.0) {
+        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+    }else {
+        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+    }
+}
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
@@ -41,5 +85,6 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
 
 @end
