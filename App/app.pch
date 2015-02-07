@@ -16,6 +16,7 @@
 #import "Utility.h"
 #import "KVNProgress.h"
 #import "NSObject+Motis.h"
+#import "WQDataShare.h"
 #endif
 
 
@@ -58,4 +59,4 @@
 
 #define Platform [[[UIDevice currentDevice] systemVersion] floatValue]
 
-
+#define AddProductImagesMax  5

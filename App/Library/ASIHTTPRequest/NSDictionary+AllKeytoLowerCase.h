@@ -12,4 +12,5 @@
 
 -(NSDictionary*)allKeytoLowerCase;//所有key小写
 
+-(NSMutableDictionary *)mutableDeepCopy;//创建深层可变副本
 @end

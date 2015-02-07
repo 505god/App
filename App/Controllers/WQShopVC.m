@@ -8,6 +8,7 @@
 
 #import "WQShopVC.h"
 
+#import "WQNewProductVC.h"
 @interface WQShopVC ()
 
 @end
@@ -26,6 +27,11 @@
     [super viewWillAppear:animated];
     
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                              initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                              target:self
+                                              action:@selector(addNewProduct)];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -45,6 +51,12 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)addNewProduct {
+    WQNewProductVC *proVC = LOADVC(@"WQNewProductVC");
+    
+    [self.navigationController pushViewController:proVC animated:YES];
+    SafeRelease(proVC);
+}
 /*
 #pragma mark - Navigation
 

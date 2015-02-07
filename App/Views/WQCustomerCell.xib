@@ -15,37 +15,54 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dsj-m3-ryD" customClass="WQStarView">
-                        <rect key="frame" x="45" y="32" width="130" height="20"/>
+                        <rect key="frame" x="99" y="10" width="120" height="20"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="randomheader_7" translatesAutoresizingMaskIntoConstraints="NO" id="NPL-px-do9">
-                        <rect key="frame" x="8" y="5" width="50" height="50"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="56e-d4-NqW">
+                        <rect key="frame" x="68" y="10" width="87" height="22"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="50" id="LE0-eZ-RIy"/>
-                            <constraint firstAttribute="width" constant="50" id="o5L-Xg-jOe"/>
+                            <constraint firstAttribute="height" constant="22" id="NEg-II-4ma"/>
                         </constraints>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                <integer key="value" value="25"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="56e-d4-NqW">
-                        <rect key="frame" x="66" y="8" width="220" height="22"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FhA-VO-e1E">
+                        <rect key="frame" x="68" y="33" width="220" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="22" id="kEn-xF-BII"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="randomheader_7" translatesAutoresizingMaskIntoConstraints="NO" id="NPL-px-do9" customClass="WQTapImg">
+                        <rect key="frame" x="8" y="5" width="50" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="50" id="Osu-fT-sHU"/>
+                            <constraint firstAttribute="width" constant="50" id="QlA-J9-OEO"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="4"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </imageView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="NPL-px-do9" secondAttribute="bottom" constant="5" id="9Oi-HD-CYC"/>
-                    <constraint firstItem="NPL-px-do9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="Asp-8T-xCx"/>
-                    <constraint firstItem="NPL-px-do9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="nGx-sQ-nrg"/>
+                    <constraint firstItem="56e-d4-NqW" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="RrY-yf-Kpe"/>
+                    <constraint firstItem="56e-d4-NqW" firstAttribute="leading" secondItem="NPL-px-do9" secondAttribute="trailing" constant="10" id="Wgp-Jx-Ddc"/>
+                    <constraint firstItem="FhA-VO-e1E" firstAttribute="top" secondItem="56e-d4-NqW" secondAttribute="bottom" constant="1" id="ZwO-sG-J0W"/>
+                    <constraint firstItem="NPL-px-do9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="cj3-4y-cFX"/>
+                    <constraint firstItem="NPL-px-do9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="hLC-fX-E6O"/>
+                    <constraint firstItem="FhA-VO-e1E" firstAttribute="leading" secondItem="NPL-px-do9" secondAttribute="trailing" constant="10" id="yla-DB-S31"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="headerImg" destination="NPL-px-do9" id="Eqs-eU-Uts"/>
                 <outlet property="nameLab" destination="56e-d4-NqW" id="9ai-6d-a1s"/>
+                <outlet property="phoneLab" destination="FhA-VO-e1E" id="7yg-97-3wb"/>
                 <outlet property="starV" destination="dsj-m3-ryD" id="tM3-fh-k3U"/>
             </connections>
             <point key="canvasLocation" x="243" y="215"/>

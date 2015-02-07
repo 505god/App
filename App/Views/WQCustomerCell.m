@@ -8,14 +8,18 @@
 
 #import "WQCustomerCell.h"
 
+#import "WQTapImg.h"
 #import "WQStarView.h"
+#import "UIView+Common.h"
+#import "UIView+LayerEffects.h"
 
-@interface WQCustomerCell ()
+@interface WQCustomerCell ()<WQTapImgDelegate>
 
-@property (nonatomic, weak) IBOutlet UIImageView *headerImg;
+@property (nonatomic, weak) IBOutlet WQTapImg *headerImg;
 @property (nonatomic, weak) IBOutlet UILabel *nameLab;
 @property (nonatomic, weak) IBOutlet WQStarView *starV;
 
+@property (nonatomic, weak) IBOutlet UILabel *phoneLab;
 @end
 
 @implementation WQCustomerCell
@@ -31,12 +35,28 @@
         self.contentView.backgroundColor = [UIColor clearColor];
         self.backgroundColor = [UIColor clearColor];
         
+        self.headerImg.delegate = self;
+        
+        self.notificationHub = [[RKNotificationHub alloc]initWithView:self];
+        [self.notificationHub setCircleAtFrame:(CGRect){50,2,20,20}];
+
+        [self.headerImg setShadow:[UIColor blackColor] opacity:0.5 offset:CGSizeMake(1.0, 1.0) blurRadius:3];
+        
+        self.starV.enable = NO;
+        self.starV.showNormal = NO;
     }
     return self;
 }
 
 - (void)awakeFromNib {
     // Initialization code
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    
+    [self.nameLab sizeToFit];
+    self.starV.frame = (CGRect){self.nameLab.right-10,10,120,20};
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -51,7 +71,15 @@
         _customerObj = customerObj;
         
         self.nameLab.text = customerObj.customerName;
+        self.phoneLab.text = customerObj.customerPhone;
         self.starV.starNumber = customerObj.customerDegree;
+    }
+}
+
+//点击用户头像查看、编辑用户信息页面
+- (void)tappedWithObject:(id) sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(tapCellWithCustomer:)]) {
+        [self.delegate tapCellWithCustomer:self.customerObj];
     }
 }
 @end

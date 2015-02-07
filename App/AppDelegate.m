@@ -37,6 +37,8 @@
     [self setupNavbarUI];
     
     [self.window makeKeyAndVisible];
+    
+    
     return YES;
 }
 #pragma mark - 导航栏设置

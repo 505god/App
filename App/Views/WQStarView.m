@@ -68,6 +68,12 @@
         self.topView.frame = CGRectMake(0, 0, self.starWidth*(starNumber+1), self.bounds.size.height);
     }
 }
+
+-(void)setShowNormal:(BOOL)showNormal {
+    _showNormal = showNormal;
+    [self.bottomView setHidden:!showNormal];
+}
+
 -(void)tap:(UITapGestureRecognizer *)gesture{
     if(self.enable){
         CGPoint point = [gesture locationInView:self];

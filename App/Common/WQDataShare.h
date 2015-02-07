@@ -11,4 +11,5 @@
 @interface WQDataShare : NSObject
 
 + (WQDataShare *)sharedService;
+
 @end

@@ -11,14 +11,14 @@
 @interface WQStarView : UIView
 
 @property (nonatomic, assign) NSInteger starNumber;
-/*
- *调整底部视图的颜色
- */
+
+//调整底部视图的颜色
 @property (nonatomic, strong) UIColor *viewColor;
 
-/*
- *是否允许可触摸
- */
+//是否允许可触摸
 @property (nonatomic, assign) BOOL enable;
+
+//显示灰色五角星
+@property (nonatomic, assign) BOOL showNormal;
 
 @end

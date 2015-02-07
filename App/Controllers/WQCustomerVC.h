@@ -8,17 +8,7 @@
 
 #import "BaseViewController.h"
 
-#import "UIFolderTableView.h"
-
-@class WQCustomBtn;
-
-@interface WQCustomerVC : BaseViewController<UITableViewDataSource, UITableViewDelegate,UIFolderTableViewDelegate>
-
-@property (strong, nonatomic) IBOutlet UIFolderTableView *tableView;
+@interface WQCustomerVC : BaseViewController
 
 
-//查看个人信息
--(void)subViewInfoBtnAction:(WQCustomBtn *)sender;
-//进入往来记录
--(void)subViewMessageBtnAction:(WQCustomBtn *)sender;
 @end

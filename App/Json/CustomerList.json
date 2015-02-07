@@ -1,24 +1,112 @@
 {
-  "status": "1",
-  "msg": "",
-  "returnObj": {
-    "customerList": [
-      {
-        "customerId": "0",
-        "customerName": "邱大侠",
-        "customerPhone": "18962159223",
-        "customerHeader": "http://",
-        "customerDegree": "3",
-        "customerCode": "2N457YD90"
-      },
-      {
-        "customerId": "1",
-        "customerName": "王浩",
-        "customerPhone": "13962159223",
-        "customerHeader": "http://",
-        "customerDegree": "2",
-        "customerCode": "2N457YD90"
-      }
-    ]
-  }
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "customerList": [
+                         {
+                         "customerId": "0",
+                         "customerName": "邱大侠",
+                         "customerPhone": "13876483992",
+                         "customerHeader": "http://",
+                         "customerDegree": "3",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "1",
+                         "customerName": "王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         },
+                         {
+                         "customerId": "2",
+                         "customerName": "x王浩",
+                         "customerPhone": "13962159223",
+                         "customerHeader": "http://",
+                         "customerDegree": "2",
+                         "customerCode": "2N457YD90"
+                         }
+                         ]
+    }
 }

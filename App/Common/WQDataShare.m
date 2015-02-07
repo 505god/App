@@ -12,8 +12,7 @@
 
 - (id)init{
     self = [super init];
-    if (!self) {
-        
+    if (self) {
     }
     return self;
 }
@@ -26,4 +25,5 @@
     });
     return dataService;
 }
+
 @end

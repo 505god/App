@@ -14,6 +14,7 @@
 #import "WQOrderVC.h"
 #import "WQSaleVC.h"
 
+
 @interface WQMainVC ()
 
 //店铺
@@ -33,6 +34,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.title = @"首页";
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -43,6 +46,9 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
+    [self.orderControl.notificationHub setCount:5];
+    [self.orderControl.notificationHub bump];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -68,6 +74,7 @@
 }
 -(IBAction)customerVCPressed:(id)sender {
     WQCustomerVC *customerVC = LOADVC(@"WQCustomerVC");
+//    WQCustomerVCC *customerVC = [[WQCustomerVCC alloc]init];
     [self.navigationController pushViewController:customerVC animated:YES];
     [self.navigationController setHidesBottomBarWhenPushed:YES];
     SafeRelease(customerVC);
