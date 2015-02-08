@@ -16,7 +16,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="cBl-AK-odJ">
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="cBl-AK-odJ">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                     <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -27,6 +27,12 @@
                 </tableView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="cBl-AK-odJ" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="EkV-Tp-YEI"/>
+                <constraint firstAttribute="trailing" secondItem="cBl-AK-odJ" secondAttribute="trailing" id="QD0-9V-Jms"/>
+                <constraint firstAttribute="bottom" secondItem="cBl-AK-odJ" secondAttribute="bottom" id="kUi-vP-jYX"/>
+                <constraint firstItem="cBl-AK-odJ" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="uqo-np-aKO"/>
+            </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
     </objects>

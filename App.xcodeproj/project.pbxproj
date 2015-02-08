@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D0762DF1A879A7100F8576C /* StyledPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D0762DC1A879A7100F8576C /* StyledPageControl.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		5D0762E01A879A7100F8576C /* XLCycleScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D0762DE1A879A7100F8576C /* XLCycleScrollView.m */; };
+		5D0762E31A879D6100F8576C /* WQProductObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D0762E21A879D6100F8576C /* WQProductObj.m */; };
+		5D0762E71A87A34500F8576C /* ProductList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D0762E61A87A34500F8576C /* ProductList.json */; };
 		5D4E468F1A8337D4000E766B /* WQCustomerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D4E468C1A8337D4000E766B /* WQCustomerVC.xib */; };
 		5D4E46901A8337D4000E766B /* WQCustomerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D4E468D1A8337D4000E766B /* WQCustomerVC.m */; };
 		5D7324011A7EFB1200949D93 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7324001A7EFB1200949D93 /* main.m */; };
@@ -262,6 +266,10 @@
 		5D759D171A848BC9001920FA /* WQProductImageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D759D151A848BC9001920FA /* WQProductImageCell.xib */; };
 		5D759D1B1A84A6CD001920FA /* WQProductPropertyCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D759D191A84A6CD001920FA /* WQProductPropertyCell.m */; };
 		5D759D1C1A84A6CD001920FA /* WQProductPropertyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D759D1A1A84A6CD001920FA /* WQProductPropertyCell.xib */; };
+		5D759D1F1A86003D001920FA /* WQProductText.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D759D1E1A86003D001920FA /* WQProductText.m */; };
+		5D759D231A864737001920FA /* WQProductActionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D759D211A864737001920FA /* WQProductActionCell.m */; };
+		5D759D241A864737001920FA /* WQProductActionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D759D221A864737001920FA /* WQProductActionCell.xib */; };
+		5D759D2A1A877E59001920FA /* WQCellSelectedBackground.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D759D291A877E59001920FA /* WQCellSelectedBackground.m */; };
 		5D79E0AD1A831DB70095949C /* WQIndexedCollationWithSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D79E0AC1A831DB70095949C /* WQIndexedCollationWithSearch.m */; };
 		5D7DECCA1A8071B700496850 /* WQInitVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7DECC81A8071B700496850 /* WQInitVC.m */; };
 		5D7DECCB1A8071B700496850 /* WQInitVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7DECC91A8071B700496850 /* WQInitVC.xib */; };
@@ -316,6 +324,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5D0762DB1A879A7100F8576C /* StyledPageControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StyledPageControl.h; sourceTree = "<group>"; };
+		5D0762DC1A879A7100F8576C /* StyledPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StyledPageControl.m; sourceTree = "<group>"; };
+		5D0762DD1A879A7100F8576C /* XLCycleScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XLCycleScrollView.h; sourceTree = "<group>"; };
+		5D0762DE1A879A7100F8576C /* XLCycleScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XLCycleScrollView.m; sourceTree = "<group>"; };
+		5D0762E11A879D6100F8576C /* WQProductObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductObj.h; sourceTree = "<group>"; };
+		5D0762E21A879D6100F8576C /* WQProductObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductObj.m; sourceTree = "<group>"; };
+		5D0762E61A87A34500F8576C /* ProductList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ProductList.json; sourceTree = "<group>"; };
 		5D4E468C1A8337D4000E766B /* WQCustomerVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQCustomerVC.xib; sourceTree = "<group>"; };
 		5D4E468D1A8337D4000E766B /* WQCustomerVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCustomerVC.m; sourceTree = "<group>"; };
 		5D4E468E1A8337D4000E766B /* WQCustomerVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCustomerVC.h; sourceTree = "<group>"; };
@@ -820,6 +835,13 @@
 		5D759D181A84A6CD001920FA /* WQProductPropertyCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductPropertyCell.h; sourceTree = "<group>"; };
 		5D759D191A84A6CD001920FA /* WQProductPropertyCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductPropertyCell.m; sourceTree = "<group>"; };
 		5D759D1A1A84A6CD001920FA /* WQProductPropertyCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQProductPropertyCell.xib; sourceTree = "<group>"; };
+		5D759D1D1A86003D001920FA /* WQProductText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductText.h; sourceTree = "<group>"; };
+		5D759D1E1A86003D001920FA /* WQProductText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductText.m; sourceTree = "<group>"; };
+		5D759D201A864737001920FA /* WQProductActionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductActionCell.h; sourceTree = "<group>"; };
+		5D759D211A864737001920FA /* WQProductActionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductActionCell.m; sourceTree = "<group>"; };
+		5D759D221A864737001920FA /* WQProductActionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQProductActionCell.xib; sourceTree = "<group>"; };
+		5D759D281A877E59001920FA /* WQCellSelectedBackground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCellSelectedBackground.h; sourceTree = "<group>"; };
+		5D759D291A877E59001920FA /* WQCellSelectedBackground.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCellSelectedBackground.m; sourceTree = "<group>"; };
 		5D79E0AB1A831DB70095949C /* WQIndexedCollationWithSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQIndexedCollationWithSearch.h; sourceTree = "<group>"; };
 		5D79E0AC1A831DB70095949C /* WQIndexedCollationWithSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQIndexedCollationWithSearch.m; sourceTree = "<group>"; };
 		5D7DECC71A8071B700496850 /* WQInitVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQInitVC.h; sourceTree = "<group>"; };
@@ -924,6 +946,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5D0762DA1A879A7100F8576C /* ScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				5D0762DB1A879A7100F8576C /* StyledPageControl.h */,
+				5D0762DC1A879A7100F8576C /* StyledPageControl.m */,
+				5D0762DD1A879A7100F8576C /* XLCycleScrollView.h */,
+				5D0762DE1A879A7100F8576C /* XLCycleScrollView.m */,
+			);
+			path = ScrollView;
+			sourceTree = "<group>";
+		};
 		5D7323F21A7EFB1200949D93 = {
 			isa = PBXGroup;
 			children = (
@@ -1048,6 +1081,7 @@
 		5D7324271A7EFC5600949D93 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				5D0762DA1A879A7100F8576C /* ScrollView */,
 				5D759CA21A83AA35001920FA /* PNChart */,
 				5D8187831A82164500DF3BFA /* PinYin */,
 				5D7DECF11A80D18F00496850 /* NotificationHub */,
@@ -1069,6 +1103,8 @@
 			children = (
 				5D81876F1A81E69F00DF3BFA /* WQCustomerObj.h */,
 				5D8187701A81E69F00DF3BFA /* WQCustomerObj.m */,
+				5D0762E11A879D6100F8576C /* WQProductObj.h */,
+				5D0762E21A879D6100F8576C /* WQProductObj.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1084,6 +1120,8 @@
 				5D7DECED1A80CB7700496850 /* WQTapImg.m */,
 				5D7DECF51A80D33E00496850 /* WQMainControl.h */,
 				5D7DECF61A80D33E00496850 /* WQMainControl.m */,
+				5D759D281A877E59001920FA /* WQCellSelectedBackground.h */,
+				5D759D291A877E59001920FA /* WQCellSelectedBackground.m */,
 				5D759D111A84714A001920FA /* ShopV */,
 				5D759D101A847138001920FA /* CustomerV */,
 			);
@@ -2248,9 +2286,14 @@
 				5D759D131A848BC9001920FA /* WQProductImageCell.h */,
 				5D759D141A848BC9001920FA /* WQProductImageCell.m */,
 				5D759D151A848BC9001920FA /* WQProductImageCell.xib */,
+				5D759D1D1A86003D001920FA /* WQProductText.h */,
+				5D759D1E1A86003D001920FA /* WQProductText.m */,
 				5D759D181A84A6CD001920FA /* WQProductPropertyCell.h */,
 				5D759D191A84A6CD001920FA /* WQProductPropertyCell.m */,
 				5D759D1A1A84A6CD001920FA /* WQProductPropertyCell.xib */,
+				5D759D201A864737001920FA /* WQProductActionCell.h */,
+				5D759D211A864737001920FA /* WQProductActionCell.m */,
+				5D759D221A864737001920FA /* WQProductActionCell.xib */,
 			);
 			name = ShopV;
 			sourceTree = "<group>";
@@ -2270,6 +2313,7 @@
 			children = (
 				5D7DECD81A80B95200496850 /* checkPhone.json */,
 				5D8187721A81E8E800DF3BFA /* CustomerList.json */,
+				5D0762E61A87A34500F8576C /* ProductList.json */,
 			);
 			path = Json;
 			sourceTree = "<group>";
@@ -2437,6 +2481,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D8187971A82165100DF3BFA /* unicode_to_hanyu_pinyin.txt in Resources */,
+				5D0762E71A87A34500F8576C /* ProductList.json in Resources */,
 				5D8187091A81A54D00DF3BFA /* WQShopVC.xib in Resources */,
 				5D7326281A7F008F00949D93 /* build-libidn.sh in Resources */,
 				5D7DECD61A80B31F00496850 /* WQPhoneVC.xib in Resources */,
@@ -2451,6 +2496,7 @@
 				5D81876E1A81D02700DF3BFA /* WQCustomerCell.xib in Resources */,
 				5D73240F1A7EFB1300949D93 /* LaunchScreen.xib in Resources */,
 				5D7326791A7F043D00949D93 /* JKImagePickerController.strings in Resources */,
+				5D759D241A864737001920FA /* WQProductActionCell.xib in Resources */,
 				5D7326231A7F008F00949D93 /* README.txt in Resources */,
 				5D8187181A81A57B00DF3BFA /* WQSaleVC.xib in Resources */,
 				5D7DECE41A80BD9400496850 /* WQCodeVC.xib in Resources */,
@@ -2548,6 +2594,7 @@
 				5D7325A41A7F008F00949D93 /* XMPPXOAuth2Google.m in Sources */,
 				5D73259E1A7F008F00949D93 /* XMPPDeprecatedDigestAuthentication.m in Sources */,
 				5D7326551A7F041D00949D93 /* BlockActionSheet.m in Sources */,
+				5D759D1F1A86003D001920FA /* WQProductText.m in Sources */,
 				5D73260A1A7F008F00949D93 /* XEP_0223.m in Sources */,
 				5D7326051A7F008F00949D93 /* XMPPAutoPing.m in Sources */,
 				5D7326F31A7F1CD900949D93 /* MKAnnotationView+WebCache.m in Sources */,
@@ -2569,6 +2616,7 @@
 				5D7DECEE1A80CB7700496850 /* WQTapImg.m in Sources */,
 				5D7326A61A7F0BF800949D93 /* ASIDownloadCache.m in Sources */,
 				5D7326F61A7F1CD900949D93 /* SDWebImageCompat.m in Sources */,
+				5D759D2A1A877E59001920FA /* WQCellSelectedBackground.m in Sources */,
 				5D7326FB1A7F1CD900949D93 /* SDWebImagePrefetcher.m in Sources */,
 				5D7327011A7F1CD900949D93 /* UIImageView+WebCache.m in Sources */,
 				5D7326081A7F008F00949D93 /* XMPPTime.m in Sources */,
@@ -2590,6 +2638,7 @@
 				5D7326171A7F008F00949D93 /* XMPPSRVResolver.m in Sources */,
 				5D7326271A7F008F00949D93 /* DDXMLNode.m in Sources */,
 				5D73267C1A7F043D00949D93 /* JKAssetsCollectionFooterView.m in Sources */,
+				5D0762E01A879A7100F8576C /* XLCycleScrollView.m in Sources */,
 				5D759C9B1A83A3D0001920FA /* WQNewCustomerVC.m in Sources */,
 				5D7325F21A7F008F00949D93 /* XMPPCapabilities.xcdatamodel in Sources */,
 				5D7326B71A7F0F7B00949D93 /* InterfaceCache.m in Sources */,
@@ -2638,6 +2687,7 @@
 				5D73260C1A7F008F00949D93 /* XMPPMessage+XEP_0224.m in Sources */,
 				5D7325EC1A7F008F00949D93 /* NSDate+XMPPDateTimeProfiles.m in Sources */,
 				5D7325C81A7F008F00949D93 /* XMPPPrivacy.m in Sources */,
+				5D0762E31A879D6100F8576C /* WQProductObj.m in Sources */,
 				5D7325CB1A7F008F00949D93 /* XMPPRoomMessageCoreDataStorageObject.m in Sources */,
 				5D7326121A7F008F00949D93 /* NSXMLElement+XEP_0335.m in Sources */,
 				5D7325C21A7F008F00949D93 /* XMPPSystemInputActivityMonitor.m in Sources */,
@@ -2646,6 +2696,7 @@
 				5D7326FC1A7F1CD900949D93 /* UIButton+WebCache.m in Sources */,
 				5D7326871A7F043D00949D93 /* UIView+JKPicker.m in Sources */,
 				5D759CC31A83AA35001920FA /* PNColor.m in Sources */,
+				5D759D231A864737001920FA /* WQProductActionCell.m in Sources */,
 				5D759D1B1A84A6CD001920FA /* WQProductPropertyCell.m in Sources */,
 				5D7325FA1A7F008F00949D93 /* XMPPMessageArchivingCoreDataStorage.m in Sources */,
 				5D7326851A7F043D00949D93 /* JKUtil.m in Sources */,
@@ -2670,6 +2721,7 @@
 				5D7325B41A7F008F00949D93 /* XMPPIncomingFileTransfer.m in Sources */,
 				5D7326001A7F008F00949D93 /* XMPPMessageDeliveryReceipts.m in Sources */,
 				5D7326A31A7F0BF800949D93 /* ASIFormDataRequest.m in Sources */,
+				5D0762DF1A879A7100F8576C /* StyledPageControl.m in Sources */,
 				5D81879A1A8217DF00DF3BFA /* ChineseInclude.m in Sources */,
 				5D73270D1A7F1D4500949D93 /* SRRefreshView.m in Sources */,
 				5D7327021A7F1CD900949D93 /* UIView+WebCacheOperation.m in Sources */,
@@ -2873,6 +2925,7 @@
 					/usr/include/libxml2,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "57363786-3c6d-4fa7-9642-f458d541ef81";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -2881,7 +2934,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/App/Library",
@@ -2901,6 +2955,7 @@
 					/usr/include/libxml2,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "57363786-3c6d-4fa7-9642-f458d541ef81";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

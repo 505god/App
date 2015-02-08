@@ -1,0 +1,34 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "productList": [
+                        {
+                        "productId": 0,
+                        "productName": "篮球鞋",
+                        "productPrice": "288",
+                        "productStockCount": 132,
+                        "productDetails": "很好，32个赞",
+                        "productSaleCount": 123,
+                        "productProperty": [
+                        ],
+                        "productImages": "image||image||image",
+                        "productPraiseCount": 1345,
+                        "productViewCount": 2312341
+                        },
+                        {
+                        "productId": 0,
+                        "productName": "足球鞋",
+                        "productPrice": "288",
+                        "productStockCount": 132,
+                        "productDetails": "很好，32个赞",
+                        "productSaleCount": 123,
+                        "productProperty": [
+                        ],
+                        "productImages": "image||image||image",
+                        "productPraiseCount": 1345,
+                        "productViewCount": 2312341
+                        }
+                        ]
+    }
+}

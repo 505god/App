@@ -52,6 +52,11 @@
     // Configure the view for the selected state
 }
 
+-(void)setImages:(NSArray *)imageArray {
+    [imageArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        [self.unitView addImageUnit:obj withName:@""];
+    }];
+}
 #pragma mark - WQProImagesVDelegate
 
 -(void)addNewProduct {

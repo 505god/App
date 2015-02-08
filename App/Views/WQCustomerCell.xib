@@ -49,17 +49,34 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </imageView>
+                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nIL-K3-UJl">
+                        <rect key="frame" x="268" y="14" width="32" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="32" id="S8I-go-eRU"/>
+                            <constraint firstAttribute="height" constant="32" id="ynO-aJ-ZzQ"/>
+                        </constraints>
+                        <state key="normal" image="photo_check_default">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <state key="selected" image="photo_check_selected"/>
+                        <connections>
+                            <action selector="selectedCheckBtn:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="khs-x9-e84"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="nIL-K3-UJl" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="14" id="Ox8-3h-Bnb"/>
                     <constraint firstItem="56e-d4-NqW" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="RrY-yf-Kpe"/>
                     <constraint firstItem="56e-d4-NqW" firstAttribute="leading" secondItem="NPL-px-do9" secondAttribute="trailing" constant="10" id="Wgp-Jx-Ddc"/>
                     <constraint firstItem="FhA-VO-e1E" firstAttribute="top" secondItem="56e-d4-NqW" secondAttribute="bottom" constant="1" id="ZwO-sG-J0W"/>
                     <constraint firstItem="NPL-px-do9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="cj3-4y-cFX"/>
                     <constraint firstItem="NPL-px-do9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="hLC-fX-E6O"/>
+                    <constraint firstAttribute="trailing" secondItem="nIL-K3-UJl" secondAttribute="trailing" constant="20" id="iwy-HB-8J3"/>
                     <constraint firstItem="FhA-VO-e1E" firstAttribute="leading" secondItem="NPL-px-do9" secondAttribute="trailing" constant="10" id="yla-DB-S31"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="checkButton" destination="nIL-K3-UJl" id="5sD-5K-F0i"/>
                 <outlet property="headerImg" destination="NPL-px-do9" id="Eqs-eU-Uts"/>
                 <outlet property="nameLab" destination="56e-d4-NqW" id="9ai-6d-a1s"/>
                 <outlet property="phoneLab" destination="FhA-VO-e1E" id="7yg-97-3wb"/>
@@ -69,6 +86,8 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="photo_check_default" width="32" height="32"/>
+        <image name="photo_check_selected" width="32" height="32"/>
         <image name="randomheader_7" width="125" height="125"/>
     </resources>
 </document>

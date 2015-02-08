@@ -10,6 +10,8 @@
 
 //产品属性cell
 
+#import "WQProductText.h"
+
 @protocol WQProductPropertyCellDelegate;
 
 @interface WQProductPropertyCell : UITableViewCell
@@ -19,12 +21,12 @@
 //default is NO; YES 创建新的属性cell
 @property (nonatomic, assign) BOOL isCouldExtend;
 
-@property (nonatomic, weak) IBOutlet UITextField *titleTextField;
-@property (nonatomic, weak) IBOutlet UITextField *infoTextField;
+@property (nonatomic, weak) IBOutlet WQProductText *titleTextField;
+@property (nonatomic, weak) IBOutlet WQProductText *infoTextField;
 
 @property (nonatomic, strong) NSIndexPath *indexPath;
 
-@property (nonatomic, strong) NSDictionary *aDic;
+@property (nonatomic, strong) NSString *textString;
 @end
 
 @protocol WQProductPropertyCellDelegate <NSObject>

@@ -8,6 +8,8 @@
 
 #import "WQProductPropertyCell.h"
 
+
+
 @interface WQProductPropertyCell ()
 
 @property (nonatomic, weak) IBOutlet UIButton *addPropertyBtn;
@@ -27,8 +29,6 @@
         
         self.contentView.backgroundColor = [UIColor whiteColor];
         self.backgroundColor = [UIColor clearColor];
-
-        self.addPropertyBtn.hidden = YES;
     }
     return self;
 }
@@ -43,19 +43,22 @@
     _isCouldExtend = isCouldExtend;
     if (isCouldExtend) {
         self.addPropertyBtn.hidden = NO;
-        self.titleTextField.userInteractionEnabled = NO;
-        self.infoTextField.userInteractionEnabled = NO;
+        self.titleTextField.hidden = YES;
+        self.infoTextField.hidden = YES;
         self.lineView.hidden = YES;
     }else {
         self.addPropertyBtn.hidden = YES;
-        self.titleTextField.userInteractionEnabled = YES;
-        self.infoTextField.userInteractionEnabled = YES;
+        self.titleTextField.hidden = NO;
+        self.infoTextField.hidden = NO;
         self.lineView.hidden = NO;
     }
 }
 
 -(void)setIndexPath:(NSIndexPath *)indexPath {
     _indexPath = indexPath;
+    
+    self.titleTextField.idxPath = indexPath;
+    self.infoTextField.idxPath = indexPath;
     
     self.titleTextField.userInteractionEnabled = NO;
     
@@ -66,19 +69,24 @@
     }else if (indexPath.row==2) {
         self.infoTextField.placeholder = @"最多20个字";
     }else {
+        self.titleTextField.placeholder = @"";
+        self.infoTextField.placeholder = @"";
         if (!self.isCouldExtend) {
             self.titleTextField.userInteractionEnabled = YES;
+            self.titleTextField.placeholder = @"最多5个字";
+            self.infoTextField.placeholder = @"最多5个字";
         }
     }
 }
 
--(void)setADic:(NSDictionary *)aDic {
-    _aDic = aDic;
-    NSString *name = [[aDic allKeys] firstObject];
+-(void)setTextString:(NSString *)textString {
+    _textString = textString;
     
-    self.titleTextField.text = name;
-        
-    self.infoTextField.text = [aDic objectForKey:name];
+    NSArray *array = [textString componentsSeparatedByString:@":"];
+
+    self.titleTextField.text = [Utility checkString:array[0]]?array[0]:@"";
+    
+    self.infoTextField.text = [Utility checkString:array[1]]?array[1]:@"";
 }
 
 

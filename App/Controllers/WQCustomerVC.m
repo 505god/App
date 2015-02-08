@@ -18,15 +18,18 @@
 #import "WQCustomerInfoVC.h"
 #import "WQNewCustomerVC.h"
 
+#import "JKUtil.h"
+
 @interface WQCustomerVC ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate,WQCustomerCellDelegate>
 
 @property(nonatomic, weak) IBOutlet UITableView *tableView;
 @property(nonatomic, strong) UISearchBar *searchBar;
 @property(nonatomic, strong) UISearchDisplayController *strongSearchDisplayController;
 
+//搜索结果
 @property (nonatomic, strong) NSMutableArray *searchResults;
+//客户列表
 @property (nonatomic, strong) NSMutableArray *customerList;
-
 
 @end
 
@@ -72,6 +75,8 @@
                                               initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                               target:self
                                               action:@selector(addNewCustomer)];
+    
+    [self setupNavBar];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -91,11 +96,66 @@
     // Dispose of any resources that can be recreated.
 }
 
+//present出的view设置navbar
+-(void)setupNavBar {
+    if (self.isPresentVC) {        
+        UINavigationBar *navBar = self.navigationController.navigationBar;
+        if ([navBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
+            [navBar setBackgroundImage:[Utility imageFileNamed:@"navBar.png"] forBarMetrics:UIBarMetricsDefault];
+        }else {
+            UIImageView *imageView = (UIImageView *)[navBar viewWithTag:10];
+            if (imageView == nil) {
+                imageView = [[UIImageView alloc] initWithImage:
+                             [Utility imageFileNamed:@"navBar.png"]];
+                [imageView setTag:10];
+                [navBar insertSubview:imageView atIndex:0];
+                SafeRelease(imageView);
+            }
+        }
+        navBar.titleTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil];
+        
+        
+        self.navigationItem.title = @"选择客户";
+        
+        UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        rightBtn.frame = CGRectMake(0, 0, 50, 30);
+        [rightBtn setTitle:@"完成" forState:UIControlStateNormal];
+        [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [rightBtn setTitleColor:[JKUtil getColor:@"828689"] forState:UIControlStateHighlighted];
+        [rightBtn setTitleColor:[JKUtil getColor:@"828689"] forState:UIControlStateDisabled];
+        [rightBtn addTarget:self action:@selector(finishSelectedCustomers) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:rightBtn];
+        [self.navigationItem setRightBarButtonItem:rightItem animated:NO];
+        self.navigationItem.rightBarButtonItem.enabled = (self.selectedList.count>0);
+        
+        UIButton *cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        cancelBtn.frame = CGRectMake(0, 0, 50, 30);
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+        [cancelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[JKUtil getColor:@"828689"] forState:UIControlStateHighlighted];
+        [cancelBtn addTarget:self action:@selector(cancelEventDidTouched) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithCustomView:cancelBtn];
+        [self.navigationItem setLeftBarButtonItem:cancelItem animated:NO];
+    }
+}
+
+-(void)finishSelectedCustomers {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(customerVC:didSelectCustomers:)]) {
+        [self.delegate customerVC:self didSelectCustomers:self.selectedList];
+    }
+}
+
+-(void)cancelEventDidTouched {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(customerVCDidCancel:)]) {
+        [self.delegate customerVCDidCancel:self];
+    }
+}
 //添加客户
 - (void)addNewCustomer {
     WQNewCustomerVC *newVC = LOADVC(@"WQNewCustomerVC");
     [self.navigationController pushViewController:newVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
+     
     SafeRelease(newVC);
 }
 #pragma mark - property
@@ -104,6 +164,13 @@
         _customerList = [NSMutableArray array];
     }
     return _customerList;
+}
+
+-(NSMutableArray *)selectedList {
+    if (!_selectedList) {
+        _selectedList = [NSMutableArray array];
+    }
+    return _selectedList;
 }
 #pragma mark - 设置searchBar
 
@@ -147,16 +214,28 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
+    WQCustomerObj *customer = nil;
     if (tableView == self.searchDisplayController.searchResultsTableView) {
-        WQCustomerObj *customer = (WQCustomerObj *)self.searchResults[indexPath.row];
+        customer = (WQCustomerObj *)self.searchResults[indexPath.row];
         [cell setCustomerObj:customer];
-    }
-    else {
-        WQCustomerObj *customer = (WQCustomerObj *)self.customerList[indexPath.row];
+    }else {
+        customer = (WQCustomerObj *)self.customerList[indexPath.row];
         [cell setCustomerObj:customer];
     }
     cell.delegate = self;
+
+    //判断选择客户列表
+    if (self.isPresentVC) {
+        [cell.checkButton setHidden:NO];
+        
+        if ([self.selectedList containsObject:[NSString stringWithFormat:@"%d",customer.customerId]]) {
+            [cell setIsSelected:YES];
+        }else {
+            [cell setIsSelected:NO];
+        }
+    }
     
+    //判断
     if (indexPath.row==0) {
         [cell.notificationHub setCount:5];
         [cell.notificationHub bump];
@@ -173,15 +252,24 @@
 }
 
 #pragma mark - WQCustomerCellDelegate
-
+//点击头像浏览客户信息
 -(void)tapCellWithCustomer:(WQCustomerObj *)customer {
     WQCustomerInfoVC *infoVC = LOADVC(@"WQCustomerInfoVC");
     infoVC.customerObj = customer;
     [self.navigationController pushViewController:infoVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
+     
     SafeRelease(infoVC);
 }
 
+//选中客户
+-(void)selectedCustomer:(WQCustomerObj *)customer animated:(BOOL)animated {
+    if (animated) {
+        [self.selectedList addObject:[NSString stringWithFormat:@"%d",customer.customerId]];
+    }else {
+        [self.selectedList removeObject:[NSString stringWithFormat:@"%d",customer.customerId]];
+    }
+    self.navigationItem.rightBarButtonItem.enabled = (self.selectedList.count>0);
+}
 #pragma mark - search代理
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)search{

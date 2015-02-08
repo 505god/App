@@ -18,6 +18,7 @@
 
 - (void)addNewUnit:(UIImage *)image withName:(NSString *)name;
 
+- (void)addImageUnit:(NSString *)imageUrl withName:(NSString *)name;
 @end
 
 @protocol WQProImagesVDelegate <NSObject>

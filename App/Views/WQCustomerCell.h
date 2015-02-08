@@ -21,10 +21,16 @@
 
 @property (nonatomic, strong) RKNotificationHub *notificationHub;
 
+//选择推荐客户
+@property (nonatomic, assign) BOOL isSelected;
+@property (nonatomic, weak) IBOutlet UIButton *checkButton;
 @end
 
 @protocol WQCustomerCellDelegate <NSObject>
-
+//点击头像浏览客户信息
 -(void)tapCellWithCustomer:(WQCustomerObj *)customer;
+
+//选中客户
+-(void)selectedCustomer:(WQCustomerObj *)customer animated:(BOOL)animated;
 
 @end

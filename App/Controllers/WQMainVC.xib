@@ -12,7 +12,7 @@
                 <outlet property="orderControl" destination="Tpk-Ud-hTt" id="v9M-Gc-YH4"/>
                 <outlet property="saleControl" destination="YfG-Cg-3CE" id="lGz-TZ-INr"/>
                 <outlet property="shopControl" destination="wTR-bp-UP1" id="6K5-oH-qqS"/>
-                <outlet property="view" destination="iN0-l3-epB" id="67J-Ob-O11"/>
+                <outlet property="view" destination="iN0-l3-epB" id="xZW-De-mVJ"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>

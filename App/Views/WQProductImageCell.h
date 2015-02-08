@@ -15,7 +15,11 @@
 
 @property (nonatomic, assign) id<WQProductImageCellDelegate>delegate;
 
+//新添产品图片数组
 -(void)addProductImages:(NSArray *)images;
+
+//产品详情数组
+-(void)setImages:(NSArray *)imageArray;
 
 @end
 

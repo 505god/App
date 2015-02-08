@@ -79,7 +79,7 @@
     codeVC.phoneNumber = self.phoneText.text;
     codeVC.type = self.type;
     [self.navigationController pushViewController:codeVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
+     
     SafeRelease(codeVC);
 }
 

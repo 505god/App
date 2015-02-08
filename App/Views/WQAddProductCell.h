@@ -17,7 +17,7 @@
 
 @property (nonatomic, strong) UIImage *image;
 
-- (id)initWithFrame:(CGRect)frame andImage:(UIImage *)image andName:(NSString *)name;
+- (id)initWithFrame:(CGRect)frame andImage:(UIImage *)image andName:(NSString *)name andImageUrl:(NSURL *)imageUrl;
 
 @end
 

@@ -82,7 +82,7 @@
     _scrollView.contentSize = [self contentSizeForUIScrollView:0];
     [self addSubview:_scrollView];
     
-    _defaultUnit = [[WQAddProductCell alloc] initWithFrame:CGRectMake(defaultPace, 5, defaultWidth, defaultHeight) andImage:[Utility imageFileNamed:@"add_attention_btn"] andName:@""];
+    _defaultUnit = [[WQAddProductCell alloc] initWithFrame:CGRectMake(defaultPace, 5, defaultWidth, defaultHeight) andImage:[Utility imageFileNamed:@"add_attention_btn"] andName:@"" andImageUrl:nil];
     [_defaultUnit addTarget:self action:@selector(addNewItem) forControlEvents:UIControlEventTouchUpInside];
     [_scrollView addSubview:_defaultUnit];
     [self scrollViewAbleScroll];
@@ -142,7 +142,7 @@
     }else if (_unitList.count<AddProductImagesMax){
         __block WQAddProductCell *newUnitCell;
         CGFloat x = (_unitList.count) * (defaultPace + defaultWidth)+defaultPace;
-        newUnitCell = [[WQAddProductCell alloc] initWithFrame:CGRectMake(x, 5, defaultWidth, defaultHeight) andImage:image andName:name];
+        newUnitCell = [[WQAddProductCell alloc] initWithFrame:CGRectMake(x, 5, defaultWidth, defaultHeight) andImage:image andName:name andImageUrl:nil];
         newUnitCell.alpha = 0.1;
         newUnitCell.delegate = self;
         [_unitList addObject:newUnitCell];
@@ -151,6 +151,40 @@
         if (self.delegate && [self.delegate respondsToSelector:@selector(addNewImage:)]) {
             [self.delegate addNewImage:image];
         }
+        
+        [_defaultUnit setHidden:_unitList.count==AddProductImagesMax?YES:NO];
+        
+        [_scrollView addSubview:newUnitCell];
+        [self scrollViewAbleScroll];
+        _defaultUnit.alpha = 0.5;
+        
+        [UIView animateWithDuration:duration animations:^(){
+            CGRect rect = _defaultUnit.frame;
+            rect.origin.x += (defaultPace + defaultWidth);
+            _defaultUnit.frame = rect;
+            _defaultUnit.alpha = 1.0;
+            newUnitCell.alpha = 0.8;
+            
+        } completion:^(BOOL finished){
+            newUnitCell.alpha = 1.0;
+            
+        }];
+    }
+}
+
+//TODO:设置imageURL
+- (void)addImageUnit:(NSString *)imageUrl withName:(NSString *)name
+{
+    if (_unitList.count==AddProductImagesMax) {//个数限制
+        
+    }else if (_unitList.count<AddProductImagesMax){
+        __block WQAddProductCell *newUnitCell;
+        CGFloat x = (_unitList.count) * (defaultPace + defaultWidth)+defaultPace;
+        newUnitCell = [[WQAddProductCell alloc] initWithFrame:CGRectMake(x, 5, defaultWidth, defaultHeight) andImage:nil andName:name andImageUrl:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",imageUrl,imageUrl]]];
+        newUnitCell.alpha = 0.1;
+        newUnitCell.backgroundColor = [UIColor redColor];
+        newUnitCell.delegate = self;
+        [_unitList addObject:newUnitCell];
         
         [_defaultUnit setHidden:_unitList.count==AddProductImagesMax?YES:NO];
         

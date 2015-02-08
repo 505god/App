@@ -8,6 +8,7 @@
 
 #import "WQMainControl.h"
 #import "UIView+LayerEffects.h"
+#import "UIView+Common.h"
 
 @implementation WQMainControl
 
@@ -46,6 +47,12 @@
     k.calculationMode = kCAAnimationLinear;
 
     [self.layer addAnimation:k forKey:@"SHOW"];
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    
+    [self.notificationHub setCircleAtFrame:(CGRect){self.width-15,-15,30,30}];
 }
 
 @end

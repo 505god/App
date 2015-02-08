@@ -20,6 +20,7 @@
 @property (nonatomic, weak) IBOutlet WQStarView *starV;
 
 @property (nonatomic, weak) IBOutlet UILabel *phoneLab;
+
 @end
 
 @implementation WQCustomerCell
@@ -73,6 +74,19 @@
         self.nameLab.text = customerObj.customerName;
         self.phoneLab.text = customerObj.customerPhone;
         self.starV.starNumber = customerObj.customerDegree;
+    }
+}
+
+-(void)setIsSelected:(BOOL)isSelected {
+    _isSelected = isSelected;
+    
+    [self.checkButton setSelected:isSelected];
+}
+
+-(IBAction)selectedCheckBtn:(id)sender {
+    [self.checkButton setSelected:!self.checkButton.selected];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(selectedCustomer:animated:)]) {
+        [self.delegate selectedCustomer:self.customerObj animated:self.checkButton.selected];
     }
 }
 

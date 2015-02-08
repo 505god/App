@@ -84,7 +84,7 @@
             infoVC.phoneNumber = self.phoneNumber;
             
             [self.navigationController pushViewController:infoVC animated:YES];
-            [self.navigationController setHidesBottomBarWhenPushed:YES];
+             
             SafeRelease(infoVC);
             
         }else {

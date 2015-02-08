@@ -181,7 +181,7 @@
     WQPhoneVC *phoneVC = LOADVC(@"WQPhoneVC");
     phoneVC.type = type;
     [self.navigationController pushViewController:phoneVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
+     
     SafeRelease(phoneVC);
 }
 -(void)resigBtnClick {

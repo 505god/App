@@ -70,7 +70,7 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
 {
     self = [super init];
     if (self) {
-        self.filterType = JKImagePickerControllerFilterTypeNone;
+        self.filterType = JKImagePickerControllerFilterTypePhotos;
     }
     return self;
 }
@@ -132,9 +132,6 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
     UIBarButtonItem *preItem = [[UIBarButtonItem alloc] initWithCustomView:preBtn];
     [self.navigationItem setRightBarButtonItem:preItem animated:NO];
     self.navigationItem.rightBarButtonItem.enabled = NO;
-    
-    
-    
 }
 
 - (void)cancelEventDidTouched

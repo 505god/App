@@ -7,6 +7,7 @@
 //
 
 #import "WQAddProductCell.h"
+#import "UIButton+WebCache.h"
 
 @interface WQAddProductCell ()
 
@@ -17,24 +18,23 @@
 
 @implementation WQAddProductCell
 
-- (id)initWithFrame:(CGRect)frame andImage:(UIImage *)image andName:(NSString *)name {
+- (id)initWithFrame:(CGRect)frame andImage:(UIImage *)image andName:(NSString *)name andImageUrl:(NSURL *)imageUrl{
     _image = image;
     _name = name;
     self = [super initWithFrame:frame];
     if (self) {
-        [self setProperty];
+        if (image) {
+            [self setBackgroundImage:_image forState:UIControlStateNormal];
+        }else {
+            [self sd_setImageWithURL:imageUrl forState:UIControlStateNormal];
+        }
+        self.layer.masksToBounds = YES;
+        self.layer.cornerRadius = 4.0;
+        [self addTarget:self action:@selector(touched:) forControlEvents:UIControlEventTouchUpInside];
     }
     return self;
 }
 
-//设置Cell的属性
-- (void)setProperty
-{
-    self.layer.masksToBounds = YES;
-    self.layer.cornerRadius = 4.0;
-    [self setBackgroundImage:_image forState:UIControlStateNormal];
-    [self addTarget:self action:@selector(touched:) forControlEvents:UIControlEventTouchUpInside];
-}
 
 - (void)touched:(id)sender
 {

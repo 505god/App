@@ -30,6 +30,15 @@
 
 @implementation WQMainVC
 
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
@@ -46,7 +55,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+
     [self.orderControl.notificationHub setCount:5];
     [self.orderControl.notificationHub bump];
 }
@@ -69,26 +78,21 @@
 -(IBAction)shopVCPressed:(id)sender {
     WQShopVC *shopVC = LOADVC(@"WQShopVC");
     [self.navigationController pushViewController:shopVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
     SafeRelease(shopVC);
 }
 -(IBAction)customerVCPressed:(id)sender {
     WQCustomerVC *customerVC = LOADVC(@"WQCustomerVC");
-//    WQCustomerVCC *customerVC = [[WQCustomerVCC alloc]init];
     [self.navigationController pushViewController:customerVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
     SafeRelease(customerVC);
 }
 -(IBAction)orderVCPressed:(id)sender {
     WQOrderVC *orderVC = LOADVC(@"WQOrderVC");
     [self.navigationController pushViewController:orderVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
     SafeRelease(orderVC);
 }
 -(IBAction)saleVCPressed:(id)sender {
     WQSaleVC *saleVC = LOADVC(@"WQSaleVC");
     [self.navigationController pushViewController:saleVC animated:YES];
-    [self.navigationController setHidesBottomBarWhenPushed:YES];
     SafeRelease(saleVC);
 }
 @end

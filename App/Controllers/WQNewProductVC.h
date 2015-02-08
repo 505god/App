@@ -10,4 +10,7 @@
 
 @interface WQNewProductVC : BaseViewController
 
+//编辑产品详情
+@property (nonatomic, assign) BOOL isEditing;
+
 @end
