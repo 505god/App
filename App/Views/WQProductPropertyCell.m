@@ -62,31 +62,30 @@
     
     self.titleTextField.userInteractionEnabled = NO;
     
-    if (indexPath.row==0) {
-        self.infoTextField.placeholder = @"最多5个字";
-    }else if (indexPath.row==1) {
-        self.infoTextField.keyboardType = UIKeyboardTypeNumberPad;
-    }else if (indexPath.row==2) {
-        self.infoTextField.placeholder = @"最多20个字";
-    }else {
-        self.titleTextField.placeholder = @"";
-        self.infoTextField.placeholder = @"";
-        if (!self.isCouldExtend) {
-            self.titleTextField.userInteractionEnabled = YES;
-            self.titleTextField.placeholder = @"最多5个字";
-            self.infoTextField.placeholder = @"最多5个字";
+    if (indexPath.section==0) {//固定属性
+        if (indexPath.row==0) {
+        }else if (indexPath.row==1) {
+            self.infoTextField.keyboardType = UIKeyboardTypeNumberPad;
+        }else if (indexPath.row==2) {
+            self.infoTextField.placeholder = @"最多20个字";
         }
     }
+    
 }
 
 -(void)setTextString:(NSString *)textString {
     _textString = textString;
     
-    NSArray *array = [textString componentsSeparatedByString:@":"];
-
-    self.titleTextField.text = [Utility checkString:array[0]]?array[0]:@"";
+    if (self.indexPath.section==0) {//固定属性
+        NSArray *array = [textString componentsSeparatedByString:@":"];
+        
+        self.titleTextField.text = [Utility checkString:array[0]]?array[0]:@"";
+        
+        self.infoTextField.text = [Utility checkString:array[1]]?array[1]:@"";
+        
+        SafeRelease(array);
+    }
     
-    self.infoTextField.text = [Utility checkString:array[1]]?array[1]:@"";
 }
 
 

@@ -9,7 +9,6 @@
 #import "WQCustomerCell.h"
 
 #import "WQTapImg.h"
-#import "WQStarView.h"
 #import "UIView+Common.h"
 #import "UIView+LayerEffects.h"
 
@@ -17,7 +16,8 @@
 
 @property (nonatomic, weak) IBOutlet WQTapImg *headerImg;
 @property (nonatomic, weak) IBOutlet UILabel *nameLab;
-@property (nonatomic, weak) IBOutlet WQStarView *starV;
+
+@property (nonatomic, weak) IBOutlet UIImageView *levelImg;
 
 @property (nonatomic, weak) IBOutlet UILabel *phoneLab;
 
@@ -43,8 +43,6 @@
 
         [self.headerImg setShadow:[UIColor blackColor] opacity:0.5 offset:CGSizeMake(1.0, 1.0) blurRadius:3];
         
-        self.starV.enable = NO;
-        self.starV.showNormal = NO;
     }
     return self;
 }
@@ -57,7 +55,7 @@
     [super layoutSubviews];
     
     [self.nameLab sizeToFit];
-    self.starV.frame = (CGRect){self.nameLab.right-10,10,120,20};
+    self.levelImg.frame = (CGRect){self.nameLab.right+5,10,22,22};
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -67,14 +65,12 @@
 }
 
 -(void)setCustomerObj:(WQCustomerObj *)customerObj {
-    if (_customerObj != customerObj) {
-        _customerObj = nil;
-        _customerObj = customerObj;
-        
-        self.nameLab.text = customerObj.customerName;
-        self.phoneLab.text = customerObj.customerPhone;
-        self.starV.starNumber = customerObj.customerDegree;
-    }
+    _customerObj = customerObj;
+    
+    self.nameLab.text = customerObj.customerName;
+    self.phoneLab.text = customerObj.customerPhone;
+    //        self.starV.starNumber = customerObj.customerDegree;
+    self.levelImg.image = [UIImage imageNamed:@"back"];
 }
 
 -(void)setIsSelected:(BOOL)isSelected {

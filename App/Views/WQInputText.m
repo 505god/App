@@ -30,7 +30,7 @@
     textField.textColor = [UIColor whiteColor];
     textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     textField.clearButtonMode = UITextFieldViewModeAlways;
-    UIImage *bigIcon = [Utility imageFileNamed:icon];
+    UIImage *bigIcon = [UIImage imageNamed:icon];
     UIImageView *iconView = [[UIImageView alloc] initWithImage:bigIcon];
     if (icon) {
         iconView.width = 25;

@@ -13,6 +13,11 @@
 		5D0762E71A87A34500F8576C /* ProductList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D0762E61A87A34500F8576C /* ProductList.json */; };
 		5D4E468F1A8337D4000E766B /* WQCustomerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D4E468C1A8337D4000E766B /* WQCustomerVC.xib */; };
 		5D4E46901A8337D4000E766B /* WQCustomerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D4E468D1A8337D4000E766B /* WQCustomerVC.m */; };
+		5D703EA41A8887BD00647713 /* WQCustomerTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EA31A8887BD00647713 /* WQCustomerTable.m */; };
+		5D703EA71A88887700647713 /* WQCustomerTableIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EA61A88887700647713 /* WQCustomerTableIndex.m */; };
+		5D703EAC1A8894A000647713 /* WQIndexedCollationWithSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EAB1A8894A000647713 /* WQIndexedCollationWithSearch.m */; };
+		5D703EB01A88FDF600647713 /* WQProductColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EAE1A88FDF600647713 /* WQProductColorCell.m */; };
+		5D703EB11A88FDF600647713 /* WQProductColorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D703EAF1A88FDF600647713 /* WQProductColorCell.xib */; };
 		5D7324011A7EFB1200949D93 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7324001A7EFB1200949D93 /* main.m */; };
 		5D7324041A7EFB1200949D93 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7324031A7EFB1200949D93 /* AppDelegate.m */; };
 		5D73240C1A7EFB1200949D93 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D73240B1A7EFB1200949D93 /* Images.xcassets */; };
@@ -270,7 +275,6 @@
 		5D759D231A864737001920FA /* WQProductActionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D759D211A864737001920FA /* WQProductActionCell.m */; };
 		5D759D241A864737001920FA /* WQProductActionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D759D221A864737001920FA /* WQProductActionCell.xib */; };
 		5D759D2A1A877E59001920FA /* WQCellSelectedBackground.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D759D291A877E59001920FA /* WQCellSelectedBackground.m */; };
-		5D79E0AD1A831DB70095949C /* WQIndexedCollationWithSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D79E0AC1A831DB70095949C /* WQIndexedCollationWithSearch.m */; };
 		5D7DECCA1A8071B700496850 /* WQInitVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7DECC81A8071B700496850 /* WQInitVC.m */; };
 		5D7DECCB1A8071B700496850 /* WQInitVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7DECC91A8071B700496850 /* WQInitVC.xib */; };
 		5D7DECCE1A8072E300496850 /* WQInitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7DECCD1A8072E300496850 /* WQInitView.m */; };
@@ -290,6 +294,13 @@
 		5D7DECF01A80CC1F00496850 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D7DECEF1A80CC1F00496850 /* AssetsLibrary.framework */; };
 		5D7DECF41A80D19B00496850 /* RKNotificationHub.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7DECF31A80D19B00496850 /* RKNotificationHub.m */; };
 		5D7DECF71A80D33E00496850 /* WQMainControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7DECF61A80D33E00496850 /* WQMainControl.m */; };
+		5D7E392D1A8A31C700690975 /* WQColorVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E392B1A8A31C700690975 /* WQColorVC.m */; };
+		5D7E392E1A8A31C700690975 /* WQColorVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7E392C1A8A31C700690975 /* WQColorVC.xib */; };
+		5D7E39301A8A335400690975 /* ColorList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D7E392F1A8A335400690975 /* ColorList.json */; };
+		5D7E39331A8A33A800690975 /* WQColorObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E39321A8A33A800690975 /* WQColorObj.m */; };
+		5D7E39371A8A3A8100690975 /* WQColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E39351A8A3A8100690975 /* WQColorCell.m */; };
+		5D7E39381A8A3A8100690975 /* WQColorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7E39361A8A3A8100690975 /* WQColorCell.xib */; };
+		5D7E393B1A8A48B000690975 /* WQPopView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E393A1A8A48B000690975 /* WQPopView.m */; };
 		5D8187081A81A54D00DF3BFA /* WQShopVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8187061A81A54D00DF3BFA /* WQShopVC.m */; };
 		5D8187091A81A54D00DF3BFA /* WQShopVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D8187071A81A54D00DF3BFA /* WQShopVC.xib */; };
 		5D8187121A81A56C00DF3BFA /* WQOrderVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8187101A81A56C00DF3BFA /* WQOrderVC.m */; };
@@ -334,6 +345,15 @@
 		5D4E468C1A8337D4000E766B /* WQCustomerVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQCustomerVC.xib; sourceTree = "<group>"; };
 		5D4E468D1A8337D4000E766B /* WQCustomerVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCustomerVC.m; sourceTree = "<group>"; };
 		5D4E468E1A8337D4000E766B /* WQCustomerVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCustomerVC.h; sourceTree = "<group>"; };
+		5D703EA21A8887BD00647713 /* WQCustomerTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCustomerTable.h; sourceTree = "<group>"; };
+		5D703EA31A8887BD00647713 /* WQCustomerTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCustomerTable.m; sourceTree = "<group>"; };
+		5D703EA51A88887700647713 /* WQCustomerTableIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCustomerTableIndex.h; sourceTree = "<group>"; };
+		5D703EA61A88887700647713 /* WQCustomerTableIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCustomerTableIndex.m; sourceTree = "<group>"; };
+		5D703EAA1A8894A000647713 /* WQIndexedCollationWithSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQIndexedCollationWithSearch.h; sourceTree = "<group>"; };
+		5D703EAB1A8894A000647713 /* WQIndexedCollationWithSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQIndexedCollationWithSearch.m; sourceTree = "<group>"; };
+		5D703EAD1A88FDF600647713 /* WQProductColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductColorCell.h; sourceTree = "<group>"; };
+		5D703EAE1A88FDF600647713 /* WQProductColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductColorCell.m; sourceTree = "<group>"; };
+		5D703EAF1A88FDF600647713 /* WQProductColorCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQProductColorCell.xib; sourceTree = "<group>"; };
 		5D7323FB1A7EFB1200949D93 /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D7323FF1A7EFB1200949D93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D7324001A7EFB1200949D93 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -842,8 +862,6 @@
 		5D759D221A864737001920FA /* WQProductActionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQProductActionCell.xib; sourceTree = "<group>"; };
 		5D759D281A877E59001920FA /* WQCellSelectedBackground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCellSelectedBackground.h; sourceTree = "<group>"; };
 		5D759D291A877E59001920FA /* WQCellSelectedBackground.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCellSelectedBackground.m; sourceTree = "<group>"; };
-		5D79E0AB1A831DB70095949C /* WQIndexedCollationWithSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQIndexedCollationWithSearch.h; sourceTree = "<group>"; };
-		5D79E0AC1A831DB70095949C /* WQIndexedCollationWithSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQIndexedCollationWithSearch.m; sourceTree = "<group>"; };
 		5D7DECC71A8071B700496850 /* WQInitVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQInitVC.h; sourceTree = "<group>"; };
 		5D7DECC81A8071B700496850 /* WQInitVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQInitVC.m; sourceTree = "<group>"; };
 		5D7DECC91A8071B700496850 /* WQInitVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQInitVC.xib; sourceTree = "<group>"; };
@@ -872,6 +890,17 @@
 		5D7DECF31A80D19B00496850 /* RKNotificationHub.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKNotificationHub.m; sourceTree = "<group>"; };
 		5D7DECF51A80D33E00496850 /* WQMainControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQMainControl.h; sourceTree = "<group>"; };
 		5D7DECF61A80D33E00496850 /* WQMainControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQMainControl.m; sourceTree = "<group>"; };
+		5D7E392A1A8A31C700690975 /* WQColorVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQColorVC.h; sourceTree = "<group>"; };
+		5D7E392B1A8A31C700690975 /* WQColorVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQColorVC.m; sourceTree = "<group>"; };
+		5D7E392C1A8A31C700690975 /* WQColorVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQColorVC.xib; sourceTree = "<group>"; };
+		5D7E392F1A8A335400690975 /* ColorList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ColorList.json; sourceTree = "<group>"; };
+		5D7E39311A8A33A800690975 /* WQColorObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQColorObj.h; sourceTree = "<group>"; };
+		5D7E39321A8A33A800690975 /* WQColorObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQColorObj.m; sourceTree = "<group>"; };
+		5D7E39341A8A3A8100690975 /* WQColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQColorCell.h; sourceTree = "<group>"; };
+		5D7E39351A8A3A8100690975 /* WQColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQColorCell.m; sourceTree = "<group>"; };
+		5D7E39361A8A3A8100690975 /* WQColorCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQColorCell.xib; sourceTree = "<group>"; };
+		5D7E39391A8A48B000690975 /* WQPopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQPopView.h; sourceTree = "<group>"; };
+		5D7E393A1A8A48B000690975 /* WQPopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQPopView.m; sourceTree = "<group>"; };
 		5D8187051A81A54D00DF3BFA /* WQShopVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQShopVC.h; sourceTree = "<group>"; };
 		5D8187061A81A54D00DF3BFA /* WQShopVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQShopVC.m; sourceTree = "<group>"; };
 		5D8187071A81A54D00DF3BFA /* WQShopVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQShopVC.xib; sourceTree = "<group>"; };
@@ -987,11 +1016,11 @@
 				5D7DECD71A80B94C00496850 /* Json */,
 				5D7326B41A7F0F4F00949D93 /* Category */,
 				5D7324241A7EFC5600949D93 /* Common */,
+				5D7324291A7EFC5600949D93 /* Views */,
 				5D7324251A7EFC5600949D93 /* Controllers */,
 				5D7324261A7EFC5600949D93 /* Interface */,
 				5D7324271A7EFC5600949D93 /* Library */,
 				5D7324281A7EFC5600949D93 /* Models */,
-				5D7324291A7EFC5600949D93 /* Views */,
 				5D73240B1A7EFB1200949D93 /* Images.xcassets */,
 				5D73240D1A7EFB1200949D93 /* LaunchScreen.xib */,
 				5D7323FE1A7EFB1200949D93 /* Supporting Files */,
@@ -1105,6 +1134,8 @@
 				5D8187701A81E69F00DF3BFA /* WQCustomerObj.m */,
 				5D0762E11A879D6100F8576C /* WQProductObj.h */,
 				5D0762E21A879D6100F8576C /* WQProductObj.m */,
+				5D7E39311A8A33A800690975 /* WQColorObj.h */,
+				5D7E39321A8A33A800690975 /* WQColorObj.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1112,6 +1143,8 @@
 		5D7324291A7EFC5600949D93 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5D7E39391A8A48B000690975 /* WQPopView.h */,
+				5D7E393A1A8A48B000690975 /* WQPopView.m */,
 				5D7DECCC1A8072E300496850 /* WQInitView.h */,
 				5D7DECCD1A8072E300496850 /* WQInitView.m */,
 				5D7DECCF1A80A32F00496850 /* WQInputText.h */,
@@ -2264,6 +2297,10 @@
 		5D759D101A847138001920FA /* CustomerV */ = {
 			isa = PBXGroup;
 			children = (
+				5D703EA21A8887BD00647713 /* WQCustomerTable.h */,
+				5D703EA31A8887BD00647713 /* WQCustomerTable.m */,
+				5D703EA51A88887700647713 /* WQCustomerTableIndex.h */,
+				5D703EA61A88887700647713 /* WQCustomerTableIndex.m */,
 				5D81876A1A81D02700DF3BFA /* WQCustomerCell.h */,
 				5D81876B1A81D02700DF3BFA /* WQCustomerCell.m */,
 				5D81876C1A81D02700DF3BFA /* WQCustomerCell.xib */,
@@ -2294,6 +2331,12 @@
 				5D759D201A864737001920FA /* WQProductActionCell.h */,
 				5D759D211A864737001920FA /* WQProductActionCell.m */,
 				5D759D221A864737001920FA /* WQProductActionCell.xib */,
+				5D703EAD1A88FDF600647713 /* WQProductColorCell.h */,
+				5D703EAE1A88FDF600647713 /* WQProductColorCell.m */,
+				5D703EAF1A88FDF600647713 /* WQProductColorCell.xib */,
+				5D7E39341A8A3A8100690975 /* WQColorCell.h */,
+				5D7E39351A8A3A8100690975 /* WQColorCell.m */,
+				5D7E39361A8A3A8100690975 /* WQColorCell.xib */,
 			);
 			name = ShopV;
 			sourceTree = "<group>";
@@ -2311,6 +2354,7 @@
 		5D7DECD71A80B94C00496850 /* Json */ = {
 			isa = PBXGroup;
 			children = (
+				5D7E392F1A8A335400690975 /* ColorList.json */,
 				5D7DECD81A80B95200496850 /* checkPhone.json */,
 				5D8187721A81E8E800DF3BFA /* CustomerList.json */,
 				5D0762E61A87A34500F8576C /* ProductList.json */,
@@ -2336,6 +2380,9 @@
 				5D759CCF1A844C75001920FA /* WQNewProductVC.h */,
 				5D759CD01A844C75001920FA /* WQNewProductVC.m */,
 				5D759CD11A844C75001920FA /* WQNewProductVC.xib */,
+				5D7E392A1A8A31C700690975 /* WQColorVC.h */,
+				5D7E392B1A8A31C700690975 /* WQColorVC.m */,
+				5D7E392C1A8A31C700690975 /* WQColorVC.xib */,
 			);
 			name = ShopVC;
 			sourceTree = "<group>";
@@ -2343,8 +2390,8 @@
 		5D8187021A81A51700DF3BFA /* CustomerVC */ = {
 			isa = PBXGroup;
 			children = (
-				5D79E0AB1A831DB70095949C /* WQIndexedCollationWithSearch.h */,
-				5D79E0AC1A831DB70095949C /* WQIndexedCollationWithSearch.m */,
+				5D703EAA1A8894A000647713 /* WQIndexedCollationWithSearch.h */,
+				5D703EAB1A8894A000647713 /* WQIndexedCollationWithSearch.m */,
 				5D4E468E1A8337D4000E766B /* WQCustomerVC.h */,
 				5D4E468D1A8337D4000E766B /* WQCustomerVC.m */,
 				5D4E468C1A8337D4000E766B /* WQCustomerVC.xib */,
@@ -2485,6 +2532,7 @@
 				5D8187091A81A54D00DF3BFA /* WQShopVC.xib in Resources */,
 				5D7326281A7F008F00949D93 /* build-libidn.sh in Resources */,
 				5D7DECD61A80B31F00496850 /* WQPhoneVC.xib in Resources */,
+				5D7E39381A8A3A8100690975 /* WQColorCell.xib in Resources */,
 				5D759C971A83A253001920FA /* WQCustomerInfoVC.xib in Resources */,
 				5D7326CA1A7F1BFF00949D93 /* AppImages.xcassets in Resources */,
 				5D81877F1A82075400DF3BFA /* multipy_unicode.dat in Resources */,
@@ -2497,10 +2545,12 @@
 				5D73240F1A7EFB1300949D93 /* LaunchScreen.xib in Resources */,
 				5D7326791A7F043D00949D93 /* JKImagePickerController.strings in Resources */,
 				5D759D241A864737001920FA /* WQProductActionCell.xib in Resources */,
+				5D703EB11A88FDF600647713 /* WQProductColorCell.xib in Resources */,
 				5D7326231A7F008F00949D93 /* README.txt in Resources */,
 				5D8187181A81A57B00DF3BFA /* WQSaleVC.xib in Resources */,
 				5D7DECE41A80BD9400496850 /* WQCodeVC.xib in Resources */,
 				5D73267A1A7F043D00949D93 /* ImagesPicker.xcassets in Resources */,
+				5D7E392E1A8A31C700690975 /* WQColorVC.xib in Resources */,
 				5D8187731A81E8E800DF3BFA /* CustomerList.json in Resources */,
 				5D759C9C1A83A3D0001920FA /* WQNewCustomerVC.xib in Resources */,
 				5D759CA11A83A5CD001920FA /* WQCustomerInfoHeader.xib in Resources */,
@@ -2511,6 +2561,7 @@
 				5D73264A1A7F040900949D93 /* KVNProgressView.xib in Resources */,
 				5D4E468F1A8337D4000E766B /* WQCustomerVC.xib in Resources */,
 				5D7DECEB1A80C85500496850 /* WQInfoVC.xib in Resources */,
+				5D7E39301A8A335400690975 /* ColorList.json in Resources */,
 				5D759D1C1A84A6CD001920FA /* WQProductPropertyCell.xib in Resources */,
 				5D7DECCB1A8071B700496850 /* WQInitVC.xib in Resources */,
 			);
@@ -2570,6 +2621,7 @@
 				5D7326F71A7F1CD900949D93 /* SDWebImageDecoder.m in Sources */,
 				5D7326801A7F043D00949D93 /* JKAssetsViewCell.m in Sources */,
 				5D7325AD1A7F008F00949D93 /* XMPPModule.m in Sources */,
+				5D7E39371A8A3A8100690975 /* WQColorCell.m in Sources */,
 				5D73260B1A7F008F00949D93 /* XMPPAttentionModule.m in Sources */,
 				5D7325E21A7F008F00949D93 /* XMPPvCardTempModule.m in Sources */,
 				5D7325D21A7F008F00949D93 /* XMPPRoomMessageMemoryStorageObject.m in Sources */,
@@ -2635,6 +2687,7 @@
 				5D7325D11A7F008F00949D93 /* XMPPRoomMemoryStorage.m in Sources */,
 				5D759CC81A83AA35001920FA /* PNPieChartDataItem.m in Sources */,
 				5D7325EA1A7F008F00949D93 /* XMPPMessage+XEP_0066.m in Sources */,
+				5D7E39331A8A33A800690975 /* WQColorObj.m in Sources */,
 				5D7326171A7F008F00949D93 /* XMPPSRVResolver.m in Sources */,
 				5D7326271A7F008F00949D93 /* DDXMLNode.m in Sources */,
 				5D73267C1A7F043D00949D93 /* JKAssetsCollectionFooterView.m in Sources */,
@@ -2655,6 +2708,7 @@
 				5D7325CC1A7F008F00949D93 /* XMPPRoomOccupantCoreDataStorageObject.m in Sources */,
 				5D7325EE1A7F008F00949D93 /* XMPPMessage+XEP_0085.m in Sources */,
 				5D7DECD11A80A32F00496850 /* WQInputText.m in Sources */,
+				5D703EB01A88FDF600647713 /* WQProductColorCell.m in Sources */,
 				5D7325ED1A7F008F00949D93 /* XMPPDateTimeProfiles.m in Sources */,
 				5D7325B01A7F008F00949D93 /* XMPPStream.m in Sources */,
 				5D7326561A7F041D00949D93 /* BlockAlertView.m in Sources */,
@@ -2664,6 +2718,7 @@
 				5D7327001A7F1CD900949D93 /* UIImageView+HighlightedWebCache.m in Sources */,
 				5D7325C41A7F008F00949D93 /* XMPPIQ+JabberRPCResonse.m in Sources */,
 				5D759CCA1A83AA35001920FA /* PNScatterChartData.m in Sources */,
+				5D703EA41A8887BD00647713 /* WQCustomerTable.m in Sources */,
 				5D7325E41A7F008F00949D93 /* NSXMLElement+XEP_0059.m in Sources */,
 				5D7DECCA1A8071B700496850 /* WQInitVC.m in Sources */,
 				5D7326821A7F043D00949D93 /* JKPhotoBrowser.m in Sources */,
@@ -2700,6 +2755,7 @@
 				5D759D1B1A84A6CD001920FA /* WQProductPropertyCell.m in Sources */,
 				5D7325FA1A7F008F00949D93 /* XMPPMessageArchivingCoreDataStorage.m in Sources */,
 				5D7326851A7F043D00949D93 /* JKUtil.m in Sources */,
+				5D7E392D1A8A31C700690975 /* WQColorVC.m in Sources */,
 				5D7325F41A7F008F00949D93 /* XMPPCapsCoreDataStorageObject.m in Sources */,
 				5D7325A31A7F008F00949D93 /* XMPPXFacebookPlatformAuthentication.m in Sources */,
 				5D8187911A82165100DF3BFA /* PinYinForObjc.m in Sources */,
@@ -2713,6 +2769,7 @@
 				5D7325F51A7F008F00949D93 /* XMPPCapsResourceCoreDataStorageObject.m in Sources */,
 				5D759CBF1A83AA35001920FA /* PNBar.m in Sources */,
 				5D73264C1A7F040900949D93 /* UIImage+KVNImageEffects.m in Sources */,
+				5D7E393B1A8A48B000690975 /* WQPopView.m in Sources */,
 				5D7326A51A7F0BF800949D93 /* ASINetworkQueue.m in Sources */,
 				5D7326A81A7F0BF800949D93 /* ASIDataCompressor.m in Sources */,
 				5D7326811A7F043D00949D93 /* JKImagePickerController.m in Sources */,
@@ -2736,6 +2793,7 @@
 				5D73260F1A7F008F00949D93 /* NSXMLElement+XEP_0297.m in Sources */,
 				5D7325B81A7F008F00949D93 /* XMPPReconnect.m in Sources */,
 				5D7325B91A7F008F00949D93 /* XMPPGroupCoreDataStorageObject.m in Sources */,
+				5D703EA71A88887700647713 /* WQCustomerTableIndex.m in Sources */,
 				5D7325DC1A7F008F00949D93 /* XMPPvCardTemp.m in Sources */,
 				5D7326F51A7F1CD900949D93 /* SDImageCache.m in Sources */,
 				5D8187761A81FA5200DF3BFA /* WQStarView.m in Sources */,
@@ -2754,6 +2812,7 @@
 				5D7325FB1A7F008F00949D93 /* XMPPMessageArchiving.m in Sources */,
 				5D7326041A7F008F00949D93 /* XMPPStreamManagement.m in Sources */,
 				5D73261F1A7F008F00949D93 /* DDTTYLogger.m in Sources */,
+				5D703EAC1A8894A000647713 /* WQIndexedCollationWithSearch.m in Sources */,
 				5D7327271A7F563A00949D93 /* WQLogVC.m in Sources */,
 				5D7325B51A7F008F00949D93 /* XMPPOutgoingFileTransfer.m in Sources */,
 				5D7326111A7F008F00949D93 /* XMPPMessage+XEP_0333.m in Sources */,
@@ -2772,7 +2831,6 @@
 				5D73260D1A7F008F00949D93 /* XMPPMessage+XEP_0280.m in Sources */,
 				5D7325F01A7F008F00949D93 /* XMPPTransports.m in Sources */,
 				5D73260E1A7F008F00949D93 /* XMPPMessageCarbons.m in Sources */,
-				5D79E0AD1A831DB70095949C /* WQIndexedCollationWithSearch.m in Sources */,
 				5D759CC01A83AA35001920FA /* PNBarChart.m in Sources */,
 				5D7326A11A7F0BF800949D93 /* ASIAuthenticationDialog.m in Sources */,
 				5D7327231A7F55CD00949D93 /* WQMainVC.m in Sources */,

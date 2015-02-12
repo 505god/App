@@ -14,6 +14,8 @@
 
 @property (nonatomic, strong) UINavigationController *navControl;
 
+@property (assign, nonatomic) BOOL isReachable;//网络是否连接
+
 + (AppDelegate *)shareIntance;
 @end
 

@@ -42,10 +42,10 @@ static CGFloat animationDuration = 1.0;
     CGFloat shrinkDuration = animationDuration * 0.3;
     CGFloat growDuration = animationDuration * 0.7;
     
-    [UIView animateWithDuration:shrinkDuration delay:0 usingSpringWithDamping:0.7f initialSpringVelocity:10 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:shrinkDuration animations:^{
         CGAffineTransform scaleTransform = CGAffineTransformMakeScale(0.75, 0.75);
         self.logoImg.transform = scaleTransform;
-    } completion:^(BOOL finished) {
+    }completion:^(BOOL finished) {
         [UIView animateWithDuration:growDuration animations:^{
             CGAffineTransform scaleTransform = CGAffineTransformMakeScale(20, 20);
             self.logoImg.transform = scaleTransform;
@@ -54,7 +54,7 @@ static CGFloat animationDuration = 1.0;
             [self.logoImg removeFromSuperview];
         }];
     }];
-    
+
     //背景动画
     CGFloat bounceDuration = animationDuration * 0.8;
     [NSTimer scheduledTimerWithTimeInterval:bounceDuration target:self selector:@selector(pingGrowAnimation) userInfo:nil repeats:NO];

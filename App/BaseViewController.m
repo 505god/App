@@ -24,6 +24,10 @@
     [super viewWillAppear:animated];
     
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
+    if (Platform>=7.0) {
+        self.edgesForExtendedLayout=UIRectEdgeNone;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {

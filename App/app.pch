@@ -59,4 +59,4 @@
 
 #define Platform [[[UIDevice currentDevice] systemVersion] floatValue]
 
-#define AddProductImagesMax  5
+#define AddProductImagesMax  1

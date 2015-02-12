@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+//产品属性
+
 @interface WQProductObj : NSObject
 
 @property (nonatomic, assign) NSInteger productId;

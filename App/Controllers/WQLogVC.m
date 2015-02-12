@@ -163,16 +163,16 @@
         NSString *phoneRegex = @"1([3-5]|[7-8]){1}[0-9]{9}";
         NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", phoneRegex];
         if (![phoneTest evaluateWithObject:self.userText.text]){
-            [Utility errorAlert:@"请输入正确手机号码" dismiss:YES];
+            [Utility errorAlert:@"请输入正确手机号码" view:self.view];
         }else {
             if ([Utility checkString:self.passwordText.text]) {
                 DLog(@"登录中...");
             }else {
-                [Utility errorAlert:@"请输入密码" dismiss:YES];
+                [Utility errorAlert:@"请输入密码" view:self.view];
             }
         }
     }else {
-        [Utility errorAlert:@"请输入手机号码" dismiss:YES];
+        [Utility errorAlert:@"请输入手机号码" view:self.view];
     }
 }
 -(void)pushResignVCWithType:(NSInteger)type {

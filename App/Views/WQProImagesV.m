@@ -82,7 +82,7 @@
     _scrollView.contentSize = [self contentSizeForUIScrollView:0];
     [self addSubview:_scrollView];
     
-    _defaultUnit = [[WQAddProductCell alloc] initWithFrame:CGRectMake(defaultPace, 5, defaultWidth, defaultHeight) andImage:[Utility imageFileNamed:@"add_attention_btn"] andName:@"" andImageUrl:nil];
+    _defaultUnit = [[WQAddProductCell alloc] initWithFrame:CGRectMake(defaultPace, 5, defaultWidth, defaultHeight) andImage:[UIImage imageNamed:@"add_attention_btn"] andName:@"" andImageUrl:nil];
     [_defaultUnit addTarget:self action:@selector(addNewItem) forControlEvents:UIControlEventTouchUpInside];
     [_scrollView addSubview:_defaultUnit];
     [self scrollViewAbleScroll];

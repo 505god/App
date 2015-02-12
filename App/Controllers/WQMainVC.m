@@ -14,7 +14,7 @@
 #import "WQOrderVC.h"
 #import "WQSaleVC.h"
 
-
+#import "WQColorVC.h"
 @interface WQMainVC ()
 
 //店铺
@@ -82,6 +82,8 @@
 }
 -(IBAction)customerVCPressed:(id)sender {
     WQCustomerVC *customerVC = LOADVC(@"WQCustomerVC");
+    [self setHidesBottomBarWhenPushed:YES];
+    [self.navigationController.view setBackgroundColor:[UIColor lightGrayColor]];
     [self.navigationController pushViewController:customerVC animated:YES];
     SafeRelease(customerVC);
 }
@@ -91,7 +93,7 @@
     SafeRelease(orderVC);
 }
 -(IBAction)saleVCPressed:(id)sender {
-    WQSaleVC *saleVC = LOADVC(@"WQSaleVC");
+    WQColorVC *saleVC = LOADVC(@"WQColorVC");
     [self.navigationController pushViewController:saleVC animated:YES];
     SafeRelease(saleVC);
 }

@@ -9,6 +9,14 @@
 #import "Utility.h"
 #import <objc/runtime.h>
 
+
+
+@interface Utility ()
+
+
+
+@end
+
 @implementation Utility
 
 #pragma mark - 获取当前时间
@@ -47,21 +55,12 @@
     view.layer.mask = maskLayer;
 }
 #pragma mark - 提示信息
-+ (void)errorAlert:(NSString *)message dismiss:(BOOL)animated
++ (void)errorAlert:(NSString *)message view:(UIView *)view
 {
-    BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:message];
-    if (!animated) {
-        [alert addButtonWithTitle:@"确定" block:nil];
-    }else {
-        [NSTimer scheduledTimerWithTimeInterval:1.f target:self selector:@selector(closeAlert:) userInfo:alert repeats:NO];
-    }
-    [alert show];
-}
-
-+ (void)closeAlert:(NSTimer*)timer {
-    BlockAlertView *alert = (BlockAlertView*)timer.userInfo;
-    [alert performDismissal];
-    alert = nil;
+    WQPopView *popView = [[WQPopView alloc]initWithFrame:(CGRect){100, 140, 0, 0}];
+    popView.parentView = view;
+    [popView setText:message];
+    [view addSubview:popView];
 }
 
 #pragma mark - 放大缩小动画
@@ -90,23 +89,6 @@
     return YES;
 }
 
-#pragma mark 设置背景
-+(void)setBackGround:(UIViewController *)VC WithImage:(NSString *)imageName
-{
-    VC.view.backgroundColor = [UIColor colorWithPatternImage:[Utility imageFileNamed:imageName]];
-}
-
-
-+ (UIImage*)imageFileNamed:(NSString*)name{
-    return [UIImage imageWithContentsOfFile:[[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:name]];
-}
-
-//获取随头像
-+ (NSString *)getRandomHeader {
-    NSInteger i = arc4random() % 13 ;
-    NSString *header = [NSString stringWithFormat:@"randomheader_%d",i];
-    return header;
-}
 
 + (Class)JSONParserClass {
     return objc_getClass("NSJSONSerialization");
@@ -122,7 +104,7 @@
         NSDictionary *aDic = [dataObject objectForKey:@"returnObj"];
         return aDic;
     }else {
-        [Utility errorAlert:[dataObject objectForKey:@"msg"] dismiss:NO];
+        
     }
     
     return nil;

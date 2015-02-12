@@ -1,0 +1,18 @@
+{
+  "status": "1",
+  "msg": "",
+  "returnObj": {
+    "colorList": [
+      {
+        "colorId": "0",
+        "colorName": "黑色",
+        "colorNumber": 4
+      },
+      {
+        "colorId": "1",
+        "colorName": "蓝色",
+        "colorNumber": 3
+      }
+    ]
+  }
+}

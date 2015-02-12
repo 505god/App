@@ -21,9 +21,9 @@ typedef void(^ErrorBlock_t)(NSString *notice);
 
 @property (nonatomic, strong) ASIHTTPRequest *request;
 
-+ (id)request:(NSMutableDictionary *)params requestUrl:(NSString *)requestUrl method:(NSString *)method completeBlock:(CompleteBlock_t)complet errorBlock:(ErrorBlock_t)error;
++ (BaseInterface *)sharedInterface;
 
-- (id)initWithRequest:(NSMutableDictionary *)params requestUrl:(NSString *)requestUrl method:(NSString *)method completeBlock:(CompleteBlock_t)complet errorBlock:(ErrorBlock_t)error;
+- (void)initWithRequest:(NSMutableDictionary *)params requestUrl:(NSString *)requestUrl method:(NSString *)method completeBlock:(CompleteBlock_t)complet errorBlock:(ErrorBlock_t)error;
 
 
 -(void)cancelOperation;

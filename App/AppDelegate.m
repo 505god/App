@@ -10,8 +10,11 @@
 #import <SMS_SDK/SMS_SDK.h>
 #import "WQInitVC.h"
 
+#import "Reachability.h"
 
 @interface AppDelegate ()
+
+@property (strong, nonatomic) Reachability *hostReach;//网络监听所用
 
 @end
 
@@ -27,6 +30,12 @@
     [SMS_SDK registerApp:@"46c880df3c3f" withSecret:@"e5d8a4bb450b2e2f2076bffdf57b2ec7"];
     [SMS_SDK enableAppContactFriends:NO];
     
+    //开启网络状况的监听
+    _isReachable = YES;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    _hostReach = [Reachability reachabilityWithHostName:@"www.baidu.com"] ;
+    [_hostReach startNotifier];  //开始监听，会启动一个run loop
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     
@@ -34,38 +43,20 @@
     self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
     self.window.rootViewController = self.navControl;
     
-    [self setupNavbarUI];
+    if (Platform>=7.0) {
+        [[UINavigationBar appearance] setBarTintColor:COLOR(57, 164, 247, 1)];
+        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+        [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil]];
+    }else {
+        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+    }
     
     [self.window makeKeyAndVisible];
     
     
     return YES;
 }
-#pragma mark - 导航栏设置
-- (void)setupNavbarUI {
-    UINavigationBar *navBar = self.navControl.navigationBar;
-    if ([navBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
-        [navBar setBackgroundImage:[Utility imageFileNamed:@"navBar.png"] forBarMetrics:UIBarMetricsDefault];
-    }else {
-        UIImageView *imageView = (UIImageView *)[navBar viewWithTag:10];
-        if (imageView == nil) {
-            imageView = [[UIImageView alloc] initWithImage:
-                         [Utility imageFileNamed:@"navBar.png"]];
-            [imageView setTag:10];
-            [navBar insertSubview:imageView atIndex:0];
-            SafeRelease(imageView);
-        }
-    }
-    
-    navBar.titleTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil];
-    
-    
-    if (Platform>=7.0) {
-        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    }else {
-        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    }
-}
+
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
@@ -88,5 +79,21 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+#pragma mark - 网络
+
+- (void)reachabilityChanged:(NSNotification *)note {
+    Reachability *currReach = [note object];
+    NSParameterAssert([currReach isKindOfClass:[Reachability class]]);
+    //对连接改变做出响应处理动作
+    NetworkStatus status = [currReach currentReachabilityStatus];
+    if(status == NotReachable)
+    {
+        _isReachable = NO;
+    }
+    else
+    {
+        _isReachable = YES;
+    }
+}
 
 @end

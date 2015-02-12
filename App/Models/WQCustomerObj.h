@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+//客户属性
+
 @interface WQCustomerObj : NSObject
 
 @property (nonatomic, assign) NSInteger customerId;

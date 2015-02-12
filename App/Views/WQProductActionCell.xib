@@ -43,6 +43,7 @@
                 <outlet property="switchBtn" destination="cPx-cu-zyx" id="QPf-mw-MP6"/>
                 <outlet property="titleLab" destination="R9u-63-tg2" id="L6y-tT-Dce"/>
             </connections>
+            <point key="canvasLocation" x="117" y="191"/>
         </tableViewCell>
     </objects>
     <resources>

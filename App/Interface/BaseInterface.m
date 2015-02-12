@@ -13,12 +13,24 @@
 
 @implementation BaseInterface
 
-
-+ (id)request:(NSMutableDictionary *)params requestUrl:(NSString *)requestUrl method:(NSString *)method completeBlock:(CompleteBlock_t)complet errorBlock:(ErrorBlock_t)error {
-    return [self request:params requestUrl:requestUrl method:method completeBlock:complet errorBlock:error];
+- (id)init{
+    self = [super init];
+    if (self) {
+    }
+    return self;
 }
 
-- (id)initWithRequest:(NSMutableDictionary *)params requestUrl:(NSString *)requestUrl method:(NSString *)method completeBlock:(CompleteBlock_t)complet errorBlock:(ErrorBlock_t)error {
++ (BaseInterface *)sharedInterface {
+    static dispatch_once_t once;
+    static BaseInterface *dataService = nil;
+    
+    dispatch_once(&once, ^{
+        dataService = [[super alloc] init];
+    });
+    return dataService;
+}
+
+- (void)initWithRequest:(NSMutableDictionary *)params requestUrl:(NSString *)requestUrl method:(NSString *)method completeBlock:(CompleteBlock_t)complet errorBlock:(ErrorBlock_t)error {
     if ([method isEqualToString:@"GET"]) {
         NSMutableString *urlStr = [NSMutableString stringWithFormat:@"%@",requestUrl];
         NSString *postURL=[self createPostURL:params];
@@ -52,9 +64,6 @@
     [self.request setRequestMethod:method];
     [self.request setDelegate:self];
     [self.request startAsynchronous];
-    
-    
-    return self;
 }
 -(NSString *)createPostURL:(NSDictionary *)params
 {

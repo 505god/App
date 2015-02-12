@@ -14,18 +14,33 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField opaque="NO" clipsSubviews="YES" tag="1000" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ni1-sy-mMQ" customClass="WQProductText">
+                    <textField opaque="NO" clipsSubviews="YES" tag="100" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="SMr-5R-X7q" customClass="WQProductText">
+                        <rect key="frame" x="5" y="7" width="78" height="30"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="78" id="5tM-aF-u1d"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <textInputTraits key="textInputTraits" returnKeyType="next"/>
+                    </textField>
+                    <textField opaque="NO" clipsSubviews="YES" tag="1000" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ni1-sy-mMQ" customClass="WQProductText">
                         <rect key="frame" x="110" y="7" width="205" height="30"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                         <textInputTraits key="textInputTraits" returnKeyType="done"/>
                     </textField>
-                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qwF-mx-9hA">
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qwF-mx-9hA">
                         <rect key="frame" x="88" y="7" width="1" height="30"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="1" id="PM4-qH-VkN"/>
+                        </constraints>
                     </view>
-                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wcr-4E-EwC">
-                        <rect key="frame" x="8" y="7" width="94" height="30"/>
+                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wcr-4E-EwC">
+                        <rect key="frame" x="8" y="7" width="108" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="108" id="c6i-DB-Bzz"/>
+                        </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                         <state key="normal" title="添加属性" image="login_name">
                             <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
@@ -35,13 +50,22 @@
                             <action selector="addPropertyBtnPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="j0t-tI-MsJ"/>
                         </connections>
                     </button>
-                    <textField opaque="NO" clipsSubviews="YES" tag="100" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="SMr-5R-X7q" customClass="WQProductText">
-                        <rect key="frame" x="5" y="7" width="78" height="30"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                        <textInputTraits key="textInputTraits" returnKeyType="next"/>
-                    </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="Wcr-4E-EwC" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="8nk-WS-DXJ"/>
+                    <constraint firstItem="Wcr-4E-EwC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="Bw5-jT-nl1"/>
+                    <constraint firstItem="ni1-sy-mMQ" firstAttribute="leading" secondItem="qwF-mx-9hA" secondAttribute="trailing" constant="21" id="FAi-eO-Pcd"/>
+                    <constraint firstAttribute="bottom" secondItem="ni1-sy-mMQ" secondAttribute="bottom" constant="7" id="MKL-ci-mRE"/>
+                    <constraint firstAttribute="bottom" secondItem="Wcr-4E-EwC" secondAttribute="bottom" constant="7" id="PZZ-u1-aH1"/>
+                    <constraint firstAttribute="bottom" secondItem="qwF-mx-9hA" secondAttribute="bottom" constant="7" id="TQq-DQ-nvY"/>
+                    <constraint firstItem="SMr-5R-X7q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="5" id="WnW-lr-nJz"/>
+                    <constraint firstItem="ni1-sy-mMQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="XmH-Sr-XgH"/>
+                    <constraint firstAttribute="bottom" secondItem="SMr-5R-X7q" secondAttribute="bottom" constant="7" id="b3h-RS-m7i"/>
+                    <constraint firstItem="SMr-5R-X7q" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="k3r-qq-AxA"/>
+                    <constraint firstItem="qwF-mx-9hA" firstAttribute="leading" secondItem="SMr-5R-X7q" secondAttribute="trailing" constant="5" id="mt0-Ez-Hgx"/>
+                    <constraint firstAttribute="trailing" secondItem="ni1-sy-mMQ" secondAttribute="trailing" constant="5" id="tbj-so-9hy"/>
+                    <constraint firstItem="qwF-mx-9hA" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="yI5-nF-9ya"/>
+                </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="addPropertyBtn" destination="Wcr-4E-EwC" id="pTR-hR-PsY"/>

@@ -53,6 +53,13 @@
     
     self.title = @"我的店铺";
     
+    //导航栏设置
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                              initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                              target:self
+                                              action:@selector(addNewProduct)];
+
+    
     self.scrollView.delegate = self;
     self.scrollView.datasource = self;
     
@@ -80,13 +87,6 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                              initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                              target:self
-                                              action:@selector(addNewProduct)];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -137,7 +137,7 @@
     UIImageView *imgView = [[UIImageView alloc]initWithFrame:(CGRect){0,0,CGRectGetWidth(self.scrollView.frame),CGRectGetHeight(self.scrollView.frame)}];
     WQProductObj *product = (WQProductObj *)self.productList[index];
     
-    [imgView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",product.productImagesArray[0]]] placeholderImage:[Utility imageFileNamed:@""]];
+    [imgView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",product.productImagesArray[0]]] placeholderImage:[UIImage imageNamed:@""]];
     
     UILabel *nameLab = [[UILabel alloc]initWithFrame:(CGRect){20,CGRectGetHeight(self.scrollView.frame)-20,200,20}];
     nameLab.text = product.productName;

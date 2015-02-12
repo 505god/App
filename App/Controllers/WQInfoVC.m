@@ -35,7 +35,7 @@
     self.title = @"填写信息";
     
     if (self.type==0) {//注册
-        self.headerImg.image = [Utility imageFileNamed:@"randomheader_7"];
+        self.headerImg.image = [UIImage imageNamed:@"randomheader_7"];
         self.headerImg.delegate = self;
         
     }else if (self.type==1){//找回密码
@@ -79,7 +79,7 @@
     if ([Utility checkString:self.companyText.text]) {
         if ([Utility checkString:self.passwordText1.text]) {
             if (![self.passwordText1.text isEqualToString:self.passwordText2.text]) {
-                [Utility errorAlert:@"两次密码不一致" dismiss:YES];
+                [Utility errorAlert:@"两次密码不一致" view:self.view];
             }else {
                 [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"努力加载中...",KVNProgressViewParameterBackgroundType:@(KVNProgressBackgroundTypeSolid),KVNProgressViewParameterFullScreen: @(NO)}];
                 
@@ -90,10 +90,10 @@
                 }
             }
         }else {
-            [Utility errorAlert:@"请设置密码" dismiss:YES];
+            [Utility errorAlert:@"请设置密码" view:self.view];
         }
     }else {
-        [Utility errorAlert:@"请输入用户姓名" dismiss:YES];
+        [Utility errorAlert:@"请输入用户姓名" view:self.view];
     }
 }
 #pragma mark - UITextFieldDelegate

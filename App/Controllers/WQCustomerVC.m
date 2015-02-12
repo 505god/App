@@ -8,7 +8,9 @@
 
 #import "WQCustomerVC.h"
 
-#import "WQIndexedCollationWithSearch.h"
+#import "WQIndexedCollationWithSearch.h"//检索
+#import "WQCustomerTable.h"
+
 #import "WQCustomerCell.h"
 
 #import "WQCustomerObj.h"
@@ -20,21 +22,90 @@
 
 #import "JKUtil.h"
 
-@interface WQCustomerVC ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate,WQCustomerCellDelegate>
+@interface WQCustomerVC ()<WQCustomerTableDelegate,UISearchDisplayDelegate,WQCustomerCellDelegate>
 
-@property(nonatomic, weak) IBOutlet UITableView *tableView;
-@property(nonatomic, strong) UISearchBar *searchBar;
-@property(nonatomic, strong) UISearchDisplayController *strongSearchDisplayController;
+//通讯录列表
+@property (nonatomic, strong) WQCustomerTable *tableView;
+
+@property (nonatomic, assign) BOOL isSearching;
+//@property (nonatomic, strong) UISearchBar *searchBar;
+@property (nonatomic, strong) UISearchDisplayController *searchController;
 
 //搜索结果
 @property (nonatomic, strong) NSMutableArray *searchResults;
 //客户列表
+@property (nonatomic, strong) NSMutableArray *dataArray;
 @property (nonatomic, strong) NSMutableArray *customerList;
 
 @end
 
 @implementation WQCustomerVC
 
+#pragma mark - 姓名检索
+
+- (NSMutableArray *)emptyPartitionedArray {
+    NSUInteger sectionCount = [[[WQIndexedCollationWithSearch currentCollation] sectionTitles] count];
+    NSMutableArray *sections = [NSMutableArray arrayWithCapacity:sectionCount];
+    for (int i = 0; i < sectionCount; i++) {
+        [sections addObject:[NSMutableArray array]];
+    }
+    return sections;
+}
+
+- (void)sortCustomers:(NSArray *)customers {
+    NSMutableArray *mutableArray = [[self emptyPartitionedArray] mutableCopy];
+    //添加分类
+    for (WQCustomerObj *customer in customers) {
+        SEL selector = @selector(customerName);
+        NSInteger index = [[WQIndexedCollationWithSearch currentCollation]
+                           sectionForObject:customer
+                           collationStringSelector:selector];
+        [mutableArray[index] addObject:customer];
+    }
+    
+    [self setupCustomerList:mutableArray];
+}
+
+-(void)setupCustomerList:(NSArray *)customers {
+    self.customerList = nil;
+    [customers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSArray *array = (NSArray *)obj;
+        
+        if (array.count>0) {
+            NSMutableDictionary *aDic = [NSMutableDictionary dictionary];
+            [aDic setObject:array forKey:@"data"];
+            
+            WQCustomerObj *customer = (WQCustomerObj *)array[0];
+
+            NSString *nameSection = [[NSString stringWithFormat:@"%c",[[PinYinForObjc chineseConvertToPinYin:customer.customerName] characterAtIndex:0]]uppercaseString];
+            
+            NSString *nameRegex = @"^[a-zA-Z]+$";
+            NSPredicate *nameTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", nameRegex];
+            if ([nameTest evaluateWithObject:nameSection]) {//字母
+                [aDic setObject:nameSection forKey:@"indexTitle"];
+            }else {
+               [aDic setObject:@"#" forKey:@"indexTitle"];
+            }
+            
+            [self.customerList addObject:aDic];
+        }
+    }];
+    
+    if (!self.tableView) {
+        [self createTableView];
+        
+        [self setupSearchBar];
+    }else
+        [self.tableView reloadData];
+    
+}
+
+// 创建tableView
+- (void) createTableView {
+    self.tableView = [[WQCustomerTable alloc] initWithFrame:self.view.bounds];
+    self.tableView.delegate = self;
+    [self.view addSubview:self.tableView];
+}
 
 #pragma mark - lifestyle
 
@@ -42,9 +113,13 @@
     [super viewDidLoad];
     
     self.title = @"客户管理";
-
-    [self setupSearchBar];
-
+    
+    //导航栏设置
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                              initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                              target:self
+                                              action:@selector(addNewCustomer)];
+    
     
     //TODO:获取通讯录列表
     NSDictionary *aDic = [Utility returnDicByPath:@"CustomerList"];
@@ -55,26 +130,19 @@
         [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             NSDictionary *aDic = (NSDictionary *)obj;
             WQCustomerObj *customer = [WQCustomerObj returnCustomerWithDic:aDic];
-            [wself.customerList addObject:customer];
+            [wself.dataArray addObject:customer];
             SafeRelease(customer);
             SafeRelease(aDic);
         }];
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
-            [wself.tableView reloadData];
+            [wself sortCustomers:wself.dataArray];
         });
     });
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                              initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                              target:self
-                                              action:@selector(addNewCustomer)];
     
     [self setupNavBar];
 }
@@ -100,20 +168,9 @@
 -(void)setupNavBar {
     if (self.isPresentVC) {        
         UINavigationBar *navBar = self.navigationController.navigationBar;
-        if ([navBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
-            [navBar setBackgroundImage:[Utility imageFileNamed:@"navBar.png"] forBarMetrics:UIBarMetricsDefault];
-        }else {
-            UIImageView *imageView = (UIImageView *)[navBar viewWithTag:10];
-            if (imageView == nil) {
-                imageView = [[UIImageView alloc] initWithImage:
-                             [Utility imageFileNamed:@"navBar.png"]];
-                [imageView setTag:10];
-                [navBar insertSubview:imageView atIndex:0];
-                SafeRelease(imageView);
-            }
-        }
-        navBar.titleTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil];
+        [navBar setBarTintColor:COLOR(57, 164, 247, 1)];
         
+        navBar.titleTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil];
         
         self.navigationItem.title = @"选择客户";
         
@@ -127,6 +184,8 @@
         UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:rightBtn];
         [self.navigationItem setRightBarButtonItem:rightItem animated:NO];
         self.navigationItem.rightBarButtonItem.enabled = (self.selectedList.count>0);
+        SafeRelease(rightBtn);
+        SafeRelease(rightItem);
         
         UIButton *cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         cancelBtn.frame = CGRectMake(0, 0, 50, 30);
@@ -137,6 +196,8 @@
         [cancelBtn addTarget:self action:@selector(cancelEventDidTouched) forControlEvents:UIControlEventTouchUpInside];
         UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithCustomView:cancelBtn];
         [self.navigationItem setLeftBarButtonItem:cancelItem animated:NO];
+        SafeRelease(cancelBtn);
+        SafeRelease(cancelItem);
     }
 }
 
@@ -172,42 +233,62 @@
     }
     return _selectedList;
 }
+
+-(NSMutableArray *)dataArray {
+    if (!_dataArray) {
+        _dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
 #pragma mark - 设置searchBar
 
--(void)setupSearchBar {
-    if (Platform>=7.0) {
-        self.tableView.sectionIndexBackgroundColor = [UIColor clearColor];
+-(void)setupSearchBar {    
+    self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:self.tableView.searchBar contentsController:self];
+    self.searchController.searchResultsDataSource = self;
+    self.searchController.searchResultsDelegate = self;
+    self.searchController.delegate = self;
+    
+    if ([self.searchController.searchBar respondsToSelector : @selector (barTintColor)]){
+        if (Platform>=7.1){
+            [[[[self.searchController.searchBar.subviews objectAtIndex:0] subviews] objectAtIndex:0] removeFromSuperview];
+            [self.searchController.searchBar setBackgroundColor:[UIColor lightGrayColor]];
+        }else{//7.0
+            [self.searchController.searchBar setBarTintColor :[UIColor clearColor]];
+            [self.searchController.searchBar setBackgroundColor :[UIColor lightGrayColor]];
+        }
+    }else {//7.0以下
+        [[self.searchController.searchBar.subviews objectAtIndex:0] removeFromSuperview];
+        
+        [self.searchController.searchBar setBackgroundColor:[UIColor lightGrayColor]];
     }
-    
-    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectZero];
-    self.searchBar.placeholder = @"搜索";
-    self.searchBar.delegate = self;
-    [self.searchBar sizeToFit];
-    self.tableView.tableHeaderView = self.searchBar;
-    
-    self.strongSearchDisplayController = [[UISearchDisplayController alloc] initWithSearchBar:self.searchBar contentsController:self];
-    self.searchDisplayController.searchResultsDataSource = self;
-    self.searchDisplayController.searchResultsDelegate = self;
-    self.searchDisplayController.delegate = self;
 }
 
-#pragma mark - TableView Delegate and DataSource
+#pragma mark - UITableViewDataSource
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (tableView == self.searchDisplayController.searchResultsTableView) {
-        return self.searchResults.count;
+- (NSArray *)sectionIndexTitlesForWQCustomerTable:(WQCustomerTable *)tableView {
+    NSMutableArray * indexTitles = [NSMutableArray array];
+    for (NSDictionary * sectionDictionary in self.customerList) {
+        [indexTitles addObject:sectionDictionary[@"indexTitle"]];
     }
-    else {
-        return self.customerList.count;
-    }
+    return indexTitles;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return self.customerList[section][@"indexTitle"];
+}
+
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
+    return self.customerList.count;
+}
+
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self.customerList[section][@"data"] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    static NSString *CellIdentifier = @"customer_cell";
+    NSString * CellIdentifier = @"customer_cell";
     
     WQCustomerCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    
     if (cell == nil) {
         cell = [[WQCustomerCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                      reuseIdentifier:CellIdentifier];
@@ -215,15 +296,10 @@
     }
     
     WQCustomerObj *customer = nil;
-    if (tableView == self.searchDisplayController.searchResultsTableView) {
-        customer = (WQCustomerObj *)self.searchResults[indexPath.row];
-        [cell setCustomerObj:customer];
-    }else {
-        customer = (WQCustomerObj *)self.customerList[indexPath.row];
-        [cell setCustomerObj:customer];
-    }
+    customer = (WQCustomerObj *)self.customerList[indexPath.section][@"data"][indexPath.row];
+    [cell setCustomerObj:customer];
     cell.delegate = self;
-
+    
     //判断选择客户列表
     if (self.isPresentVC) {
         [cell.checkButton setHidden:NO];
@@ -235,23 +311,23 @@
         }
     }
     
-    //判断
-    if (indexPath.row==0) {
-        [cell.notificationHub setCount:5];
-        [cell.notificationHub bump];
-    }
+//    //判断
+//    if (indexPath.row==0) {
+//        [cell.notificationHub setCount:5];
+//        [cell.notificationHub bump];
+//    }
     
     return cell;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 60;
 }
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
 
 #pragma mark - WQCustomerCellDelegate
+
 //点击头像浏览客户信息
 -(void)tapCellWithCustomer:(WQCustomerObj *)customer {
     WQCustomerInfoVC *infoVC = LOADVC(@"WQCustomerInfoVC");
@@ -273,9 +349,10 @@
 #pragma mark - search代理
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)search{
-    self.searchBar.showsCancelButton = YES;
+    self.isSearching = YES;
+    search.showsCancelButton = YES;
     if (Platform>=7.0) {
-        for(id cc in [self.searchBar subviews]) {
+        for(id cc in [search subviews]) {
             if([cc isKindOfClass:[UIView class]]) {
                 UIView *cc_view = (UIView *)cc;
                 for (id vv in [cc_view subviews]){
@@ -288,7 +365,7 @@
             }
         }
     }else {
-        for(id cc in [self.searchBar subviews]){
+        for(id cc in [search subviews]){
             if([cc isKindOfClass:[UIButton class]]){
                 UIButton *btn = (UIButton *)cc;
                 [btn setTitle:@"取消"  forState:UIControlStateNormal];
@@ -297,19 +374,43 @@
         }
     }
 }
+
 - (void)searchBarCancelButtonClicked:(UISearchBar *)search{
-    self.searchBar.showsCancelButton=NO;
-    self.searchBar.text=nil;
-    [self.searchBar resignFirstResponder];
+    self.isSearching = NO;
+    search.showsCancelButton=NO;
+    search.text=nil;
+    [search resignFirstResponder];
+    
+    [self sortCustomers:self.dataArray];
     
 }
-
+- (void) searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller {
+    
+}
+- (void) searchDisplayControllerWillEndSearch:(UISearchDisplayController *)controller {
+    self.isSearching = NO;
+    
+    self.tableView.searchBar.showsCancelButton=NO;
+    self.tableView.searchBar.text=nil;
+    [self.tableView.searchBar resignFirstResponder];
+    
+    [self sortCustomers:self.dataArray];
+}
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString{
+    return YES;
+}
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption{
+    return YES;
+}
+- (void)searchDisplayControllerDidEndSearch:(UISearchDisplayController *)controller{
+    
+}
 - (void)searchBar:(UISearchBar *)aSearch textDidChange:(NSString *)searchText {
     self.searchResults = [[NSMutableArray alloc]init];
     
     if (aSearch.text.length>0 && ![ChineseInclude isIncludeChineseInString:aSearch.text]) {//英文或者数字搜素
         
-        [self.customerList enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        [self.dataArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             WQCustomerObj *customer = (WQCustomerObj *)obj;
             
             if ([ChineseInclude isIncludeChineseInString:customer.customerName]) {//名称含有中文
@@ -348,7 +449,7 @@
         }];
         
     } else if (aSearch.text.length>0&&[ChineseInclude isIncludeChineseInString:aSearch.text]) {//中文搜索
-        for (WQCustomerObj *customer in self.customerList) {
+        for (WQCustomerObj *customer in self.dataArray) {
             NSRange titleResult=[customer.customerName rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
             if (titleResult.length>0) {
                 [self.searchResults addObject:customer];
@@ -356,6 +457,6 @@
         }
     }
     
-    [self.tableView reloadData];
+    [self sortCustomers:self.searchResults];
 }
 @end

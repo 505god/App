@@ -50,10 +50,10 @@ typedef enum{
 }RPKeyboardType;
 
 
-
-#import "BlockAlertView.h"
+#import "WQPopView.h"
 
 @interface Utility : NSObject
+
 
 + (NSString *)getNowDateFromatAnDate;
 
@@ -63,17 +63,12 @@ typedef enum{
 
 +(void)setRightRoundcornerWithView:(UIView *)view;
 
-+ (void)errorAlert:(NSString *)message dismiss:(BOOL)animated;
++ (void)errorAlert:(NSString *)message view:(UIView *)view;
 
 +(void)animationWithView:(UIView *)view image:(NSString *)image selectedImage:(NSString *)selectedImage type:(int)type;
 
 +(BOOL)checkString:(NSString *)string;
 
-+(void)setBackGround:(UIViewController *)VC WithImage:(NSString *)imageName;
-
-+ (UIImage*)imageFileNamed:(NSString*)name;
-
-+ (NSString *)getRandomHeader;
 
 +(NSDictionary *)returnDicByPath:(NSString *)jsonPath;
 @end

@@ -94,18 +94,7 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
     [super viewWillAppear:animated];
     
     UINavigationBar *navBar = self.navigationController.navigationBar;
-    if ([navBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
-        [navBar setBackgroundImage:[Utility imageFileNamed:@"navBar.png"] forBarMetrics:UIBarMetricsDefault];
-    }else {
-        UIImageView *imageView = (UIImageView *)[navBar viewWithTag:10];
-        if (imageView == nil) {
-            imageView = [[UIImageView alloc] initWithImage:
-                         [Utility imageFileNamed:@"navBar.png"]];
-            [imageView setTag:10];
-            [navBar insertSubview:imageView atIndex:0];
-            SafeRelease(imageView);
-        }
-    }
+    [navBar setBarTintColor:COLOR(57, 164, 247, 1)];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
