@@ -17,6 +17,7 @@
     SafeRelease(tap);
     
     self.clipsToBounds = YES;
+    self.layer.cornerRadius = 4;
     self.contentMode = UIViewContentModeScaleAspectFill;
     self.userInteractionEnabled = YES;
 }

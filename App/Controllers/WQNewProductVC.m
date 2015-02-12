@@ -9,7 +9,6 @@
 
 #import "WQNewProductVC.h"
 
-#import "WQProductImageCell.h" //添加产品图片cell
 
 #import "JKImagePickerController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -23,7 +22,9 @@
 #import "WQCustomerVC.h"
 
 #import "WQColorVC.h"
+#import "WQSizeVC.h"
 
+#import "WQSizeObj.h"
 /*
  手动：
  编码、价格、描述
@@ -42,7 +43,7 @@
 
 static WQProductColorCell *addProductImageCell = nil;
 
-@interface WQNewProductVC ()<UITableViewDataSource, UITableViewDelegate,WQProductImageCellDelegate,JKImagePickerControllerDelegate,UITextFieldDelegate,WQProductPropertyCellDelegate,WQProductActionCellDelegate,WQCustomerVCDelegate,WQColorVCDelegate,WQProductColorCellDelegate>
+@interface WQNewProductVC ()<UITableViewDataSource, UITableViewDelegate,JKImagePickerControllerDelegate,WQProductPropertyCellDelegate,WQProductActionCellDelegate,WQCustomerVCDelegate,WQColorVCDelegate,WQSizeVCDelegate,WQProductColorCellDelegate>
 
 @property (nonatomic, weak) IBOutlet UITableView *table;
 
@@ -54,8 +55,6 @@ static WQProductColorCell *addProductImageCell = nil;
 @property (nonatomic, strong) NSMutableArray *customerArray;
 //颜色与库存
 @property (nonatomic, strong) NSMutableArray *colorArray;
-//尺码
-@property (nonatomic, strong) NSMutableArray *sizeArray;
 //自定义属性
 @property (nonatomic, strong) NSMutableArray *customPropertyArray;
 
@@ -74,11 +73,6 @@ static WQProductColorCell *addProductImageCell = nil;
     
     NSString *detailStr = @"描述:";
     [self.propertyArray addObject:detailStr];
-}
-//尺码
--(void)initSizes {
-    NSString *sizeStr = @"设置尺码";
-    [self.sizeArray addObject:sizeStr];
 }
 
 //客户
@@ -214,13 +208,6 @@ static WQProductColorCell *addProductImageCell = nil;
     return _colorArray;
 }
 
--(NSMutableArray *)sizeArray {
-    if (!_sizeArray) {
-        _sizeArray = [NSMutableArray array];
-    }
-    return _sizeArray;
-}
-
 -(NSMutableArray *)propertyArray {
     if (!_propertyArray) {
         _propertyArray = [NSMutableArray array];
@@ -243,7 +230,7 @@ static WQProductColorCell *addProductImageCell = nil;
 }
 #pragma mark - TableView Delegate and DataSource
 // 材质 包装规格  适用性别
-// 0:固定属性 1:颜色与库存 2:尺码 3:客户 4:设置热卖 5:自定义属性
+// 0:固定属性 1:颜色、库存、尺码 2:客户 3:设置热卖 4:自定义属性
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
@@ -257,30 +244,6 @@ static WQProductColorCell *addProductImageCell = nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    /*
-    if (indexPath.section==0) {//添加产品图片cell
-        static NSString *CellIdentifier = @"WQProductImageCell_cell";
-        
-        WQProductImageCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        
-        if (cell == nil) {
-            cell = [[WQProductImageCell alloc] initWithStyle:UITableViewCellStyleDefault
-                                         reuseIdentifier:CellIdentifier];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        }
-        //TODO:编辑状态下
-//        NSMutableArray *array = [NSMutableArray arrayWithCapacity:5];
-//        for (int i=0; i<4; i++) {
-//            [array addObject:@"test"];
-//        }
-//        
-//        [cell setImages:array];
-        
-        cell.delegate = self;
-        return cell;
-        
-    }else
-        */
     if (indexPath.section==0) {//添加产品属性
         static NSString *CellIdentifier = @"WQProductPropertyCell_cell";
         
@@ -305,7 +268,7 @@ static WQProductColorCell *addProductImageCell = nil;
         cell.delegate = self;
         
         return cell;
-    }else if (indexPath.section==1) {
+    }else if (indexPath.section==1) {//图片、颜色、库存、尺码
         static NSString *CellIdentifier = @"WQProductColorCell_cell";
         
         WQProductColorCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -316,18 +279,25 @@ static WQProductColorCell *addProductImageCell = nil;
         }
         
         if (indexPath.row==0) {
-            cell.textLabel.text = @"设置颜色和库存";
-            [cell.stockTxt setHidden:YES];
+            cell.textLabel.text = @"添加产品颜色";
             cell.productImgView.hidden = YES;
+            cell.colorNameLab.hidden = YES;
+            
+            for (UIView *view in cell.contentView.subviews){
+                if (view.tag>=6000) {
+                    [view removeFromSuperview];
+                }
+            }
         }else {
+            cell.textLabel.text = @"";
+            cell.productImgView.hidden = NO;
+            cell.colorNameLab.hidden = NO;
             [cell setIndexPath:indexPath];
-            cell.stockTxt.delegate = self;
+            cell.productVC = self;
+            
             WQColorObj *color = (WQColorObj *)self.colorArray[indexPath.row-1];
             [cell setColorObj:color];
             cell.delegate = self;
-            cell.directionImg.hidden = YES;
-            [cell.stockTxt setHidden:NO];
-            cell.productImgView.hidden = NO;
         }
         
         return cell;
@@ -353,8 +323,14 @@ static WQProductColorCell *addProductImageCell = nil;
     }else if(indexPath.section==1){
         if (indexPath.row==0) {
             return 40;
+        }else {
+            WQColorObj *color = (WQColorObj *)self.colorArray[indexPath.row-1];
+            if (color.sizeArray.count<=2) {
+                return 80;
+            }else {
+                return 30*color.sizeArray.count;
+            }
         }
-        return 60;
     }
         return 40;
 }
@@ -370,12 +346,24 @@ static WQProductColorCell *addProductImageCell = nil;
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if (indexPath.section == 1) {//设置颜色
-        WQColorVC *colorVC = LOADVC(@"WQColorVC");
-        colorVC.isPresentVC = YES;
-        colorVC.selectedList = self.colorArray;
-        colorVC.delegate = self;
-        [self.navigationController pushViewController:colorVC animated:YES];
-        SafeRelease(colorVC);
+        if (indexPath.row==0) {//选择颜色
+            WQColorVC *colorVC = LOADVC(@"WQColorVC");
+            colorVC.isPresentVC = YES;
+            colorVC.selectedList = [NSMutableArray arrayWithArray:self.colorArray];
+            colorVC.delegate = self;
+            [self.navigationController pushViewController:colorVC animated:YES];
+            SafeRelease(colorVC);
+        }else {//选择尺码
+            WQSizeVC *sizeVC = LOADVC(@"WQSizeVC");
+            sizeVC.isPresentVC = YES;
+            sizeVC.indexPath = indexPath;
+            WQColorObj *color = (WQColorObj *)self.colorArray[indexPath.row-1];
+            sizeVC.selectedList = [NSMutableArray arrayWithArray:color.sizeArray];
+            sizeVC.delegate = self;
+            [self.navigationController pushViewController:sizeVC animated:YES];
+            SafeRelease(sizeVC);
+        }
+        
         
     }else if (indexPath.section == 3) {//推荐客户
         NSMutableArray *tempArray = self.customerArray;
@@ -406,8 +394,8 @@ static WQProductColorCell *addProductImageCell = nil;
 }
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section==1) {
-        [self.colorArray removeObjectAtIndex:indexPath.row];
         
+        [self.colorArray removeObjectAtIndex:indexPath.row-1];
         [self.table deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
 }
@@ -430,12 +418,10 @@ static WQProductColorCell *addProductImageCell = nil;
     if ([textField isKindOfClass:[WQProductText class]]) {
         WQProductText *text = (WQProductText *)textField;
 
-        
-        WQProductPropertyCell *cell = (WQProductPropertyCell *)[self.table cellForRowAtIndexPath:text.idxPath];
-        
-        NSString *string = nil;
-        
         if (text.idxPath.section==0) {//固定属性
+            WQProductPropertyCell *cell = (WQProductPropertyCell *)[self.table cellForRowAtIndexPath:text.idxPath];
+            NSString *string = nil;
+            
             if (text.tag<1000) {
                 WQProductText *textInfo = (WQProductText *)[cell.contentView viewWithTag:1000];
                 
@@ -445,11 +431,10 @@ static WQProductColorCell *addProductImageCell = nil;
                 string = [NSString stringWithFormat:@"%@:%@",textTitle.text,text.text];
             }
             [self.propertyArray replaceObjectAtIndex:text.idxPath.row withObject:string];
-            
-            DLog(@"%@",self.propertyArray);
         }else if (text.idxPath.section==1){//颜色和库存
             WQColorObj *color = (WQColorObj *)self.colorArray[text.idxPath.row-1];
-            color.stockCount = [text.text integerValue];
+            WQSizeObj *size = color.sizeArray[text.tag-6000];
+            size.stockCount = [text.text integerValue];
         }
     }
 }
@@ -540,7 +525,8 @@ static WQProductColorCell *addProductImageCell = nil;
 #pragma mark - WQCustomerVCDelegate
 //选择颜色
 - (void)colorVC:(WQColorVC *)colorVC didSelectColor:(NSArray *)colors {
-    self.colorArray = [NSMutableArray arrayWithArray:colors];
+    self.colorArray = nil;
+    [self.colorArray addObjectsFromArray:colors];
     
     [self.table reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
@@ -611,5 +597,15 @@ static WQProductColorCell *addProductImageCell = nil;
     }
     
     return [UIImage imageWithData:imageData];
+}
+
+#pragma mark - WQSizeVCDelegate
+//选择尺码
+- (void)sizeVC:(WQSizeVC *)sizeVC didSelectSize:(NSArray *)sizes {
+    WQColorObj *color = (WQColorObj *)self.colorArray[sizeVC.indexPath.row-1];
+    color.sizeArray = [[NSMutableArray alloc]init];
+    [color.sizeArray addObjectsFromArray:sizes];
+    
+    [self.table reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 @end

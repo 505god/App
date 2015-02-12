@@ -1,17 +1,15 @@
 //
-//  WQColorVC.m
+//  WQSizeVC.m
 //  App
 //
-//  Created by 邱成西 on 15/2/10.
+//  Created by 邱成西 on 15/2/12.
 //  Copyright (c) 2015年 Just Do It. All rights reserved.
 //
 
-#import "WQColorVC.h"
-#import "WQColorObj.h"
+#import "WQSizeVC.h"
+#import "WQSizeObj.h"
 
-
-
-@interface WQColorVC ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
+@interface WQSizeVC ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 
 @property (nonatomic, weak) IBOutlet UITableView *table;
 
@@ -19,14 +17,14 @@
 
 @end
 
-@implementation WQColorVC
+@implementation WQSizeVC
 
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"颜色";
+    self.title = @"尺码";
     
     //导航栏设置
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
@@ -34,20 +32,37 @@
                                               target:self
                                               action:@selector(addNewColor)];
     
-    //TODO:获取颜色列表
-    self.dataArray = nil;
-    if ([WQDataShare sharedService].colorArray.count>0) {
-        self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].colorArray];
+    if ([WQDataShare sharedService].sizeArray.count>0) {
+        self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].sizeArray];
+//        for (int i=0; i<self.selectedList.count; i++) {
+//            WQSizeObj *size = (WQSizeObj *)self.selectedList[i];
+//            
+//            NSPredicate *predicateString = [NSPredicate predicateWithFormat:@"sizeId==%d", size.sizeId];
+//            NSMutableArray  *filteredArray = [NSMutableArray arrayWithArray:[self.dataArray filteredArrayUsingPredicate:predicateString]];
+//            
+//            NSInteger index = [self.dataArray indexOfObject:filteredArray[0]];
+//            
+//            [self.dataArray replaceObjectAtIndex:index withObject:size];
+//        }
+        
         [self.table reloadData];
     }else {
         __weak typeof(self) wself = self;
-        [[WQDataShare sharedService] getColorListCompleteBlock:^(BOOL finished) {
-            wself.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].colorArray];
+        [[WQDataShare sharedService] getSizeListCompleteBlock:^(BOOL finished) {
+            wself.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].sizeArray];
+//            for (int i=0; i<self.selectedList.count; i++) {
+//                WQSizeObj *size = (WQSizeObj *)self.selectedList[i];
+//                
+//                NSPredicate *predicateString = [NSPredicate predicateWithFormat:@"sizeId==%d", size.sizeId];
+//                NSMutableArray  *filteredArray = [NSMutableArray arrayWithArray:[self.dataArray filteredArrayUsingPredicate:predicateString]];
+//                
+//                NSInteger index = [self.dataArray indexOfObject:filteredArray[0]];
+//                
+//                [self.dataArray replaceObjectAtIndex:index withObject:size];
+//            }
             [wself.table reloadData];
         }];
     }
-    
-    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -61,10 +76,10 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    //筛选颜色是否选中
+    //筛选尺码是否选中
     if (self.isPresentVC) {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(colorVC:didSelectColor:)]) {
-            [self.delegate colorVC:self didSelectColor:self.selectedList];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(sizeVC:didSelectSize:)]) {
+            [self.delegate sizeVC:self didSelectSize:self.selectedList];
         }
     }
 }
@@ -79,7 +94,7 @@
 }
 
 -(void)addNewColor {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"添加颜色" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"添加尺码" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
     [alert show];
 }
@@ -90,11 +105,11 @@
         UITextField *textField = [alertView textFieldAtIndex:0];
         
         if (![Utility checkString:textField.text]) {
-            [Utility errorAlert:@"抱歉，颜色名称不能为空" view:self.view];
+            [Utility errorAlert:@"抱歉，尺码名称不能为空" view:self.view];
         }else {
-            NSDictionary *aDic = @{@"colorId":@5,@"colorName":textField.text,@"colorNumber":@0};
-            WQColorObj *color = [WQColorObj returnColorWithDic:aDic];
-            [self.dataArray addObject:color];
+            NSDictionary *aDic = @{@"sizeId":@5,@"sizeName":textField.text,@"sizeNumber":@0};
+            WQSizeObj *size= [WQSizeObj returnSizeWithDic:aDic];
+            [self.dataArray addObject:size];
             [self.table reloadData];
         }
         //TODO:上传后台
@@ -102,29 +117,35 @@
     }
 }
 
+
+#pragma mark - property
+
+-(void)setIndexPath:(NSIndexPath *)indexPath {
+    _indexPath = indexPath;
+}
 #pragma mark - UITableViewDataSource
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString * CellIdentifier = @"color_cell";
+    NSString * CellIdentifier = @"size_cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                     reuseIdentifier:CellIdentifier];
+                                  reuseIdentifier:CellIdentifier];
     }
     
-    WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
+    WQSizeObj *size = (WQSizeObj *)self.dataArray[indexPath.row];
     
     //判断选择颜色
     if (self.isPresentVC) {
         BOOL isExit = NO;
         for (int i=0; i<self.selectedList.count; i++) {
-            WQColorObj *colorTemp = self.selectedList[i];
+            WQSizeObj *sizeTemp = self.selectedList[i];
             
-            if (color.colorId == colorTemp.colorId) {
+            if (size.sizeId == sizeTemp.sizeId) {
                 isExit = YES;
                 break;
             }
@@ -133,8 +154,7 @@
         cell.accessoryType = isExit?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
     }
     
-    cell.textLabel.text = color.colorName;
-    
+    cell.textLabel.text = size.sizeName;
     return cell;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -146,26 +166,24 @@
     if (self.isPresentVC) {
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         
-        WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
+        WQSizeObj *size = (WQSizeObj *)self.dataArray[indexPath.row];
         
         if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
             cell.accessoryType = UITableViewCellAccessoryNone;
-            
             for (int i=0; i<self.selectedList.count; i++) {
-                WQColorObj *colorTemp = self.selectedList[i];
+                 WQSizeObj *sizeTemp = self.selectedList[i];
                 
-                if (color.colorId == colorTemp.colorId) {
-                    [self.selectedList removeObject:colorTemp];
+                if (size.sizeId == sizeTemp.sizeId) {
+                    [self.selectedList removeObject:sizeTemp];
                     break;
                 }
             }
-            
         }else {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            color.sizeArray = nil;
-            color.productImg = nil;
-            [self.selectedList addObject:color];
+            size.stockCount = 0;
+            [self.selectedList addObject:size];
         }
     }
 }
+
 @end

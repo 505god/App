@@ -18,10 +18,11 @@
 
 @property (nonatomic, assign) NSInteger colorNumber;
 
-////添加产品时候设置的颜色对应的库存
-@property (nonatomic, assign) NSInteger stockCount;
 ////添加产品时候设置的颜色对应的图片
 @property (nonatomic, strong) UIImage *productImg;
+
+////添加产品时候设置的颜色对应的尺码
+@property (nonatomic, strong) NSMutableArray *sizeArray;
 
 +(WQColorObj *)returnColorWithDic:(NSDictionary *)aDic;
 @end

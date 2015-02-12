@@ -32,8 +32,6 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
-    [self setupBaseKVNProgressUI];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -58,22 +56,6 @@
         [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
     }
 }
-#pragma mark - loading框设置
-- (void)setupBaseKVNProgressUI
-{
-    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
-    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
-    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
-    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
-    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
-    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleSize = 75.0f;
-    [KVNProgress appearance].lineWidth = 2.0f;
-}
-
 
 /*
 #pragma mark - Navigation

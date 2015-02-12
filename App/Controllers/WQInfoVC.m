@@ -81,7 +81,7 @@
             if (![self.passwordText1.text isEqualToString:self.passwordText2.text]) {
                 [Utility errorAlert:@"两次密码不一致" view:self.view];
             }else {
-                [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"努力加载中...",KVNProgressViewParameterBackgroundType:@(KVNProgressBackgroundTypeSolid),KVNProgressViewParameterFullScreen: @(NO)}];
+//                [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"努力加载中...",KVNProgressViewParameterBackgroundType:@(KVNProgressBackgroundTypeSolid),KVNProgressViewParameterFullScreen: @(NO)}];
                 
                 if (self.type==0) {
                     

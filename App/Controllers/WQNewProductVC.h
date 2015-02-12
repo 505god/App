@@ -8,7 +8,7 @@
 
 #import "BaseViewController.h"
 
-@interface WQNewProductVC : BaseViewController
+@interface WQNewProductVC : BaseViewController<UITextFieldDelegate>
 
 //编辑产品详情
 @property (nonatomic, assign) BOOL isEditing;

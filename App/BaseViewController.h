@@ -10,5 +10,4 @@
 
 @interface BaseViewController : UIViewController
 
--(void)setupBaseKVNProgressUI;
 @end

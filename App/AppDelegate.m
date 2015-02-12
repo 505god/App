@@ -50,6 +50,40 @@
     }else {
         [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
     }
+
+    NSMutableArray *dataArray = [NSMutableArray arrayWithObjects:
+                                 [NSMutableString stringWithString:@"one"],
+                                 [NSMutableString stringWithString:@"two"],
+                                 [NSMutableString stringWithString:@"three"],
+                                 nil
+                                 ];
+    NSMutableArray *dataArray2;
+    NSMutableString *mStr;
+    
+    NSLog(@"dataArray:   ");
+    for(NSString *elem in dataArray)
+        NSLog(@"   %@", elem);
+    
+    //执行一个拷贝，然后改变其中的一个字符串(浅复制)
+    dataArray2 = [dataArray mutableCopy];
+    
+    //这种方式会同时改变连个数组中的对象
+    mStr = [dataArray objectAtIndex:0];
+//    [mStr appendString:@"ONE"];
+    
+    mStr = [NSMutableString stringWithString:[dataArray2 objectAtIndex:0]];
+    [mStr appendString:@"ONE"];
+    [dataArray2 replaceObjectAtIndex:0 withObject:mStr];
+    
+    NSLog(@"dataArray:");
+    for(NSString *elem in dataArray)
+        NSLog(@"  %@",elem);
+    
+    NSLog(@"dataArray2:");
+    for(NSString *elem in dataArray2)
+        NSLog(@"  %@",elem);
+    
+    
     
     [self.window makeKeyAndVisible];
     

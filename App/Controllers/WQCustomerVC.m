@@ -28,77 +28,11 @@
 @property (nonatomic, strong) WQCustomerTable *tableView;
 
 @property (nonatomic, assign) BOOL isSearching;
-//@property (nonatomic, strong) UISearchBar *searchBar;
 @property (nonatomic, strong) UISearchDisplayController *searchController;
-
-//搜索结果
-@property (nonatomic, strong) NSMutableArray *searchResults;
-//客户列表
-@property (nonatomic, strong) NSMutableArray *dataArray;
-@property (nonatomic, strong) NSMutableArray *customerList;
 
 @end
 
 @implementation WQCustomerVC
-
-#pragma mark - 姓名检索
-
-- (NSMutableArray *)emptyPartitionedArray {
-    NSUInteger sectionCount = [[[WQIndexedCollationWithSearch currentCollation] sectionTitles] count];
-    NSMutableArray *sections = [NSMutableArray arrayWithCapacity:sectionCount];
-    for (int i = 0; i < sectionCount; i++) {
-        [sections addObject:[NSMutableArray array]];
-    }
-    return sections;
-}
-
-- (void)sortCustomers:(NSArray *)customers {
-    NSMutableArray *mutableArray = [[self emptyPartitionedArray] mutableCopy];
-    //添加分类
-    for (WQCustomerObj *customer in customers) {
-        SEL selector = @selector(customerName);
-        NSInteger index = [[WQIndexedCollationWithSearch currentCollation]
-                           sectionForObject:customer
-                           collationStringSelector:selector];
-        [mutableArray[index] addObject:customer];
-    }
-    
-    [self setupCustomerList:mutableArray];
-}
-
--(void)setupCustomerList:(NSArray *)customers {
-    self.customerList = nil;
-    [customers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSArray *array = (NSArray *)obj;
-        
-        if (array.count>0) {
-            NSMutableDictionary *aDic = [NSMutableDictionary dictionary];
-            [aDic setObject:array forKey:@"data"];
-            
-            WQCustomerObj *customer = (WQCustomerObj *)array[0];
-
-            NSString *nameSection = [[NSString stringWithFormat:@"%c",[[PinYinForObjc chineseConvertToPinYin:customer.customerName] characterAtIndex:0]]uppercaseString];
-            
-            NSString *nameRegex = @"^[a-zA-Z]+$";
-            NSPredicate *nameTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", nameRegex];
-            if ([nameTest evaluateWithObject:nameSection]) {//字母
-                [aDic setObject:nameSection forKey:@"indexTitle"];
-            }else {
-               [aDic setObject:@"#" forKey:@"indexTitle"];
-            }
-            
-            [self.customerList addObject:aDic];
-        }
-    }];
-    
-    if (!self.tableView) {
-        [self createTableView];
-        
-        [self setupSearchBar];
-    }else
-        [self.tableView reloadData];
-    
-}
 
 // 创建tableView
 - (void) createTableView {
@@ -121,24 +55,23 @@
                                               action:@selector(addNewCustomer)];
     
     
-    //TODO:获取通讯录列表
-    NSDictionary *aDic = [Utility returnDicByPath:@"CustomerList"];
-    NSArray *array = [aDic objectForKey:@"customerList"];
-    
-    __weak typeof(self) wself = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSDictionary *aDic = (NSDictionary *)obj;
-            WQCustomerObj *customer = [WQCustomerObj returnCustomerWithDic:aDic];
-            [wself.dataArray addObject:customer];
-            SafeRelease(customer);
-            SafeRelease(aDic);
+    if ([WQDataShare sharedService].customerList.count>0) {
+        if (!self.tableView) {
+            [self createTableView];
+            
+            [self setupSearchBar];
+        }else
+            [self.tableView reloadData];
+    }else {
+        [[WQDataShare sharedService] getCustomerListCompleteBlock:^(BOOL finished) {
+            if (!self.tableView) {
+                [self createTableView];
+                
+                [self setupSearchBar];
+            }else
+                [self.tableView reloadData];
         }];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [wself sortCustomers:wself.dataArray];
-        });
-    });
+    }
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -220,26 +153,7 @@
     SafeRelease(newVC);
 }
 #pragma mark - property
--(NSMutableArray *)customerList {
-    if (!_customerList) {
-        _customerList = [NSMutableArray array];
-    }
-    return _customerList;
-}
 
--(NSMutableArray *)selectedList {
-    if (!_selectedList) {
-        _selectedList = [NSMutableArray array];
-    }
-    return _selectedList;
-}
-
--(NSMutableArray *)dataArray {
-    if (!_dataArray) {
-        _dataArray = [NSMutableArray array];
-    }
-    return _dataArray;
-}
 #pragma mark - 设置searchBar
 
 -(void)setupSearchBar {    
@@ -267,22 +181,22 @@
 
 - (NSArray *)sectionIndexTitlesForWQCustomerTable:(WQCustomerTable *)tableView {
     NSMutableArray * indexTitles = [NSMutableArray array];
-    for (NSDictionary * sectionDictionary in self.customerList) {
+    for (NSDictionary * sectionDictionary in [WQDataShare sharedService].customerList) {
         [indexTitles addObject:sectionDictionary[@"indexTitle"]];
     }
     return indexTitles;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return self.customerList[section][@"indexTitle"];
+    return [WQDataShare sharedService].customerList[section][@"indexTitle"];
 }
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
-    return self.customerList.count;
+    return [WQDataShare sharedService].customerList.count;
 }
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.customerList[section][@"data"] count];
+    return [[WQDataShare sharedService].customerList[section][@"data"] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -296,7 +210,7 @@
     }
     
     WQCustomerObj *customer = nil;
-    customer = (WQCustomerObj *)self.customerList[indexPath.section][@"data"][indexPath.row];
+    customer = (WQCustomerObj *)[WQDataShare sharedService].customerList[indexPath.section][@"data"][indexPath.row];
     [cell setCustomerObj:customer];
     cell.delegate = self;
     
@@ -381,7 +295,9 @@
     search.text=nil;
     [search resignFirstResponder];
     
-    [self sortCustomers:self.dataArray];
+    [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(BOOL finished) {
+        [self.tableView reloadData];
+    }];
     
 }
 - (void) searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller {
@@ -394,7 +310,9 @@
     self.tableView.searchBar.text=nil;
     [self.tableView.searchBar resignFirstResponder];
     
-    [self sortCustomers:self.dataArray];
+    [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(BOOL finished) {
+        [self.tableView reloadData];
+    }];
 }
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString{
     return YES;
@@ -406,57 +324,59 @@
     
 }
 - (void)searchBar:(UISearchBar *)aSearch textDidChange:(NSString *)searchText {
-    self.searchResults = [[NSMutableArray alloc]init];
+    NSMutableArray *searchResults = [NSMutableArray array];
     
     if (aSearch.text.length>0 && ![ChineseInclude isIncludeChineseInString:aSearch.text]) {//英文或者数字搜素
         
-        [self.dataArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        [[WQDataShare sharedService].customerArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             WQCustomerObj *customer = (WQCustomerObj *)obj;
             
             if ([ChineseInclude isIncludeChineseInString:customer.customerName]) {//名称含有中文
                 //转换为拼音
                 NSString *tempPinYinStr = [PinYinForObjc chineseConvertToPinYin:customer.customerName];
                 NSRange titleResult=[tempPinYinStr rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
-                if (titleResult.length>0 && ![self.searchResults containsObject:customer]) {
-                    [self.searchResults addObject:customer];
+                if (titleResult.length>0 && ![searchResults containsObject:customer]) {
+                    [searchResults addObject:customer];
                 }
                 
                 //转换为拼音首字母
                 NSString *tempPinYinHeadStr = [PinYinForObjc chineseConvertToPinYinHead:customer.customerName];
                 NSRange titleHeadResult=[tempPinYinHeadStr rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
-                if (titleHeadResult.length>0 && ![self.searchResults containsObject:customer]) {
-                    [self.searchResults addObject:customer];
+                if (titleHeadResult.length>0 && ![searchResults containsObject:customer]) {
+                    [searchResults addObject:customer];
                 }
                 
                 //电话号码
                 NSRange phoneResult=[customer.customerPhone rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
-                if (phoneResult.length>0 && ![self.searchResults containsObject:customer]) {
-                    [self.searchResults addObject:customer];
+                if (phoneResult.length>0 && ![searchResults containsObject:customer]) {
+                    [searchResults addObject:customer];
                 }
             }else {
                 //昵称含有数字
                 NSRange titleResult=[customer.customerName rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
                 if (titleResult.length>0) {
-                    [self.searchResults addObject:customer];
+                    [searchResults addObject:customer];
                 }
                 
                 //电话号码
                 NSRange phoneResult=[customer.customerPhone rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
-                if (phoneResult.length>0 && ![self.searchResults containsObject:customer]) {
-                    [self.searchResults addObject:customer];
+                if (phoneResult.length>0 && ![searchResults containsObject:customer]) {
+                    [searchResults addObject:customer];
                 }
             }
         }];
         
     } else if (aSearch.text.length>0&&[ChineseInclude isIncludeChineseInString:aSearch.text]) {//中文搜索
-        for (WQCustomerObj *customer in self.dataArray) {
+        for (WQCustomerObj *customer in [WQDataShare sharedService].customerArray) {
             NSRange titleResult=[customer.customerName rangeOfString:aSearch.text options:NSCaseInsensitiveSearch];
             if (titleResult.length>0) {
-                [self.searchResults addObject:customer];
+                [searchResults addObject:customer];
             }
         }
     }
     
-    [self sortCustomers:self.searchResults];
+    [[WQDataShare sharedService] sortCustomers:searchResults CompleteBlock:^(BOOL finished) {
+        [self.tableView reloadData];
+    }];
 }
 @end

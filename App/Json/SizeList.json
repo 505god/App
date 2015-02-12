@@ -1,0 +1,28 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "sizeList": [
+                     {
+                     "sizeId": "0",
+                     "sizeName": "170fff",
+                     "sizeNumber":5
+                     },
+                     {
+                     "sizeId": "1",
+                     "sizeName": "啊手机客户收到回复",
+                     "sizeNumber":5
+                     },
+                     {
+                     "sizeId": "2",
+                     "sizeName": "150",
+                     "sizeNumber":5
+                     },
+                     {
+                     "sizeId": "3",
+                     "sizeName": "180",
+                     "sizeNumber":5
+                     }
+                     ]
+    }
+}

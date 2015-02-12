@@ -14,8 +14,8 @@
     #import "AppDelegate.h"
 
 #import "Utility.h"
-#import "KVNProgress.h"
 #import "NSObject+Motis.h"
+#import "MBProgressHUD.h"
 #import "WQDataShare.h"
 #endif
 

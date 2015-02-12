@@ -17,7 +17,6 @@
 		5D703EA71A88887700647713 /* WQCustomerTableIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EA61A88887700647713 /* WQCustomerTableIndex.m */; };
 		5D703EAC1A8894A000647713 /* WQIndexedCollationWithSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EAB1A8894A000647713 /* WQIndexedCollationWithSearch.m */; };
 		5D703EB01A88FDF600647713 /* WQProductColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D703EAE1A88FDF600647713 /* WQProductColorCell.m */; };
-		5D703EB11A88FDF600647713 /* WQProductColorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D703EAF1A88FDF600647713 /* WQProductColorCell.xib */; };
 		5D7324011A7EFB1200949D93 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7324001A7EFB1200949D93 /* main.m */; };
 		5D7324041A7EFB1200949D93 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7324031A7EFB1200949D93 /* AppDelegate.m */; };
 		5D73240C1A7EFB1200949D93 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D73240B1A7EFB1200949D93 /* Images.xcassets */; };
@@ -175,10 +174,6 @@
 		5D73263B1A7F00F400949D93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D73263A1A7F00F400949D93 /* Foundation.framework */; };
 		5D73263D1A7F00FB00949D93 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D73263C1A7F00FB00949D93 /* UIKit.framework */; };
 		5D7326401A7F01F200949D93 /* WQXMPPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D73263F1A7F01F200949D93 /* WQXMPPManager.m */; };
-		5D7326491A7F040900949D93 /* KVNProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7326431A7F040900949D93 /* KVNProgress.m */; };
-		5D73264A1A7F040900949D93 /* KVNProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7326441A7F040900949D93 /* KVNProgressView.xib */; };
-		5D73264B1A7F040900949D93 /* UIImage+KVNEmpty.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7326461A7F040900949D93 /* UIImage+KVNEmpty.m */; };
-		5D73264C1A7F040900949D93 /* UIImage+KVNImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7326481A7F040900949D93 /* UIImage+KVNImageEffects.m */; };
 		5D7326551A7F041D00949D93 /* BlockActionSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D73264F1A7F041D00949D93 /* BlockActionSheet.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		5D7326561A7F041D00949D93 /* BlockAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7326511A7F041D00949D93 /* BlockAlertView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		5D7326571A7F041D00949D93 /* BlockBackground.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7326531A7F041D00949D93 /* BlockBackground.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -298,8 +293,6 @@
 		5D7E392E1A8A31C700690975 /* WQColorVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7E392C1A8A31C700690975 /* WQColorVC.xib */; };
 		5D7E39301A8A335400690975 /* ColorList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D7E392F1A8A335400690975 /* ColorList.json */; };
 		5D7E39331A8A33A800690975 /* WQColorObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E39321A8A33A800690975 /* WQColorObj.m */; };
-		5D7E39371A8A3A8100690975 /* WQColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E39351A8A3A8100690975 /* WQColorCell.m */; };
-		5D7E39381A8A3A8100690975 /* WQColorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D7E39361A8A3A8100690975 /* WQColorCell.xib */; };
 		5D7E393B1A8A48B000690975 /* WQPopView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E393A1A8A48B000690975 /* WQPopView.m */; };
 		5D8187081A81A54D00DF3BFA /* WQShopVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8187061A81A54D00DF3BFA /* WQShopVC.m */; };
 		5D8187091A81A54D00DF3BFA /* WQShopVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D8187071A81A54D00DF3BFA /* WQShopVC.xib */; };
@@ -322,6 +315,11 @@
 		5D8187961A82165100DF3BFA /* PinyinHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D81878F1A82165100DF3BFA /* PinyinHelper.m */; };
 		5D8187971A82165100DF3BFA /* unicode_to_hanyu_pinyin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5D8187901A82165100DF3BFA /* unicode_to_hanyu_pinyin.txt */; };
 		5D81879A1A8217DF00DF3BFA /* ChineseInclude.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8187991A8217DF00DF3BFA /* ChineseInclude.m */; };
+		5DA9A0601A8C76C000E59380 /* WQSizeObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */; };
+		5DA9A0621A8C789500E59380 /* SizeList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DA9A0611A8C789500E59380 /* SizeList.json */; };
+		5DA9A0651A8C7BC100E59380 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */; };
+		5DA9A0701A8C9F9500E59380 /* WQSizeVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A06E1A8C9F9500E59380 /* WQSizeVC.m */; };
+		5DA9A0711A8C9F9500E59380 /* WQSizeVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5DA9A06F1A8C9F9500E59380 /* WQSizeVC.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -353,7 +351,6 @@
 		5D703EAB1A8894A000647713 /* WQIndexedCollationWithSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQIndexedCollationWithSearch.m; sourceTree = "<group>"; };
 		5D703EAD1A88FDF600647713 /* WQProductColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductColorCell.h; sourceTree = "<group>"; };
 		5D703EAE1A88FDF600647713 /* WQProductColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductColorCell.m; sourceTree = "<group>"; };
-		5D703EAF1A88FDF600647713 /* WQProductColorCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQProductColorCell.xib; sourceTree = "<group>"; };
 		5D7323FB1A7EFB1200949D93 /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D7323FF1A7EFB1200949D93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D7324001A7EFB1200949D93 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -670,13 +667,6 @@
 		5D73263C1A7F00FB00949D93 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5D73263E1A7F01F200949D93 /* WQXMPPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQXMPPManager.h; sourceTree = "<group>"; };
 		5D73263F1A7F01F200949D93 /* WQXMPPManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQXMPPManager.m; sourceTree = "<group>"; };
-		5D7326421A7F040900949D93 /* KVNProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVNProgress.h; sourceTree = "<group>"; };
-		5D7326431A7F040900949D93 /* KVNProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVNProgress.m; sourceTree = "<group>"; };
-		5D7326441A7F040900949D93 /* KVNProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = KVNProgressView.xib; sourceTree = "<group>"; };
-		5D7326451A7F040900949D93 /* UIImage+KVNEmpty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+KVNEmpty.h"; sourceTree = "<group>"; };
-		5D7326461A7F040900949D93 /* UIImage+KVNEmpty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+KVNEmpty.m"; sourceTree = "<group>"; };
-		5D7326471A7F040900949D93 /* UIImage+KVNImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+KVNImageEffects.h"; sourceTree = "<group>"; };
-		5D7326481A7F040900949D93 /* UIImage+KVNImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+KVNImageEffects.m"; sourceTree = "<group>"; };
 		5D73264E1A7F041D00949D93 /* BlockActionSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockActionSheet.h; sourceTree = "<group>"; };
 		5D73264F1A7F041D00949D93 /* BlockActionSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlockActionSheet.m; sourceTree = "<group>"; };
 		5D7326501A7F041D00949D93 /* BlockAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockAlertView.h; sourceTree = "<group>"; };
@@ -896,9 +886,6 @@
 		5D7E392F1A8A335400690975 /* ColorList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ColorList.json; sourceTree = "<group>"; };
 		5D7E39311A8A33A800690975 /* WQColorObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQColorObj.h; sourceTree = "<group>"; };
 		5D7E39321A8A33A800690975 /* WQColorObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQColorObj.m; sourceTree = "<group>"; };
-		5D7E39341A8A3A8100690975 /* WQColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQColorCell.h; sourceTree = "<group>"; };
-		5D7E39351A8A3A8100690975 /* WQColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQColorCell.m; sourceTree = "<group>"; };
-		5D7E39361A8A3A8100690975 /* WQColorCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQColorCell.xib; sourceTree = "<group>"; };
 		5D7E39391A8A48B000690975 /* WQPopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQPopView.h; sourceTree = "<group>"; };
 		5D7E393A1A8A48B000690975 /* WQPopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQPopView.m; sourceTree = "<group>"; };
 		5D8187051A81A54D00DF3BFA /* WQShopVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQShopVC.h; sourceTree = "<group>"; };
@@ -936,6 +923,14 @@
 		5D8187901A82165100DF3BFA /* unicode_to_hanyu_pinyin.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = unicode_to_hanyu_pinyin.txt; sourceTree = "<group>"; };
 		5D8187981A8217DF00DF3BFA /* ChineseInclude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChineseInclude.h; sourceTree = "<group>"; };
 		5D8187991A8217DF00DF3BFA /* ChineseInclude.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChineseInclude.m; sourceTree = "<group>"; };
+		5DA9A05E1A8C76C000E59380 /* WQSizeObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQSizeObj.h; sourceTree = "<group>"; };
+		5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQSizeObj.m; sourceTree = "<group>"; };
+		5DA9A0611A8C789500E59380 /* SizeList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SizeList.json; sourceTree = "<group>"; };
+		5DA9A0631A8C7BC100E59380 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
+		5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		5DA9A06D1A8C9F9500E59380 /* WQSizeVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQSizeVC.h; sourceTree = "<group>"; };
+		5DA9A06E1A8C9F9500E59380 /* WQSizeVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQSizeVC.m; sourceTree = "<group>"; };
+		5DA9A06F1A8C9F9500E59380 /* WQSizeVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WQSizeVC.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1110,6 +1105,8 @@
 		5D7324271A7EFC5600949D93 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				5DA9A0631A8C7BC100E59380 /* MBProgressHUD.h */,
+				5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */,
 				5D0762DA1A879A7100F8576C /* ScrollView */,
 				5D759CA21A83AA35001920FA /* PNChart */,
 				5D8187831A82164500DF3BFA /* PinYin */,
@@ -1121,7 +1118,6 @@
 				5D7326881A7F0B1000949D93 /* Reachability */,
 				5D7326581A7F043D00949D93 /* ImagePicker */,
 				5D73264D1A7F041D00949D93 /* BlockAlert */,
-				5D7326411A7F040900949D93 /* KVNProgress */,
 				5D73242B1A7F008F00949D93 /* XMPP */,
 			);
 			path = Library;
@@ -1136,6 +1132,8 @@
 				5D0762E21A879D6100F8576C /* WQProductObj.m */,
 				5D7E39311A8A33A800690975 /* WQColorObj.h */,
 				5D7E39321A8A33A800690975 /* WQColorObj.m */,
+				5DA9A05E1A8C76C000E59380 /* WQSizeObj.h */,
+				5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1155,6 +1153,7 @@
 				5D7DECF61A80D33E00496850 /* WQMainControl.m */,
 				5D759D281A877E59001920FA /* WQCellSelectedBackground.h */,
 				5D759D291A877E59001920FA /* WQCellSelectedBackground.m */,
+				5DA9A0671A8C947C00E59380 /* FunctionVC */,
 				5D759D111A84714A001920FA /* ShopV */,
 				5D759D101A847138001920FA /* CustomerV */,
 			);
@@ -2037,20 +2036,6 @@
 			path = libidn;
 			sourceTree = "<group>";
 		};
-		5D7326411A7F040900949D93 /* KVNProgress */ = {
-			isa = PBXGroup;
-			children = (
-				5D7326421A7F040900949D93 /* KVNProgress.h */,
-				5D7326431A7F040900949D93 /* KVNProgress.m */,
-				5D7326441A7F040900949D93 /* KVNProgressView.xib */,
-				5D7326451A7F040900949D93 /* UIImage+KVNEmpty.h */,
-				5D7326461A7F040900949D93 /* UIImage+KVNEmpty.m */,
-				5D7326471A7F040900949D93 /* UIImage+KVNImageEffects.h */,
-				5D7326481A7F040900949D93 /* UIImage+KVNImageEffects.m */,
-			);
-			path = KVNProgress;
-			sourceTree = "<group>";
-		};
 		5D73264D1A7F041D00949D93 /* BlockAlert */ = {
 			isa = PBXGroup;
 			children = (
@@ -2230,6 +2215,7 @@
 				5D7327211A7F55CD00949D93 /* WQMainVC.h */,
 				5D7327221A7F55CD00949D93 /* WQMainVC.m */,
 				5D73272A1A7F572600949D93 /* WQMainVC.xib */,
+				5DA9A0661A8C946500E59380 /* FunctionVC */,
 				5D8187011A81A50A00DF3BFA /* ShopVC */,
 				5D8187021A81A51700DF3BFA /* CustomerVC */,
 				5D8187031A81A52800DF3BFA /* OrderVC */,
@@ -2333,10 +2319,6 @@
 				5D759D221A864737001920FA /* WQProductActionCell.xib */,
 				5D703EAD1A88FDF600647713 /* WQProductColorCell.h */,
 				5D703EAE1A88FDF600647713 /* WQProductColorCell.m */,
-				5D703EAF1A88FDF600647713 /* WQProductColorCell.xib */,
-				5D7E39341A8A3A8100690975 /* WQColorCell.h */,
-				5D7E39351A8A3A8100690975 /* WQColorCell.m */,
-				5D7E39361A8A3A8100690975 /* WQColorCell.xib */,
 			);
 			name = ShopV;
 			sourceTree = "<group>";
@@ -2358,6 +2340,7 @@
 				5D7DECD81A80B95200496850 /* checkPhone.json */,
 				5D8187721A81E8E800DF3BFA /* CustomerList.json */,
 				5D0762E61A87A34500F8576C /* ProductList.json */,
+				5DA9A0611A8C789500E59380 /* SizeList.json */,
 			);
 			path = Json;
 			sourceTree = "<group>";
@@ -2380,9 +2363,6 @@
 				5D759CCF1A844C75001920FA /* WQNewProductVC.h */,
 				5D759CD01A844C75001920FA /* WQNewProductVC.m */,
 				5D759CD11A844C75001920FA /* WQNewProductVC.xib */,
-				5D7E392A1A8A31C700690975 /* WQColorVC.h */,
-				5D7E392B1A8A31C700690975 /* WQColorVC.m */,
-				5D7E392C1A8A31C700690975 /* WQColorVC.xib */,
 			);
 			name = ShopVC;
 			sourceTree = "<group>";
@@ -2443,6 +2423,26 @@
 				5D8187901A82165100DF3BFA /* unicode_to_hanyu_pinyin.txt */,
 			);
 			path = PinYin;
+			sourceTree = "<group>";
+		};
+		5DA9A0661A8C946500E59380 /* FunctionVC */ = {
+			isa = PBXGroup;
+			children = (
+				5D7E392A1A8A31C700690975 /* WQColorVC.h */,
+				5D7E392B1A8A31C700690975 /* WQColorVC.m */,
+				5D7E392C1A8A31C700690975 /* WQColorVC.xib */,
+				5DA9A06D1A8C9F9500E59380 /* WQSizeVC.h */,
+				5DA9A06E1A8C9F9500E59380 /* WQSizeVC.m */,
+				5DA9A06F1A8C9F9500E59380 /* WQSizeVC.xib */,
+			);
+			name = FunctionVC;
+			sourceTree = "<group>";
+		};
+		5DA9A0671A8C947C00E59380 /* FunctionVC */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = FunctionVC;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2532,7 +2532,7 @@
 				5D8187091A81A54D00DF3BFA /* WQShopVC.xib in Resources */,
 				5D7326281A7F008F00949D93 /* build-libidn.sh in Resources */,
 				5D7DECD61A80B31F00496850 /* WQPhoneVC.xib in Resources */,
-				5D7E39381A8A3A8100690975 /* WQColorCell.xib in Resources */,
+				5DA9A0711A8C9F9500E59380 /* WQSizeVC.xib in Resources */,
 				5D759C971A83A253001920FA /* WQCustomerInfoVC.xib in Resources */,
 				5D7326CA1A7F1BFF00949D93 /* AppImages.xcassets in Resources */,
 				5D81877F1A82075400DF3BFA /* multipy_unicode.dat in Resources */,
@@ -2545,7 +2545,7 @@
 				5D73240F1A7EFB1300949D93 /* LaunchScreen.xib in Resources */,
 				5D7326791A7F043D00949D93 /* JKImagePickerController.strings in Resources */,
 				5D759D241A864737001920FA /* WQProductActionCell.xib in Resources */,
-				5D703EB11A88FDF600647713 /* WQProductColorCell.xib in Resources */,
+				5DA9A0621A8C789500E59380 /* SizeList.json in Resources */,
 				5D7326231A7F008F00949D93 /* README.txt in Resources */,
 				5D8187181A81A57B00DF3BFA /* WQSaleVC.xib in Resources */,
 				5D7DECE41A80BD9400496850 /* WQCodeVC.xib in Resources */,
@@ -2558,7 +2558,6 @@
 				5D73240C1A7EFB1200949D93 /* Images.xcassets in Resources */,
 				5D7327291A7F570200949D93 /* WQLogVC.xib in Resources */,
 				5D759D171A848BC9001920FA /* WQProductImageCell.xib in Resources */,
-				5D73264A1A7F040900949D93 /* KVNProgressView.xib in Resources */,
 				5D4E468F1A8337D4000E766B /* WQCustomerVC.xib in Resources */,
 				5D7DECEB1A80C85500496850 /* WQInfoVC.xib in Resources */,
 				5D7E39301A8A335400690975 /* ColorList.json in Resources */,
@@ -2600,11 +2599,11 @@
 				5D7326031A7F008F00949D93 /* XMPPStreamManagementStanzas.m in Sources */,
 				5D759CCE1A83B142001920FA /* UICountingLabel.m in Sources */,
 				5D7325EF1A7F008F00949D93 /* XMPPSoftwareVersion.m in Sources */,
-				5D7326491A7F040900949D93 /* KVNProgress.m in Sources */,
 				5D7326261A7F008F00949D93 /* DDXMLElement.m in Sources */,
 				5D7326FE1A7F1CD900949D93 /* UIImage+MultiFormat.m in Sources */,
 				5D7326831A7F043D00949D93 /* JKPhotoBrowserCell.m in Sources */,
 				5D7325D91A7F008F00949D93 /* XMPPvCardCoreDataStorage.m in Sources */,
+				5DA9A0701A8C9F9500E59380 /* WQSizeVC.m in Sources */,
 				5D73259F1A7F008F00949D93 /* XMPPDeprecatedPlainAuthentication.m in Sources */,
 				5D7326F41A7F1CD900949D93 /* NSData+ImageContentType.m in Sources */,
 				5D7326C81A7F1A3B00949D93 /* UIView+XD.m in Sources */,
@@ -2621,7 +2620,6 @@
 				5D7326F71A7F1CD900949D93 /* SDWebImageDecoder.m in Sources */,
 				5D7326801A7F043D00949D93 /* JKAssetsViewCell.m in Sources */,
 				5D7325AD1A7F008F00949D93 /* XMPPModule.m in Sources */,
-				5D7E39371A8A3A8100690975 /* WQColorCell.m in Sources */,
 				5D73260B1A7F008F00949D93 /* XMPPAttentionModule.m in Sources */,
 				5D7325E21A7F008F00949D93 /* XMPPvCardTempModule.m in Sources */,
 				5D7325D21A7F008F00949D93 /* XMPPRoomMessageMemoryStorageObject.m in Sources */,
@@ -2728,7 +2726,6 @@
 				5D7326C21A7F19CF00949D93 /* Utility.m in Sources */,
 				5D7325A71A7F008F00949D93 /* NSXMLElement+XMPP.m in Sources */,
 				5D7325A51A7F008F00949D93 /* NSData+XMPP.m in Sources */,
-				5D73264B1A7F040900949D93 /* UIImage+KVNEmpty.m in Sources */,
 				5D7325FE1A7F008F00949D93 /* XMPPPresence+XEP_0172.m in Sources */,
 				5D7325F31A7F008F00949D93 /* XMPPCapabilitiesCoreDataStorage.m in Sources */,
 				5D7326861A7F043D00949D93 /* PhotoAlbumManager.m in Sources */,
@@ -2768,7 +2765,6 @@
 				5D7325C31A7F008F00949D93 /* XMPPIQ+JabberRPC.m in Sources */,
 				5D7325F51A7F008F00949D93 /* XMPPCapsResourceCoreDataStorageObject.m in Sources */,
 				5D759CBF1A83AA35001920FA /* PNBar.m in Sources */,
-				5D73264C1A7F040900949D93 /* UIImage+KVNImageEffects.m in Sources */,
 				5D7E393B1A8A48B000690975 /* WQPopView.m in Sources */,
 				5D7326A51A7F0BF800949D93 /* ASINetworkQueue.m in Sources */,
 				5D7326A81A7F0BF800949D93 /* ASIDataCompressor.m in Sources */,
@@ -2798,6 +2794,7 @@
 				5D7326F51A7F1CD900949D93 /* SDImageCache.m in Sources */,
 				5D8187761A81FA5200DF3BFA /* WQStarView.m in Sources */,
 				5D7325B61A7F008F00949D93 /* XMPPGoogleSharedStatus.m in Sources */,
+				5DA9A0601A8C76C000E59380 /* WQSizeObj.m in Sources */,
 				5D7325BA1A7F008F00949D93 /* XMPPResourceCoreDataStorageObject.m in Sources */,
 				5D8187711A81E69F00DF3BFA /* WQCustomerObj.m in Sources */,
 				5D7326191A7F008F00949D93 /* XMPPTimer.m in Sources */,
@@ -2825,6 +2822,7 @@
 				5D7326091A7F008F00949D93 /* NSXMLElement+XEP_0203.m in Sources */,
 				5D7DECD51A80B31F00496850 /* WQPhoneVC.m in Sources */,
 				5D759CC41A83AA35001920FA /* PNLineChart.m in Sources */,
+				5DA9A0651A8C7BC100E59380 /* MBProgressHUD.m in Sources */,
 				5D7DECF71A80D33E00496850 /* WQMainControl.m in Sources */,
 				5D7325AB1A7F008F00949D93 /* XMPPJID.m in Sources */,
 				5D7325B21A7F008F00949D93 /* XMPPCoreDataStorage.m in Sources */,

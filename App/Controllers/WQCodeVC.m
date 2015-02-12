@@ -88,7 +88,7 @@
             SafeRelease(infoVC);
             
         }else {
-            [KVNProgress showErrorWithStatus:@"验证码不正确!"];
+//            [KVNProgress showErrorWithStatus:@"验证码不正确!"];
             
             [NSObject cancelPreviousPerformRequestsWithTarget:wself
                                                      selector:@selector(scrollTimer)
@@ -120,14 +120,14 @@
     __weak typeof(self) wself = self;
     [SMS_SDK getVerifyCodeByPhoneNumber:self.phoneNumber AndZone:@"86" result:^(enum SMS_GetVerifyCodeResponseState state) {
         if (state == SMS_ResponseStateGetVerifyCodeSuccess) {
-            [KVNProgress showSuccessWithStatus:@"验证码已发送!"];
+//            [KVNProgress showSuccessWithStatus:@"验证码已发送!"];
             
             wself.timeCount = 60;
             [wself.getCodeBtn setBackgroundImage:[UIImage imageNamed:@"BindingBtnAct"] forState:UIControlStateNormal];
             [wself.getCodeBtn setTitle:[NSString stringWithFormat:@"%ds 后重新获取验证码",wself.timeCount] forState:UIControlStateNormal];
             [wself performSelector:@selector(scrollTimer) withObject:nil afterDelay:1];
         }else {
-            [KVNProgress showErrorWithStatus:@"验证码获取失败!"];
+//            [KVNProgress showErrorWithStatus:@"验证码获取失败!"];
             self.getCodeBtn.enabled = YES;
         }
     }];
