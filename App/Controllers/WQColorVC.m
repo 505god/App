@@ -193,6 +193,8 @@
         if (!isExit) {
             [cell setColorObj:color];
         }
+    }else {
+        [cell setColorObj:color];
     }
     
     return cell;
