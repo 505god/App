@@ -7,51 +7,80 @@
 //
 
 #import "WQColorVC.h"
+
 #import "WQColorObj.h"
 
+#import "MJRefresh.h"
 
+#import "WQRightCell.h"
 
-@interface WQColorVC ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
+#import "UIViewController+MJPopupViewController.h"
+#import "WQTextVC.h"
 
-@property (nonatomic, weak) IBOutlet UITableView *table;
+@interface WQColorVC ()<UITableViewDelegate,UITableViewDataSource,WQNavBarViewDelegate,RMSwipeTableViewCellDelegate,WQTextVCDelegate>
+
+@property (nonatomic, strong) UITableView *tableView;
 
 @property (nonatomic, strong) NSMutableArray *dataArray;
 
+@property (nonatomic, strong) WQTextVC *textVC;
 @end
 
 @implementation WQColorVC
+
+-(void)dealloc {
+    SafeRelease(_tableView.delegate);
+    SafeRelease(_tableView.dataSource);
+    SafeRelease(_tableView);
+    SafeRelease(_dataArray);
+    SafeRelease(_textVC);
+    SafeRelease(_selectedList);
+    SafeRelease(_delegate);
+}
+-(void)testData {
+    NSDictionary *aDic = [Utility returnDicByPath:@"ColorList"];
+    NSArray *array = [aDic objectForKey:@"colorList"];
+    
+    __unsafe_unretained typeof(self) weakSelf = self;
+    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSDictionary *aDic = (NSDictionary *)obj;
+        WQColorObj *class = [[WQColorObj alloc]init];
+        [class mts_setValuesForKeysWithDictionary:aDic];
+        [weakSelf.dataArray addObject:class];
+        SafeRelease(class);
+        SafeRelease(aDic);
+    }];
+    
+    //判断数据源
+    if (self.dataArray.count>0) {
+        [self.tableView reloadData];
+        [self setNoneText:nil animated:NO];
+    }else {
+        [self setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+    }
+}
 
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //导航栏
+    self.navBarView.titleLab.text = NSLocalizedString(@"ColorSetup", @"");
+    [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Add", @"") forState:UIControlStateNormal];
+    self.navBarView.navDelegate = self;
+    self.navBarView.isShowShadow = YES;
+    [self.view addSubview:self.navBarView];
     
-    self.title = @"颜色";
-    
-    //导航栏设置
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                              initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                              target:self
-                                              action:@selector(addNewColor)];
-    
-    //TODO:获取颜色列表
-    self.dataArray = nil;
-    if ([WQDataShare sharedService].colorArray.count>0) {
-        self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].colorArray];
-        [self.table reloadData];
-    }else {
-        __weak typeof(self) wself = self;
-        [[WQDataShare sharedService] getColorListCompleteBlock:^(BOOL finished) {
-            wself.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].colorArray];
-            [wself.table reloadData];
-        }];
-    }
-    
-    
+    //集成刷新控件
+    [self addHeader];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    if (self.isPresentVC) {
+        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -60,13 +89,6 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
-    //筛选颜色是否选中
-    if (self.isPresentVC) {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(colorVC:didSelectColor:)]) {
-            [self.delegate colorVC:self didSelectColor:self.selectedList];
-        }
-    }
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -78,52 +100,93 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void)addNewColor {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"添加颜色" message:nil delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [alert show];
+#pragma mark - property
+-(NSMutableArray *)dataArray {
+    if (!_dataArray) {
+        _dataArray = [[NSMutableArray alloc]init];
+    }
+    return _dataArray;
 }
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 0) {
-        [alertView dismissWithClickedButtonIndex:buttonIndex animated:YES];
-    }else if (buttonIndex == 1) {
-        UITextField *textField = [alertView textFieldAtIndex:0];
+-(UITableView *)tableView {
+    if (!_tableView) {
+        _tableView = [[UITableView alloc]initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-20-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height} style:UITableViewStylePlain];
+        _tableView.backgroundColor = [UIColor whiteColor];
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        [self.view addSubview:_tableView];
+    }
+    return _tableView;
+}
+
+#pragma mark - private
+
+- (void)addHeader {
+    __unsafe_unretained typeof(self) weakSelf = self;
+    // 添加下拉刷新头部控件
+    [self.tableView addHeaderWithCallback:^{
+        // 进入刷新状态就会回调这个Block
         
-        if (![Utility checkString:textField.text]) {
-            [Utility errorAlert:@"抱歉，颜色名称不能为空" view:self.view];
-        }else {
-            NSDictionary *aDic = @{@"colorId":@5,@"colorName":textField.text,@"colorNumber":@0};
-            WQColorObj *color = [WQColorObj returnColorWithDic:aDic];
-            [self.dataArray addObject:color];
-            [self.table reloadData];
-        }
-        //TODO:上传后台
+        [weakSelf testData];
         
+        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakSelf.tableView reloadData];
+            // 结束刷新
+            [weakSelf.tableView headerEndRefreshing];
+        });
+    } dateKey:@"WQColorVC"];
+    // dateKey用于存储刷新时间，也可以不传值，可以保证不同界面拥有不同的刷新时间
+    
+    //自动刷新(一进入程序就下拉刷新)
+    [self.tableView headerBeginRefreshing];
+}
+
+-(void)setSelectedList:(NSMutableArray *)selectedList {
+    _selectedList = selectedList;
+    
+    self.toolControl.enabled = selectedList.count>0?YES:NO;
+}
+
+#pragma mark - 导航栏代理
+//左侧边栏的代理
+-(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
+    if (self.isPresentVC) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
-
+//右侧边栏的代理
+-(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    self.textVC = LOADVC(@"WQTextVC");
+    self.textVC.delegate = self;
+    self.textVC.type = 1;
+    
+    [self presentPopupViewController:self.textVC animationType:MJPopupViewAnimationSlideBottomTop];
+}
 #pragma mark - UITableViewDataSource
-
+- (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NavgationHeight;
+}
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString * CellIdentifier = @"color_cell";
+    NSString * CellIdentifier = @"colorVCCell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    WQRightCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+        cell = [[WQRightCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                      reuseIdentifier:CellIdentifier];
     }
-    
     WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
-    
-    //判断选择颜色
-    if (self.isPresentVC) {
+    if (self.isPresentVC) {//弹出选择分类
+        cell.revealDirection = RMSwipeTableViewCellRevealDirectionNone;
+        
         BOOL isExit = NO;
         for (int i=0; i<self.selectedList.count; i++) {
-            WQColorObj *colorTemp = self.selectedList[i];
-            
+            WQColorObj *colorTemp = (WQColorObj *)self.selectedList[i];
             if (color.colorId == colorTemp.colorId) {
                 isExit = YES;
                 break;
@@ -131,20 +194,21 @@
         }
         
         cell.accessoryType = isExit?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
+    }else {
+        cell.delegate = self;
+        cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
     }
     
-    cell.textLabel.text = color.colorName;
+    [cell setColorObj:color];
     
     return cell;
 }
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 44;
-}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if (self.isPresentVC) {
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
         
         WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
         
@@ -156,16 +220,63 @@
                 
                 if (color.colorId == colorTemp.colorId) {
                     [self.selectedList removeObject:colorTemp];
+                    
+                    self.toolControl.enabled = self.selectedList.count>0?YES:NO;
                     break;
                 }
             }
-            
         }else {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
             color.sizeArray = nil;
             color.productImg = nil;
             [self.selectedList addObject:color];
+            self.toolControl.enabled = self.selectedList.count>0?YES:NO;
         }
     }
+}
+
+-(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
+    if (point.x < 0 && (0-point.x) >= swipeTableViewCell.contentView.height) {
+        
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
+        WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
+        
+        if (color.productCount>0) {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ColorDelete", @"")];
+        }else {
+            swipeTableViewCell.shouldAnimateCellReset = NO;
+            [UIView animateWithDuration:0.25
+                                  delay:0
+                                options:UIViewAnimationOptionCurveLinear
+                             animations:^{
+                                 swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
+                             }
+                             completion:^(BOOL finished) {
+                                 
+                                 [self.dataArray removeObjectAtIndex:indexPath.row];
+                                 [self.tableView beginUpdates];
+                                 [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                                 [self.tableView endUpdates];
+                             }
+             ];
+        }
+    }
+}
+
+//确认选择
+-(void)toolControlPressed {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(colorVC:didSelectColor:)]) {
+        [self.delegate colorVC:self didSelectColor:self.selectedList];
+    }
+}
+
+#pragma mark - WQTextVCDelegate
+-(void)dismissTextVC:(WQTextVC *)textVC {
+    WQColorObj *colorObj = [[WQColorObj alloc]init];
+    colorObj.colorName = textVC.text.text;
+    [self.dataArray addObject:colorObj];
+    
+    [self.tableView reloadData];
+    [self dismissPopupViewControllerWithanimationType:MJPopupViewAnimationSlideBottomTop];
 }
 @end

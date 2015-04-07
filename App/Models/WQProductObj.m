@@ -7,6 +7,7 @@
 //
 
 #import "WQProductObj.h"
+#import "WQAPIClient.h"
 
 @implementation WQProductObj
 
@@ -14,13 +15,11 @@
     return  @{@"productId": mts_key(productId),
               @"productName": mts_key(productName),
               @"productPrice": mts_key(productPrice),
-              @"productStockCount": mts_key(productStockCount),
-              @"productDetails": mts_key(productDetails),
               @"productSaleCount": mts_key(productSaleCount),
-              @"productProperty": mts_key(productProperty),
-              @"productImages": mts_key(productImages),
-              @"productPraiseCount": mts_key(productPraiseCount),
+              @"productImage": mts_key(productImage),
               @"productViewCount": mts_key(productViewCount),
+              @"productIsHot": mts_key(productIsHot),
+              @"productIsSale": mts_key(productIsSale)
               };
 }
 
@@ -28,14 +27,31 @@
     return NO;
 }
 
-+(WQProductObj *)returnProductWithDic:(NSDictionary *)aDic {
-    WQProductObj *product = [[WQProductObj alloc]init];
+
++(NSURLSessionDataTask *)getProductsWithBlock:(void (^)(NSArray *products, NSError *error))block {
     
-    [product mts_setValuesForKeysWithDictionary:aDic];
+    return [[WQAPIClient sharedClient] POST:HOTSALE parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        
+    }];
     
-    product.productImagesArray = [product.productImages componentsSeparatedByString:@"||"];
-    
-    return product;
+//    return [[WQAPIClient sharedClient] GET:@"stream/0/posts/stream/global" parameters:nil success:^(NSURLSessionDataTask * __unused task, id JSON) {
+//        NSArray *postsFromResponse = [JSON valueForKeyPath:@"data"];
+//        NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+//        for (NSDictionary *attributes in postsFromResponse) {
+//            Post *post = [[Post alloc] initWithAttributes:attributes];
+//            [mutablePosts addObject:post];
+//        }
+//        
+//        if (block) {
+//            block([NSArray arrayWithArray:mutablePosts], nil);
+//        }
+//    } failure:^(NSURLSessionDataTask *__unused task, NSError *error) {
+//        if (block) {
+//            block([NSArray array], error);
+//        }
+//    }];
 }
 
 @end

@@ -4,14 +4,14 @@
   "returnObj": {
     "colorList": [
       {
-        "colorId": "0",
+        "colorId": "9",
         "colorName": "黑色",
-        "colorNumber": 4
+        "productCount": 4
       },
       {
-        "colorId": "1",
+        "colorId": "5",
         "colorName": "蓝色",
-        "colorNumber": 3
+        "productCount": 3
       }
     ]
   }

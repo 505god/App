@@ -7,7 +7,7 @@
 //
 
 #import "WQAddProductCell.h"
-#import "UIButton+WebCache.h"
+#import "UIButton+AFNetworking.h"
 
 @interface WQAddProductCell ()
 
@@ -26,7 +26,7 @@
         if (image) {
             [self setBackgroundImage:_image forState:UIControlStateNormal];
         }else {
-            [self sd_setImageWithURL:imageUrl forState:UIControlStateNormal];
+            [self setImageForState:UIControlStateNormal withURL:imageUrl];
         }
         self.layer.masksToBounds = YES;
         self.layer.cornerRadius = 4.0;

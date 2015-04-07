@@ -9,8 +9,6 @@
 #import "WQCustomerCell.h"
 
 #import "WQTapImg.h"
-#import "UIView+Common.h"
-#import "UIView+LayerEffects.h"
 
 @interface WQCustomerCell ()<WQTapImgDelegate>
 

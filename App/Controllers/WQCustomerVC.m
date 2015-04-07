@@ -34,9 +34,13 @@
 
 @implementation WQCustomerVC
 
+-(void)dealloc {
+    [self.view removeObserver:self forKeyPath:@"frame"];
+}
+
 // 创建tableView
 - (void) createTableView {
-    self.tableView = [[WQCustomerTable alloc] initWithFrame:self.view.bounds];
+    self.tableView = [[WQCustomerTable alloc] initWithFrame:(CGRect){0,0,[[UIScreen mainScreen] bounds].size.width,[[UIScreen mainScreen] bounds].size.height-64}];
     self.tableView.delegate = self;
     [self.view addSubview:self.tableView];
 }
@@ -46,14 +50,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"客户管理";
+//    self.title = NSLocalizedString(@"CustomerVC", @"");
     
     //导航栏设置
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                               initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                               target:self
                                               action:@selector(addNewCustomer)];
-    
     
     if ([WQDataShare sharedService].customerList.count>0) {
         if (!self.tableView) {
@@ -72,6 +75,9 @@
                 [self.tableView reloadData];
         }];
     }
+    
+    //KVO监测view的frame变化
+    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -378,5 +384,13 @@
     [[WQDataShare sharedService] sortCustomers:searchResults CompleteBlock:^(BOOL finished) {
         [self.tableView reloadData];
     }];
+}
+
+#pragma mark - KVO
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+    [self updateSubViews];
+}
+-(void)updateSubViews {
+   
 }
 @end

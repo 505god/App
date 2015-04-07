@@ -11,12 +11,12 @@
 //尺码
 
 @interface WQSizeObj : NSObject
-
+///尺码id
 @property (nonatomic, assign) NSInteger sizeId;
-
+///尺码名称
 @property (nonatomic, copy) NSString *sizeName;
-
-@property (nonatomic, assign) NSInteger sizeNumber;
+///尺码下产品数量
+@property (nonatomic, assign) NSInteger productCount;
 
 +(WQSizeObj *)returnSizeWithDic:(NSDictionary *)aDic;
 

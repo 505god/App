@@ -8,7 +8,6 @@
 
 #import "JKAssetsGroupsView.h"
 #import "JKAssetsGroupCell.h"
-#import "UIView+JKPicker.h"
 
 @interface JKAssetsGroupsView()<UIGestureRecognizerDelegate,UITableViewDataSource,UITableViewDelegate>
 

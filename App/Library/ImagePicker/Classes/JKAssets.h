@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 
-@interface JKAssets : NSObject<NSCoding>
-
+@interface JKAssets : NSObject
 @property (nonatomic, strong) NSString  *groupPropertyID;
 @property (nonatomic, strong) NSURL     *groupPropertyURL;
 @property (nonatomic, strong) NSURL     *assetPropertyURL;

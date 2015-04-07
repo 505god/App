@@ -1,0 +1,65 @@
+/* 
+  Localizable.strings
+  TTTTTT
+
+  Created by 邱成西 on 15/2/13.
+  Copyright (c) 2015年 苏州瑞鹏科技有限公司. All rights reserved.
+*/
+
+"MainVC" = "Home";
+
+"CustomerVC" = "Customers";
+"OrderVC" = "Orders";
+"SaleVC" = "Sales";
+
+"HotSaleVC" = "Hot Sale";
+"ProductClassifyVC" = "Classify List";
+"NewProductVC" = "Creat Product";
+
+//设置
+"SettingVC" = "setting";
+"Header" = "header";
+"ShopName" = "name";
+"ClassifySetup" = "classify";
+"ColorSetup" = "color";
+"SizeSetup" = "size";
+"CurrencySetup" = "currency";
+"LogOut" = "logout";
+
+//热卖展示
+"HasSale" = "saled";
+"NoneProducts" = "None Products";
+"NoneClass" = "暂无分类";
+"NewClass" = "创建分类";
+
+//选择照片
+"Cancel" = "cancel";
+"SelectedMaxPhoto" = "最多选择%ld张照片";
+"NextStep" = "下一步(%ld)";
+"PhotoAlert" = "严禁上传色情裸露、暴力血腥图片，一经核实，立即封号。";
+"Format_photo" = "%ld 张照片";
+"Format_photos" = "%ld 张照片";
+"PhotoSelectedError" = "选择图片失败";
+
+//刷新控件
+"FooterPullToRefresh" = "上拉可以加载更多数据";
+"FooterReleaseToRefresh" = "松开立即加载更多数据";
+"Refreshing" = "Refreshing";
+"HeaderPullToRefresh" = "Pull To Refresh";
+"HeaderReleaseToRefresh" = "Release To Refresh";
+"Today" = "Today";
+"LastUpDate" = "Last UpDate:";
+
+"ProductCode" = "product code";
+"ProductPrice" = "product price";
+"ProductDetail" = "product description";
+
+"AddProductColor" = "Add product color";
+"RecommendProduct" = "Recommend to customers";
+"SelectedCustomer" = "Selected %ld ustomer";
+"AddProduct" = "Add Product";
+
+
+
+"ColorVC" = "Colors";
+"SizeVC" = "Size";

@@ -63,6 +63,6 @@
 -(void)blink;
 -(void)bump;
 
-@property (nonatomic)UIView *hubView;
+@property (nonatomic, strong) UIView *hubView;
 
 @end

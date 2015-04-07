@@ -10,9 +10,18 @@
 
 @interface BaseViewController ()
 
+
 @end
 
 @implementation BaseViewController
+
+-(void)dealloc {
+    SafeRelease(_noneView);
+    SafeRelease(_noneLabel);
+    SafeRelease(_appDel);
+    SafeRelease(_toolControl);
+    SafeRelease(_navBarView);
+}
 
 #pragma mark - lifestyle
 
@@ -23,11 +32,13 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     if (Platform>=7.0) {
         self.edgesForExtendedLayout=UIRectEdgeNone;
     }
+    
+    self.view.backgroundColor = COLOR(213, 213, 213, 1);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -46,25 +57,94 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-#pragma mark - 导航栏设置
-- (void)setupNavbarUI {
-    if (Platform>=7.0) {
-        [[UINavigationBar appearance] setBarTintColor:[UIColor orangeColor]];
-        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-        [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil]];
+
+#pragma mark - property
+
+-(AppDelegate *)appDel {
+    if (!_appDel) {
+        _appDel = [AppDelegate shareIntance];
+    }
+    return _appDel;
+}
+
+-(WQNavBarView *)navBarView {
+    if (!_navBarView) {
+        NSArray *bundles = [[NSBundle mainBundle] loadNibNamed:@"WQNavBarView" owner:self options:nil];
+        _navBarView = (WQNavBarView*)[bundles objectAtIndex:0];
+        _navBarView.titleLab.text = @"";
+        _navBarView.backgroundColor = [UIColor whiteColor];
+        _navBarView.frame = (CGRect){0,0,self.view.width,NavgationHeight};
+    }
+    return _navBarView;
+}
+
+-(UIView *)noneView {
+    if (!_noneView) {
+        _noneView = [[UIView alloc]initWithFrame:self.view.bounds];
+        _noneView.hidden = YES;
+        _noneView.userInteractionEnabled = NO;
+        [self.view addSubview:_noneView];
+    }
+    return _noneView;
+}
+
+-(UILabel *)noneLabel {
+    if (!_noneLabel) {
+        _noneLabel = [[UILabel alloc]initWithFrame:(CGRect){(self.view.width-60)/2,(self.view.height-20)/2-30,60,20}];
+        _noneLabel.backgroundColor = [UIColor clearColor];
+        _noneLabel.textColor = [UIColor lightGrayColor];
+        _noneLabel.font = [UIFont systemFontOfSize:15];
+        [self.noneView addSubview:_noneLabel];
+    }
+    return _noneLabel;
+}
+
+-(UIButton *)toolControl {
+    if (!_toolControl) {
+        _toolControl = [UIButton buttonWithType:UIButtonTypeCustom];
+        _toolControl.frame = (CGRect){0,self.view.height-NavgationHeight,self.view.width,NavgationHeight};
+        _toolControl.backgroundColor = [UIColor whiteColor];
+        [_toolControl addTarget:self action:@selector(toolControlPressed) forControlEvents:UIControlEventTouchUpInside];
+        [_toolControl setShadow:[UIColor blackColor] rect:(CGRect){0,0,_toolControl.width,4} opacity:0.5 blurRadius:3];
+        [_toolControl setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [_toolControl setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
+        [_toolControl setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateDisabled];
+        _toolControl.hidden = !self.isToolBarHidden;
+        [self.view addSubview:_toolControl];
+    }
+    return _toolControl;
+}
+#pragma mark -
+
+-(void)setNoneText:(NSString *)text animated:(BOOL)animated {
+    self.noneView.hidden = !animated;
+    if (animated) {
+        self.noneLabel.text = text;
     }else {
-        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
+        self.noneLabel.text = @"";
+        [self.noneView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        [self.noneView removeFromSuperview];
+        SafeRelease(self.noneView);
+        SafeRelease(self.noneLabel);
     }
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+-(void)setToolImage:(NSString *)imageString text:(NSString *)text animated:(BOOL)animated {
+    self.isToolBarHidden = animated;
+    self.toolControl.hidden= !self.isToolBarHidden;
+    if (animated) {
+        if ([Utility checkString:imageString]) {
+            [self.toolControl setImage:[UIImage imageNamed:imageString] forState:UIControlStateNormal];
+        }
+        if ([Utility checkString:text]) {
+            [self.toolControl setTitle:text forState:UIControlStateNormal];
+        }
+    }else {
+        [self.toolControl removeFromSuperview];
+        SafeRelease(self.toolControl);
+    }
 }
-*/
-
+-(void)toolControlPressed {
+    
+}
 @end

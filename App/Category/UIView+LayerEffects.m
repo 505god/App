@@ -28,5 +28,11 @@
 	l.shadowRadius = blurRadius;
 }
 
-
+-(void)setShadow:(UIColor *)color rect:(CGRect)rect opacity:(CGFloat)opacity blurRadius:(CGFloat)blurRadius{
+    CALayer *l = self.layer;
+    l.shadowColor = [color CGColor];
+    l.shadowOpacity = opacity;
+    l.shadowPath = [UIBezierPath bezierPathWithRect:rect].CGPath;
+    l.shadowRadius = blurRadius;
+}
 @end

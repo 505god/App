@@ -79,7 +79,7 @@
     if ([Utility checkString:self.companyText.text]) {
         if ([Utility checkString:self.passwordText1.text]) {
             if (![self.passwordText1.text isEqualToString:self.passwordText2.text]) {
-                [Utility errorAlert:@"两次密码不一致" view:self.view];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:@"两次密码不一致"];
             }else {
 //                [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"努力加载中...",KVNProgressViewParameterBackgroundType:@(KVNProgressBackgroundTypeSolid),KVNProgressViewParameterFullScreen: @(NO)}];
                 
@@ -90,10 +90,10 @@
                 }
             }
         }else {
-            [Utility errorAlert:@"请设置密码" view:self.view];
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请设置密码"];
         }
     }else {
-        [Utility errorAlert:@"请输入用户姓名" view:self.view];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请输入用户姓名"];
     }
 }
 #pragma mark - UITextFieldDelegate
@@ -114,7 +114,6 @@
 - (void)tappedWithObject:(id) sender {
     JKImagePickerController *imagePickerController = [[JKImagePickerController alloc] init];
     imagePickerController.delegate = self;
-    imagePickerController.showsCancelButton = YES;
     imagePickerController.allowsMultipleSelection = YES;
     imagePickerController.minimumNumberOfSelection = 1;
     imagePickerController.maximumNumberOfSelection = 1;
@@ -124,28 +123,28 @@
 #pragma mark - JKImagePickerControllerDelegate
 - (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAssets:(NSArray *)assets isSource:(BOOL)source
 {
-    JKAssets *set = (JKAssets *)assets[0];
-    
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     __weak typeof(self) weakSelf = self;
     
-    __block UIImage *image = nil;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        JKAssets *asset = (JKAssets *)assets[0];
+        __block UIImage *image = nil;
         ALAssetsLibrary   *lib = [[ALAssetsLibrary alloc] init];
-        [lib assetForURL:set.assetPropertyURL resultBlock:^(ALAsset *asset) {
+        [lib assetForURL:asset.assetPropertyURL resultBlock:^(ALAsset *asset) {
             if (asset) {
                 UIImage *tempImg = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]];
                 image = [weakSelf dealImage:tempImg];
-                SafeRelease(tempImg);
             }
         } failureBlock:^(NSError *error) {
             
         }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [imagePicker dismissViewControllerAnimated:YES completion:^{
+                weakSelf.headerImg.image = image;
+                [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+            }];
+        });
     });
-    
-    [imagePicker dismissViewControllerAnimated:YES completion:^{
-        weakSelf.headerImg.image = image;
-        
-    }];
 }
 
 - (void)imagePickerControllerDidCancel:(JKImagePickerController *)imagePicker

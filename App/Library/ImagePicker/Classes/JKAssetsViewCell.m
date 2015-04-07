@@ -8,7 +8,6 @@
 
 #import "JKAssetsViewCell.h"
 #import "JKUtil.h"
-#import "UIView+JKPicker.h"
 
 @interface JKAssetsViewCell() 
 
@@ -99,6 +98,7 @@
         [_checkButton setBackgroundImage:imgH forState:UIControlStateSelected];
         [_checkButton addTarget:self action:@selector(photoDidChecked) forControlEvents:UIControlEventTouchUpInside];
         _checkButton.exclusiveTouch = YES;
+        _checkButton.userInteractionEnabled = NO;
         [self.imageView addSubview:_checkButton];
     }
     return _checkButton;

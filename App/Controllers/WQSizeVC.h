@@ -8,8 +8,7 @@
 
 #import "BaseViewController.h"
 
-//尺码
-
+///尺码设置
 @protocol WQSizeVCDelegate;
 
 @interface WQSizeVC : BaseViewController
@@ -17,8 +16,6 @@
 @property (nonatomic, assign) id<WQSizeVCDelegate>delegate;
 
 @property (nonatomic, assign) BOOL isPresentVC;
-
-@property (nonatomic, strong) NSIndexPath *indexPath;
 
 @property (nonatomic, strong) NSMutableArray *selectedList;
 

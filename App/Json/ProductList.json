@@ -7,27 +7,41 @@
                         "productId": 0,
                         "productName": "篮球鞋",
                         "productPrice": "288",
-                        "productStockCount": 132,
-                        "productDetails": "很好，32个赞",
                         "productSaleCount": 123,
-                        "productProperty": [
-                        ],
-                        "productImages": "image||image||image",
-                        "productPraiseCount": 1345,
-                        "productViewCount": 2312341
+                        "productViewCount": 2312341,
+                        "productImage": "http://img7n1.graphmovie.com/a8bec866804844b4b51d4f4e6918ae1a.jpg",
+                        "productIsHot": "1",
+                        "productIsSale": "1"
                         },
                         {
                         "productId": 0,
-                        "productName": "足球鞋",
+                        "productName": "篮球鞋",
                         "productPrice": "288",
-                        "productStockCount": 132,
-                        "productDetails": "很好，32个赞",
                         "productSaleCount": 123,
-                        "productProperty": [
-                        ],
-                        "productImages": "image||image||image",
-                        "productPraiseCount": 1345,
-                        "productViewCount": 2312341
+                        "productViewCount": 2312341,
+                        "productImage": "http://img7n1.graphmovie.com/a8bec866804844b4b51d4f4e6918ae1a.jpg",
+                        "productIsHot": "1",
+                        "productIsSale": "0"
+                        },
+                        {
+                        "productId": 0,
+                        "productName": "篮球鞋",
+                        "productPrice": "288",
+                        "productSaleCount": 123,
+                        "productViewCount": 2312341,
+                        "productImage": "http://img7n1.graphmovie.com/a8bec866804844b4b51d4f4e6918ae1a.jpg",
+                        "productIsHot": "1",
+                        "productIsSale": "1"
+                        },
+                        {
+                        "productId": 0,
+                        "productName": "篮球鞋",
+                        "productPrice": "288",
+                        "productSaleCount": 123,
+                        "productViewCount": 2312341,
+                        "productImage": "http://img7n1.graphmovie.com/a8bec866804844b4b51d4f4e6918ae1a.jpg",
+                        "productIsHot": "1",
+                        "productIsSale": "0"
                         }
                         ]
     }

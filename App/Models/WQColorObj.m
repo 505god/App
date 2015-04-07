@@ -13,7 +13,7 @@
 + (NSDictionary*)mts_mapping {
     return  @{@"colorId": mts_key(colorId),
               @"colorName": mts_key(colorName),
-              @"colorNumber": mts_key(colorNumber),
+              @"productCount": mts_key(productCount),
               };
 }
 

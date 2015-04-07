@@ -11,6 +11,9 @@
 #import "WQLogVC.h"
 #import "WQMainVC.h"
 
+
+
+
 @interface WQInitVC ()<WQInitViewDelegate>
 
 @end
@@ -67,9 +70,9 @@
 }
 //结束
 -(void)initViewDidEndAnimating:(WQInitView *) initView {
-    WQMainVC *logVC = LOADVC(@"WQMainVC");
-    [self.navigationController pushViewController:logVC animated:NO];
-    SafeRelease(logVC);
+    AppDelegate *appDel = [AppDelegate shareIntance];
+    
+    [appDel showRootVC];
 }
 /*
 #pragma mark - Navigation

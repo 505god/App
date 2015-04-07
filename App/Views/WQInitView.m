@@ -81,6 +81,11 @@ static CGFloat animationDuration = 1.0;
         [self.delegate initViewDidEndAnimating:self];
     }
 }
+
+-(void)dealloc {
+    SafeRelease(_logoImg);
+    SafeRelease(_delegate);
+}
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

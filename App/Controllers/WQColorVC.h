@@ -8,7 +8,7 @@
 
 #import "BaseViewController.h"
 
-//颜色分类
+///颜色设置
 
 @protocol WQColorVCDelegate;
 

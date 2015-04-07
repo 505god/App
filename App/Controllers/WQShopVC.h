@@ -8,6 +8,9 @@
 
 #import "BaseViewController.h"
 
+//店铺
+
 @interface WQShopVC : BaseViewController
+
 
 @end

@@ -12,6 +12,14 @@
 
 #import "Reachability.h"
 
+
+//首页子ViewController
+#import "WQShopVC.h"
+#import "WQOrderVC.h"
+#import "WQCustomerVC.h"
+#import "WQSaleVC.h"
+
+
 @interface AppDelegate ()
 
 @property (strong, nonatomic) Reachability *hostReach;//网络监听所用
@@ -26,6 +34,13 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [application setStatusBarStyle:UIStatusBarStyleLightContent];
+    
+    //statusBar
+    if (Platform>=7.0) {
+        [WQDataShare sharedService].statusHeight = 20;
+    }else {
+        [WQDataShare sharedService].statusHeight = 0;
+    }
     //短信
     [SMS_SDK registerApp:@"46c880df3c3f" withSecret:@"e5d8a4bb450b2e2f2076bffdf57b2ec7"];
     [SMS_SDK enableAppContactFriends:NO];
@@ -43,47 +58,7 @@
     self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
     self.window.rootViewController = self.navControl;
     
-    if (Platform>=7.0) {
-        [[UINavigationBar appearance] setBarTintColor:COLOR(57, 164, 247, 1)];
-        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-        [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:17],UITextAttributeFont,[UIColor whiteColor],UITextAttributeTextColor,nil]];
-    }else {
-        [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    }
-
-    NSMutableArray *dataArray = [NSMutableArray arrayWithObjects:
-                                 [NSMutableString stringWithString:@"one"],
-                                 [NSMutableString stringWithString:@"two"],
-                                 [NSMutableString stringWithString:@"three"],
-                                 nil
-                                 ];
-    NSMutableArray *dataArray2;
-    NSMutableString *mStr;
-    
-    NSLog(@"dataArray:   ");
-    for(NSString *elem in dataArray)
-        NSLog(@"   %@", elem);
-    
-    //执行一个拷贝，然后改变其中的一个字符串(浅复制)
-    dataArray2 = [dataArray mutableCopy];
-    
-    //这种方式会同时改变连个数组中的对象
-    mStr = [dataArray objectAtIndex:0];
-//    [mStr appendString:@"ONE"];
-    
-    mStr = [NSMutableString stringWithString:[dataArray2 objectAtIndex:0]];
-    [mStr appendString:@"ONE"];
-    [dataArray2 replaceObjectAtIndex:0 withObject:mStr];
-    
-    NSLog(@"dataArray:");
-    for(NSString *elem in dataArray)
-        NSLog(@"  %@",elem);
-    
-    NSLog(@"dataArray2:");
-    for(NSString *elem in dataArray2)
-        NSLog(@"  %@",elem);
-    
-    
+    [self getCurrentLanguage];
     
     [self.window makeKeyAndVisible];
     
@@ -113,21 +88,49 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+#pragma mark - 获取当前语言
+- (void)getCurrentLanguage {
+    NSArray *languages = [NSLocale preferredLanguages];
+    NSString *currentLanguage = [languages objectAtIndex:0];
+    DLog( @"%@" , currentLanguage);
+    if ([currentLanguage isEqualToString:@"zh-Hans"]) {
+        
+    }else if ([currentLanguage isEqualToString:@"zh-Hans"]) {
+        
+    }else if ([currentLanguage isEqualToString:@"zh-Hans"]) {
+        
+    }
+    
+}
 #pragma mark - 网络
-
 - (void)reachabilityChanged:(NSNotification *)note {
     Reachability *currReach = [note object];
     NSParameterAssert([currReach isKindOfClass:[Reachability class]]);
     //对连接改变做出响应处理动作
     NetworkStatus status = [currReach currentReachabilityStatus];
-    if(status == NotReachable)
-    {
-        _isReachable = NO;
-    }
-    else
-    {
-        _isReachable = YES;
+    if(status == NotReachable) {
+        self.isReachable = NO;
+    }else {
+        self.isReachable = YES;
     }
 }
 
+#pragma mark - 加载RootViewController
+-(void)showRootVC {
+    self.mainVC = [[WQMainVC alloc]init];
+    WQShopVC *shopVC = [[WQShopVC alloc]init];
+//    WQShopVC *shopVC = LOADVC(@"WQShopVC");
+    WQOrderVC *orderVC = LOADVC(@"WQOrderVC");
+    WQCustomerVC *customerVC = LOADVC(@"WQCustomerVC");
+    WQSaleVC *saleVC = LOADVC(@"WQSaleVC");
+    
+//    self.mainVC.view.frame = (CGRect){0,0,[UIScreen mainScreen].bounds.size};
+
+    self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
+
+    [self.mainVC setCurrentPageVC:0];
+    self.navControl = [[UINavigationController alloc]initWithRootViewController:self.mainVC];
+    
+    self.window.rootViewController = self.navControl;
+}
 @end

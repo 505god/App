@@ -8,8 +8,6 @@
 
 #import "PhotoAlbumManager.h"
 
-#import "PhotoAlbumManager.h"
-
 @interface PhotoAlbumManager()
 
 @property (nonatomic, strong) ALAssetsLibrary   *assetsLibrary;

@@ -16,6 +16,9 @@ typedef void(^CompleteBlock)(BOOL finished);
 
 @property (nonatomic, strong) AppDelegate *appDel;
 
+//区分6、7statusBar高度
+@property (nonatomic, assign) NSInteger statusHeight;
+
 #pragma mark - 用户列表
 @property (nonatomic, strong) NSMutableArray *customerArray;//用于搜索
 @property (nonatomic, strong) NSMutableArray *customerList;//用于显示cell

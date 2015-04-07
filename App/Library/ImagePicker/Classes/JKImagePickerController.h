@@ -6,7 +6,7 @@
 //  Copyright (c) 2015年 Jecky. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "BaseViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "JKAssets.h"
 
@@ -23,20 +23,18 @@ UIKIT_EXTERN ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterTyp
 @protocol JKImagePickerControllerDelegate <NSObject>
 
 @optional
-- (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAsset:(JKAssets *)asset isSource:(BOOL)source;
-- (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAssets:(NSArray *)assets isSource:(BOOL)source;
+- (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAssets:(NSArray *)assets;
 - (void)imagePickerControllerDidCancel:(JKImagePickerController *)imagePicker;
 
 @end
 
-@interface JKImagePickerController : UIViewController
+@interface JKImagePickerController : BaseViewController
 
 @property (nonatomic, assign) id<JKImagePickerControllerDelegate> delegate;
 @property (nonatomic, assign) JKImagePickerControllerFilterType filterType;
-@property (nonatomic, assign) BOOL showsCancelButton;
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 @property (nonatomic, assign) NSUInteger minimumNumberOfSelection;
 @property (nonatomic, assign) NSUInteger maximumNumberOfSelection;
-@property (nonatomic, strong) NSMutableArray     *selectedAssetArray;
+@property (nonatomic, strong) NSMutableArray *selectedAssetArray;
 
 @end

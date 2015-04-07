@@ -8,7 +8,6 @@
 
 #import "JKAssetsGroupCell.h"
 #import "JKUtil.h"
-#import "UIView+JKPicker.h"
 #import "JKAssetsThumbnailView.h"
 
 @interface JKAssetsGroupCell()

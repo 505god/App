@@ -9,7 +9,7 @@
 #import "WQProductColorCell.h"
 #import "WQNewProductVC.h"
 #import "WQSizeObj.h"
-#import "UIView+Common.h"
+
 
 #import "WQCellSelectedBackground.h"
 
@@ -63,7 +63,7 @@
     
     self.colorNameLab.frame = (CGRect){80,(CELL_HEIGHT-self.colorNameLab.height)/2,self.colorNameLab.width,self.colorNameLab.height};
     
-    self.directionImg.frame = (CGRect){CELL_WIDTH-45,(CELL_HEIGHT-25)/2,25,25};
+    self.directionImg.frame = (CGRect){CELL_WIDTH-32,(CELL_HEIGHT-25)/2,25,25};
     
     //尺码和库存
     CGFloat height = 30;

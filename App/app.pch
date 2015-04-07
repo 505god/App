@@ -13,11 +13,23 @@
     #import <Foundation/Foundation.h>
     #import "AppDelegate.h"
 
+#import "WQCommon.h"
+
+
+#import "WQPopView.h"//弹出框
+
+#import "UIView+LayerEffects.h"
+#import "UIView+Common.h"
+#import "UIImageView+AFNetworking.h"
 #import "Utility.h"
 #import "NSObject+Motis.h"
 #import "MBProgressHUD.h"
 #import "WQDataShare.h"
 #endif
+
+//获取热卖展示
+#define HOTSALE @""
+
 
 
 //信息
@@ -60,3 +72,5 @@
 #define Platform [[[UIDevice currentDevice] systemVersion] floatValue]
 
 #define AddProductImagesMax  1
+
+#define NavgationHeight 44

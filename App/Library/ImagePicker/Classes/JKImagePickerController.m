@@ -9,11 +9,8 @@
 #import "JKImagePickerController.h"
 #import "JKUtil.h"
 #import "JKAssetsGroupsView.h"
-#import "UIView+JKPicker.h"
 #import "JKAssetsViewCell.h"
 #import "JKAssetsCollectionFooterView.h"
-#import "JKPromptView.h"
-#import "JKPhotoBrowser.h"
 #import "PhotoAlbumManager.h"
 
 ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePickerControllerFilterType type) {
@@ -33,7 +30,7 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
 }
 
 
-@interface JKImagePickerController ()<JKAssetsGroupsViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate,JKAssetsViewCellDelegate,JKPhotoBrowserDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface JKImagePickerController ()<JKAssetsGroupsViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate,JKAssetsViewCellDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,WQNavBarViewDelegate>
 
 @property (nonatomic, strong) ALAssetsLibrary     *assetsLibrary;
 @property (nonatomic, strong) NSArray *groupTypes;
@@ -48,17 +45,10 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
 @property (nonatomic, strong) UIView                *overlayView;
 @property (nonatomic, strong) JKAssetsGroupsView    *assetsGroupsView;
 
-
 @property (nonatomic, strong) ALAssetsGroup *selectAssetsGroup;
 @property (nonatomic, strong) NSMutableArray *assetsArray;
 @property (nonatomic, assign) NSUInteger numberOfAssets;
 @property (nonatomic, assign) NSUInteger numberOfPhotos;
-@property (nonatomic, assign) NSUInteger numberOfVideos;
-
-@property (nonatomic, strong) UIToolbar     *toolbar;
-@property (nonatomic, strong) UIButton      *selectButton;
-@property (nonatomic, strong) UIButton      *finishButton;
-@property (nonatomic, strong) UILabel       *finishLabel;
 
 @property (nonatomic, strong) UICollectionView   *collectionView;
 
@@ -77,16 +67,29 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    
+    //导航栏
+    self.navBarView.navDelegate = self;
+    self.navBarView.isShowShadow = YES;
+    [self.view addSubview:self.navBarView];
+    
+    //导航栏设置
     [self setUpProperties];
     
     if ([self respondsToSelector:@selector(edgesForExtendedLayout)]) {
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
     
+    /*
+    self.toolLabel.frame = (CGRect){10,7,self.toolControl.width-20,30};
+    self.toolLabel.font = [UIFont systemFontOfSize:12];
+    self.toolLabel.numberOfLines = 2;
+    self.toolLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    self.toolLabel.textAlignment = NSTextAlignmentCenter;
+    [self setToolImage:nil text:NSLocalizedString(@"PhotoAlert", @"") animated:YES];
+     */
+    
     [self collectionView];
-    [self toolbar];
     [self loadAssetsGroups];
 }
 
@@ -94,79 +97,56 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
     [super viewWillAppear:animated];
     
     UINavigationBar *navBar = self.navigationController.navigationBar;
-    [navBar setBarTintColor:COLOR(57, 164, 247, 1)];
+    [navBar setBarTintColor:[UIColor whiteColor]];
+    [navBar setShadow:[UIColor blackColor] rect:(CGRect){0,navBar.height,navBar.width,4} opacity:0.5 blurRadius:3];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
 }
 
-- (void)setUpProperties
-{
-    // Property settings
+#pragma mark - 导航栏设置
+- (void)setUpProperties {
+    //导航栏标题
     self.groupTypes = @[@(ALAssetsGroupLibrary),
                         @(ALAssetsGroupSavedPhotos),
                         @(ALAssetsGroupPhotoStream),
                         @(ALAssetsGroupAlbum)];
-
-    self.navigationItem.titleView = self.titleButton;
+    [self.navBarView addSubview:self.titleButton];
     
-    UIButton *preBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    preBtn.frame = CGRectMake(0, 0, 50, 30);
-    [preBtn setTitle:@"预览" forState:UIControlStateNormal];
-    [preBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [preBtn setTitleColor:[JKUtil getColor:@"828689"] forState:UIControlStateHighlighted];
-    [preBtn setTitleColor:[JKUtil getColor:@"828689"] forState:UIControlStateDisabled];
-    [preBtn addTarget:self action:@selector(previewPhotoesSelected) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *preItem = [[UIBarButtonItem alloc] initWithCustomView:preBtn];
-    [self.navigationItem setRightBarButtonItem:preItem animated:NO];
-    self.navigationItem.rightBarButtonItem.enabled = NO;
+    [self.navBarView.rightBtn setTitle:[NSString stringWithFormat:NSLocalizedString(@"NextStep", @""),self.selectedAssetArray.count] forState:UIControlStateNormal];
+    self.navBarView.rightBtn.enabled = NO;
 }
 
-- (void)cancelEventDidTouched
-{
-    if ([_delegate respondsToSelector:@selector(imagePickerControllerDidCancel:)]) {
-        [_delegate imagePickerControllerDidCancel:self];
-    }
-}
+#pragma mark - 相簿选择
 
-- (void)assetsGroupDidSelected
-{
+- (void)assetsGroupDidSelected {
     self.showsAssetsGroupSelection = YES;
     
     if (self.showsAssetsGroupSelection) {
         [self showAssetsGroupView];
     }
 }
-
-- (void)selectOriginImage
-{
-    _selectButton.selected = !_selectButton.selected;
-
-}
-
-- (void)assetsGroupsDidDeselected
-{
+- (void)assetsGroupsDidDeselected {
     self.showsAssetsGroupSelection = NO;
     [self hideAssetsGroupView];
 }
 
-- (void)showAssetsGroupView
-{
+- (void)showAssetsGroupView {
     [[UIApplication sharedApplication].keyWindow addSubview:self.touchButton];
     
+    self.assetsGroupsView.hidden = NO;
     self.overlayView.alpha = 0.0f;
     [UIView animateWithDuration:0.3f
                      animations:^{
-                         self.assetsGroupsView.top = 0;
+                         self.assetsGroupsView.top = self.navBarView.bottom;
                          self.overlayView.alpha = 0.85f;
                      }completion:^(BOOL finished) {
                          
                      }];
 }
 
-- (void)hideAssetsGroupView
-{
+- (void)hideAssetsGroupView {
     [UIView animateWithDuration:0.3f
                      animations:^{
                          self.assetsGroupsView.top = -self.assetsGroupsView.height;
@@ -175,47 +155,12 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
                          [_touchButton removeFromSuperview];
                          _touchButton = nil;
                          
+                         self.assetsGroupsView.hidden = YES;
+                         
                          [_overlayView removeFromSuperview];
                          _overlayView = nil;
                      }];
     
-}
-
-- (void)previewPhotoesSelected
-{
-    [self passSelectedAssets];
-}
-
-- (void)browerPhotoes:(NSArray *)array page:(NSInteger)page
-{
-    JKPhotoBrowser  *photoBorwser = [[JKPhotoBrowser alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    photoBorwser.delegate = self;
-    photoBorwser.pickerController = self;
-    photoBorwser.currentPage = page;
-    photoBorwser.assetsArray = [NSMutableArray arrayWithArray:array];
-    [photoBorwser show:YES];
-}
-
-#pragma mark - Managing Assets
-- (void)passSelectedAssets
-{
-    // Load assets from URLs
-    __block NSMutableArray *assets = [NSMutableArray array];
-    
-    for (JKAssets *jka in self.selectedAssetArray) {
-        __weak typeof(self) weakSelf = self;
-        [self.assetsLibrary assetForURL:jka.assetPropertyURL
-                            resultBlock:^(ALAsset *asset) {
-                                // Add asset
-                                [assets addObject:asset];
-                                // Check if the loading finished
-                                if (assets.count == weakSelf.selectedAssetArray.count) {
-                                    [weakSelf browerPhotoes:assets page:0];
-                                }
-                            } failureBlock:^(NSError *error) {
-
-                            }];
-    }
 }
 
 
@@ -245,8 +190,6 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
                                  weakSelf.titleButton.enabled = NO;
                              }
                          }];
-    
-    // Validation
 }
 
 - (void)setSelectAssetsGroup:(ALAssetsGroup *)selectAssetsGroup{
@@ -296,7 +239,6 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
     self.assetsArray = assets;
     self.numberOfAssets = numberOfAssets;
     self.numberOfPhotos = numberOfPhotos;
-    self.numberOfVideos = numberOfVideos;
     
     // Update view
     [self.collectionView reloadData];
@@ -416,34 +358,6 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
     self.arrowImageView.selected = _showsAssetsGroupSelection;
     
 }
-- (void)setShowsCancelButton:(BOOL)showsCancelButton{
-    _showsCancelButton = showsCancelButton;
-    
-    // Show/hide cancel button
-    if (showsCancelButton) {
-        UIButton *cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        cancelBtn.frame = CGRectMake(0, 0, 50, 30);
-        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
-        [cancelBtn setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
-        [cancelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [cancelBtn setTitleColor:[JKUtil getColor:@"828689"] forState:UIControlStateHighlighted];
-        [cancelBtn addTarget:self action:@selector(cancelEventDidTouched) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithCustomView:cancelBtn];
-        [self.navigationItem setLeftBarButtonItem:cancelItem animated:NO];
-    } else {
-        [self.navigationItem setLeftBarButtonItem:nil animated:NO];
-    }
-}
-
-
-- (void)finishPhotoDidSelected
-{
-    if ([_delegate respondsToSelector:@selector(imagePickerController:didSelectAssets:isSource:)]) {
-        [_delegate imagePickerController:self
-                         didSelectAssets:self.selectedAssetArray
-                                isSource:_selectButton.selected];
-    }
-}
 
 static NSString *kJKImagePickerCellIdentifier = @"kJKImagePickerCellIdentifier";
 static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier";
@@ -479,54 +393,12 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
     if (kind == UICollectionElementKindSectionFooter) {
-        JKAssetsCollectionFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-                                                                                      withReuseIdentifier:kJKAssetsFooterViewIdentifier
-                                                                                             forIndexPath:indexPath];
+        JKAssetsCollectionFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter                    withReuseIdentifier:kJKAssetsFooterViewIdentifier                                  forIndexPath:indexPath];
         
-        switch (self.filterType) {
-            case JKImagePickerControllerFilterTypeNone:{
-                NSString *format;
-                if (self.numberOfPhotos == 1) {
-                    if (self.numberOfVideos == 1) {
-                        format = @"format_photo_and_video";
-                    } else {
-                        format = @"format_photo_and_videos";
-                    }
-                } else if (self.numberOfVideos == 1) {
-                    format = @"format_photos_and_video";
-                } else {
-                    format = @"format_photos_and_videos";
-                }
-                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTable(format,
-                                                                                                  @"JKImagePickerController",
-                                                                                                  nil),
-                                             self.numberOfPhotos,
-                                             self.numberOfVideos
-                                             ];
-                break;
-            }
-                
-            case JKImagePickerControllerFilterTypePhotos:{
-                NSString *format = (self.numberOfPhotos == 1) ? @"format_photo" : @"format_photos";
-                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTable(format,
-                                                                                                  @"JKImagePickerController",
-                                                                                                  nil),
-                                             self.numberOfPhotos
-                                             ];
-                break;
-            }
-                
-            case JKImagePickerControllerFilterTypeVideos:{
-                NSString *format = (self.numberOfVideos == 1) ? @"format_video" : @"format_videos";
-                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTable(format,
-                                                                                                  @"JKImagePickerController",
-                                                                                                  nil),
-                                             self.numberOfVideos
-                                             ];
-                break;
-            }
+        if (self.filterType == JKImagePickerControllerFilterTypePhotos) {
+            NSString *format = (self.numberOfPhotos == 1) ? @"Format_photo" : @"Format_photos";
+            footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedString(format, @""),self.numberOfPhotos];
         }
-        
         return footerView;
     }
     
@@ -546,38 +418,34 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
     return UIEdgeInsetsMake(2, 2, 2, 2);
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    __block UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseIn|UIViewAnimationOptionAllowUserInteraction animations:^{
-        cell.transform = CGAffineTransformMakeScale(1.03, 1.03);
-    } completion:^(BOOL finished) {
-        [self browerPhotoes:self.assetsArray page:[indexPath row]-1];
-        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseOut|UIViewAnimationOptionAllowUserInteraction animations:^{
-            cell.transform = CGAffineTransformIdentity;
-        } completion:^(BOOL finished) {
-            
-        }];
-    }];
-}
-
-#pragma mark - getter
-- (void)photoBrowser:(JKPhotoBrowser *)photoBrowser didSelectAtIndex:(NSInteger)index
-{
-    ALAsset *asset = self.assetsArray[index];
-    NSURL *assetURL = [asset valueForProperty:ALAssetPropertyAssetURL];
-    [self addAssetsObject:assetURL];
-    [self resetFinishFrame];
-    [self.collectionView reloadData];
-}
-
-- (void)photoBrowser:(JKPhotoBrowser *)photoBrowser didDeselectAtIndex:(NSInteger)index
-{
-    ALAsset *asset = self.assetsArray[index];
-    NSURL *assetURL = [asset valueForProperty:ALAssetPropertyAssetURL];
-    [self removeAssetsObject:assetURL];
-    [self resetFinishFrame];
-    [self.collectionView reloadData];
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (indexPath.item==0) {
+        
+    }else {
+        JKAssetsViewCell *assetsCell = (JKAssetsViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
+        
+        if (assetsCell.isSelected) {
+            NSURL *assetURL = [assetsCell.asset valueForProperty:ALAssetPropertyAssetURL];
+            [self removeAssetsObject:assetURL];
+            [self resetFinishFrame];
+            assetsCell.isSelected = NO;
+        }else {
+            if (self.selectedAssetArray.count>=self.maximumNumberOfSelection) {
+                NSString  *str = [NSString stringWithFormat:NSLocalizedString(@"SelectedMaxPhoto", @""),self.maximumNumberOfSelection];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:str];
+            }else {
+                BOOL  validate = [self validateMaximumNumberOfSelections:(self.selectedAssetArray.count + 1)];
+                if (validate) {
+                    // Add asset URL
+                    NSURL *assetURL = [assetsCell.asset valueForProperty:ALAssetPropertyAssetURL];
+                    [self addAssetsObject:assetURL];
+                    [self resetFinishFrame];
+                    assetsCell.isSelected = YES;
+                }
+            }            
+        }
+    }
 }
 
 #pragma mark- UIImagePickerViewController
@@ -593,7 +461,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
                                      if (error == nil && asset) {
                                          NSURL *assetURL = [asset valueForProperty:ALAssetPropertyAssetURL];
                                          [self addAssetsObject:assetURL];
-                                         [weakSelf finishPhotoDidSelected];
+                                         [weakSelf rightBtnClickByNavBarView:weakSelf.navBarView];
                                      }
                                  }];
     
@@ -603,11 +471,10 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 }
 
 #pragma mark - JKAssetsViewCellDelegate
-- (void)startPhotoAssetsViewCell:(JKAssetsViewCell *)assetsCell
-{
+- (void)startPhotoAssetsViewCell:(JKAssetsViewCell *)assetsCell {
     if (self.selectedAssetArray.count>=self.maximumNumberOfSelection) {
-        NSString  *str = [NSString stringWithFormat:@"最多选择%d张照片",self.maximumNumberOfSelection];
-        [JKPromptView showWithImageName:@"picker_alert_sigh" message:str];
+        NSString  *str = [NSString stringWithFormat:NSLocalizedString(@"SelectedMaxPhoto", @""),self.maximumNumberOfSelection];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:str];
         return;
     }
     
@@ -621,36 +488,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
     }
 }
 
-- (void)didSelectItemAssetsViewCell:(JKAssetsViewCell *)assetsCell
-{
-    if (self.selectedAssetArray.count>=self.maximumNumberOfSelection) {
-        NSString  *str = [NSString stringWithFormat:@"最多选择%d张照片",self.maximumNumberOfSelection];
-        [JKPromptView showWithImageName:@"picker_alert_sigh" message:str];
-    }
-    
-    BOOL  validate = [self validateMaximumNumberOfSelections:(self.selectedAssetArray.count + 1)];
-    if (validate) {
-        // Add asset URL
-        NSURL *assetURL = [assetsCell.asset valueForProperty:ALAssetPropertyAssetURL];
-        [self addAssetsObject:assetURL];
-        [self resetFinishFrame];
-        assetsCell.isSelected = YES;
-    }
-
-}
-
-- (void)didDeselectItemAssetsViewCell:(JKAssetsViewCell *)assetsCell
-{
-    NSURL *assetURL = [assetsCell.asset valueForProperty:ALAssetPropertyAssetURL];
-    [self removeAssetsObject:assetURL];
-    [self resetFinishFrame];
-    assetsCell.isSelected = NO;
-
-
-}
-
-- (void)removeAssetsObject:(NSURL *)assetURL
-{
+- (void)removeAssetsObject:(NSURL *)assetURL {
     for (JKAssets *asset in self.selectedAssetArray) {
         if ([assetURL isEqual:asset.assetPropertyURL]) {
             [self.assetsGroupsView removeAssetSelected:asset];
@@ -682,20 +520,9 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
     return NO;
 }
 
-- (void)resetFinishFrame
-{
-    
-    self.finishButton.enabled = self.selectedAssetArray.count<=0?NO:YES;
-    self.finishLabel.text = [NSString stringWithFormat:@"下一步(%d)",self.selectedAssetArray.count];
-    [self.finishLabel sizeToFit];
-    
-    self.finishButton.width = _finishLabel.width+10;
-    self.finishButton.right = self.view.width - 10;
-    self.finishLabel.centerX = self.finishButton.width/2;
-    self.finishLabel.centerY = self.finishButton.height/2;
-    
-    self.navigationItem.rightBarButtonItem.enabled = (self.selectedAssetArray.count>0);
-    
+- (void)resetFinishFrame {
+    [self.navBarView.rightBtn setTitle:[NSString stringWithFormat:NSLocalizedString(@"NextStep", @""),self.selectedAssetArray.count] forState:UIControlStateNormal];
+    self.navBarView.rightBtn.enabled = (self.selectedAssetArray.count>0);
 }
 
 #pragma mark - getter/setter
@@ -716,7 +543,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 - (UIButton *)titleButton{
     if (!_titleButton) {
         _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _titleButton.frame = CGRectMake(0, 0, 120, 30);
+        _titleButton.frame = CGRectMake((self.navBarView.width-120)/2, (self.navBarView.height-30)/2, 120, 30);
         UIImage  *img =[UIImage imageNamed:@"navigationbar_title_highlighted"];
         [_titleButton setBackgroundImage:nil forState:UIControlStateNormal];
         [_titleButton setBackgroundImage:[JKUtil stretchImage:img capInsets:UIEdgeInsetsMake(5, 2, 5, 2) resizingMode:UIImageResizingModeStretch] forState:UIControlStateHighlighted];
@@ -742,7 +569,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
     if (!_titleLabel) {
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.backgroundColor = [UIColor clearColor];
-        _titleLabel.textColor = [UIColor whiteColor];
+        _titleLabel.textColor = [UIColor blackColor];
         _titleLabel.font = [UIFont systemFontOfSize:16];
         [self.titleButton addSubview:_titleLabel];
     }
@@ -751,8 +578,9 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 
 - (JKAssetsGroupsView *)assetsGroupsView{
     if (!_assetsGroupsView) {
-        _assetsGroupsView = [[JKAssetsGroupsView alloc] initWithFrame:CGRectMake(0, -self.view.height, self.view.width, self.view.height)];
+        _assetsGroupsView = [[JKAssetsGroupsView alloc] initWithFrame:CGRectMake(0, -self.view.height, self.view.width, self.view.height-self.navBarView.height)];
         _assetsGroupsView.delegate = self;
+        _assetsGroupsView.hidden = YES;
         _assetsGroupsView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         [self.view addSubview:_assetsGroupsView];
     }
@@ -761,7 +589,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 
 - (UIView *)overlayView{
     if (!_overlayView) {
-        _overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
+        _overlayView = [[UIView alloc] initWithFrame:(CGRect){0,self.navBarView.height,self.view.width,self.view.height-self.navBarView.height}];
         _overlayView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.85f];
         [self.view insertSubview:_overlayView belowSubview:self.assetsGroupsView];
     }
@@ -771,79 +599,10 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 - (UIButton *)touchButton{
     if (!_touchButton) {
         _touchButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _touchButton.frame = CGRectMake(0, 0, self.view.width, 64);
+        _touchButton.frame = CGRectMake(0, 0, self.view.width, self.navBarView.height);
         [_touchButton addTarget:self action:@selector(assetsGroupsDidDeselected) forControlEvents:UIControlEventTouchUpInside];
     }
     return _touchButton;
-}
-
-- (UIToolbar *)toolbar{
-    if (!_toolbar) {
-        _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.height-44-64, self.view.width, 44)];
-        _toolbar.tintColor = [JKUtil getColor:@"f5f7fa"];
-        if ([_toolbar respondsToSelector:@selector(barTintColor)]) {
-            _toolbar.barTintColor = [JKUtil getColor:@"f5f7fa"];
-        }
-        _toolbar.translucent = YES;
-        _toolbar.userInteractionEnabled = YES;
-        
-        
-        UIImage  *img = [UIImage imageNamed:@"compose_photo_original"];
-        UIImage  *imgSelect = [UIImage imageNamed:@"compose_photo_original_highlighted"];
-        _selectButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _selectButton.frame = CGRectMake(10, floor((44-img.size.height)/2), img.size.width, img.size.height);
-        /*
-        [_selectButton setBackgroundImage:img forState:UIControlStateNormal];
-        [_selectButton setBackgroundImage:imgSelect forState:UIControlStateSelected];
-        [_selectButton addTarget:self action:@selector(selectOriginImage) forControlEvents:UIControlEventTouchUpInside];
-        [_toolbar addSubview:_selectButton];
-         */
-        
-        UILabel  *infolabel = [[UILabel alloc] initWithFrame:CGRectMake(10, floor((44-img.size.height)/2), 250, img.size.height)];
-        infolabel.backgroundColor = [UIColor clearColor];
-        infolabel.font = [UIFont systemFontOfSize:12];
-        infolabel.text = @"严禁上传色情裸露、暴力血腥图片，一经核实，立即封号。";
-        infolabel.numberOfLines = 2;
-        infolabel.lineBreakMode = NSLineBreakByWordWrapping;
-        infolabel.textAlignment = NSTextAlignmentCenter;
-        [infolabel sizeToFit];
-        [_toolbar addSubview:infolabel];
-        
-        UILabel  *label = [[UILabel alloc] init];
-        label.backgroundColor = [UIColor clearColor];
-        label.textColor = [JKUtil getColor:@"828689"];
-        label.font = [UIFont systemFontOfSize:11];
-        label.text = @"原图";
-        [label sizeToFit];
-        label.centerY = _selectButton.height/2;
-        label.right = _selectButton.width - 14;
-        [_selectButton addSubview:label];
-        
-        _finishLabel = [[UILabel alloc] init];
-        _finishLabel.backgroundColor = [UIColor clearColor];
-        _finishLabel.textColor = [UIColor whiteColor];
-        _finishLabel.font = [UIFont systemFontOfSize:14];
-        _finishLabel.text = @"下一步(0)";
-        [_finishLabel sizeToFit];
-        
-        _finishButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _finishButton.frame = CGRectMake(0, 0, _finishLabel.width+10, _selectButton.height);
-        [_finishButton setBackgroundImage:[JKUtil stretchImage:[UIImage imageNamed:@"picker_button_orange"] capInsets:UIEdgeInsetsMake(5, 5, 5, 5) resizingMode:UIImageResizingModeStretch] forState:UIControlStateNormal];
-        [_finishButton setBackgroundImage:[JKUtil stretchImage:[UIImage imageNamed:@"picker_button_orange_highlighted"] capInsets:UIEdgeInsetsMake(5, 5, 5, 5) resizingMode:UIImageResizingModeStretch] forState:UIControlStateHighlighted];
-        _finishButton.enabled = NO;
-        _finishButton.right = self.view.width-10;
-        _finishButton.centerY = _selectButton.centerY;
-//        _finishButton.hidden = YES;
-        [_finishButton addTarget:self action:@selector(finishPhotoDidSelected) forControlEvents:UIControlEventTouchUpInside];
-        [_toolbar addSubview:_finishButton];
-        
-        _finishLabel.centerY = _finishButton.height/2;
-        _finishLabel.centerX = _finishButton.width/2;
-        [_finishButton addSubview:_finishLabel];
-        
-        [self.view addSubview:_toolbar];
-    }
-    return _toolbar;
 }
 
 - (UICollectionView *)collectionView{
@@ -853,8 +612,8 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
         layout.minimumInteritemSpacing = 2.0;
         layout.scrollDirection = UICollectionViewScrollDirectionVertical;
         
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, [UIScreen mainScreen].bounds.size.height-64-44) collectionViewLayout:layout];
-        _collectionView.backgroundColor = [UIColor clearColor];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0,self.navBarView.bottom+10, self.view.width, self.view.height-self.navBarView.height-10) collectionViewLayout:layout];
+        _collectionView.backgroundColor = [UIColor whiteColor];
         [_collectionView registerClass:[JKAssetsViewCell class] forCellWithReuseIdentifier:kJKImagePickerCellIdentifier];
         [_collectionView registerClass:[JKAssetsCollectionFooterView class]
             forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
@@ -869,4 +628,21 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
     return _collectionView;
 }
 
+#pragma mark - 导航栏代理
+
+//左侧边栏的代理
+-(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
+    if ([_delegate respondsToSelector:@selector(imagePickerControllerDidCancel:)]) {
+        [_delegate imagePickerControllerDidCancel:self];
+    }
+}
+//右侧边栏的代理
+-(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    [WQPopView hiddenImage:^(BOOL finish) {
+        if ([_delegate respondsToSelector:@selector(imagePickerController:didSelectAssets:)]) {
+            [_delegate imagePickerController:self
+                             didSelectAssets:self.selectedAssetArray];
+        }
+    }];
+}
 @end

@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  TTTTTT
+
+  Created by 邱成西 on 15/2/13.
+  Copyright (c) 2015年 苏州瑞鹏科技有限公司. All rights reserved.
+*/
+"MainVC" = "首页";
+
+"ShopVC" = "My Shop";
+"ProductCode" = "product code";
+"ProductPrice" = "product price";
+"ProductDetail" = "product description";
+
+
+"CustomerVC" = "客户管理";
+"OrderVC" = "Orders";
+"SaleVC" = "Sales";
+"ColorVC" = "Colors";
+"SizeVC" = "Size";

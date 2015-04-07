@@ -12,26 +12,25 @@
 
 @interface WQProductObj : NSObject
 
+//----------------------第一页展示
+///商品id
 @property (nonatomic, assign) NSInteger productId;
-
-@property (nonatomic, copy) NSString *productName;
-
-@property (nonatomic, copy) NSString *productPrice;
-
-@property (nonatomic, assign) NSInteger productStockCount;
-
-@property (nonatomic, copy) NSString *productDetails;
-
+///商品图片
+@property (nonatomic, strong) NSString *productImage;
+///商品名称
+@property (nonatomic, strong) NSString *productName;
+///商品价格
+@property (nonatomic, strong) NSString *productPrice;
+///商品销量
 @property (nonatomic, assign) NSInteger productSaleCount;
-
-@property (nonatomic, strong) NSArray *productProperty;
-
-@property (nonatomic, copy) NSString *productImages;
-@property (nonatomic, strong) NSArray *productImagesArray;
-
-@property (nonatomic, assign) NSInteger productPraiseCount;
-
+///商品浏览量
 @property (nonatomic, assign) NSInteger productViewCount;
 
-+(WQProductObj *)returnProductWithDic:(NSDictionary *)aDic;
+///商品是否热卖
+@property (nonatomic, assign) NSInteger productIsHot;
+///商品是否上架
+@property (nonatomic, assign) NSInteger productIsSale;
+
+
++(NSURLSessionDataTask *)getProductsWithBlock:(void (^)(NSArray *products, NSError *error))block;
 @end

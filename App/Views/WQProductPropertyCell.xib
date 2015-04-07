@@ -15,7 +15,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField opaque="NO" clipsSubviews="YES" tag="100" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="SMr-5R-X7q" customClass="WQProductText">
-                        <rect key="frame" x="5" y="7" width="78" height="30"/>
+                        <rect key="frame" x="8" y="7" width="78" height="30"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="78" id="5tM-aF-u1d"/>
@@ -30,7 +30,7 @@
                         <textInputTraits key="textInputTraits" returnKeyType="done"/>
                     </textField>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qwF-mx-9hA">
-                        <rect key="frame" x="88" y="7" width="1" height="30"/>
+                        <rect key="frame" x="91" y="7" width="1" height="30"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="1" id="PM4-qH-VkN"/>
@@ -54,11 +54,11 @@
                 <constraints>
                     <constraint firstItem="Wcr-4E-EwC" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="8nk-WS-DXJ"/>
                     <constraint firstItem="Wcr-4E-EwC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="Bw5-jT-nl1"/>
-                    <constraint firstItem="ni1-sy-mMQ" firstAttribute="leading" secondItem="qwF-mx-9hA" secondAttribute="trailing" constant="21" id="FAi-eO-Pcd"/>
+                    <constraint firstItem="ni1-sy-mMQ" firstAttribute="leading" secondItem="qwF-mx-9hA" secondAttribute="trailing" constant="18" id="FAi-eO-Pcd"/>
                     <constraint firstAttribute="bottom" secondItem="ni1-sy-mMQ" secondAttribute="bottom" constant="7" id="MKL-ci-mRE"/>
                     <constraint firstAttribute="bottom" secondItem="Wcr-4E-EwC" secondAttribute="bottom" constant="7" id="PZZ-u1-aH1"/>
                     <constraint firstAttribute="bottom" secondItem="qwF-mx-9hA" secondAttribute="bottom" constant="7" id="TQq-DQ-nvY"/>
-                    <constraint firstItem="SMr-5R-X7q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="5" id="WnW-lr-nJz"/>
+                    <constraint firstItem="SMr-5R-X7q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="WnW-lr-nJz"/>
                     <constraint firstItem="ni1-sy-mMQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="XmH-Sr-XgH"/>
                     <constraint firstAttribute="bottom" secondItem="SMr-5R-X7q" secondAttribute="bottom" constant="7" id="b3h-RS-m7i"/>
                     <constraint firstItem="SMr-5R-X7q" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7" id="k3r-qq-AxA"/>

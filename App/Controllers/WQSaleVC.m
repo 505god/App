@@ -16,24 +16,29 @@
 
 @implementation WQSaleVC
 
+-(void)dealloc {
+    [self.view removeObserver:self forKeyPath:@"frame"];
+}
+
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"销售统计";
+//    self.title = NSLocalizedString(@"SaleVC", @"");
     
     [self showLineChart];
 //    [self showBarChart];
 //    [self showPieChart];
 //    [self showCircleChart];
 //    [self showScatterChart];
+    
+    //KVO监测view的frame变化
+    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -162,7 +167,7 @@
     data01.strokeColor = PNGreen;
     data01.fillColor = PNFreshGreen;
     data01.size = 2;
-    data01.itemCount = [[data01Array objectAtIndex:0] count];
+    data01.itemCount = [[data01Array objectAtIndex:0]count];
     data01.inflexionPointStyle = PNScatterChartPointStyleCircle;
     __block NSMutableArray *XAr1 = [NSMutableArray arrayWithArray:[data01Array objectAtIndex:0]];
     __block NSMutableArray *YAr1 = [NSMutableArray arrayWithArray:[data01Array objectAtIndex:1]];
@@ -203,14 +208,12 @@
 - (void)userClickedOnBarAtIndex:(NSInteger)barIndex {
     DLog(@"bar");
 }
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+#pragma mark - KVO
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+    [self updateSubViews];
 }
-*/
+-(void)updateSubViews {
+    
+}
 
 @end

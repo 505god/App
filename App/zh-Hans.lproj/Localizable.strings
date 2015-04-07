@@ -1,0 +1,97 @@
+/* 
+  Localizable.strings
+  TTTTTT
+
+  Created by 邱成西 on 15/2/13.
+  Copyright (c) 2015年 苏州瑞鹏科技有限公司. All rights reserved.
+*/
+
+
+"CustomerVC" = "客户管理";
+"OrderVC" = "订单管理";
+"SaleVC" = "销售统计";
+
+"HotSaleVC" = "热卖展示";
+"ProductClassifyVC" = "分类列表";
+"NewProductVC" = "创建产品";
+
+//设置
+"SettingVC" = "设置";
+"Header" = "头像";
+"ShopName" = "店铺名称";
+"ClassifySetup" = "分类预设";
+"ColorSetup" = "颜色预设";
+"SizeSetup" = "尺码预设";
+"CurrencySetup" = "货币预设";
+"LogOut" = "退出";
+//热卖展示
+"HasSale" = "已售出";
+"NoneProducts" = "暂无商品";
+"NoneClass" = "暂无分类";
+"NewClass" = "创建分类";
+
+//刷新控件
+"FooterPullToRefresh" = "上拉可以加载更多数据";
+"FooterReleaseToRefresh" = "松开立即加载更多数据";
+"Refreshing" = "正在努力加载中...";
+"HeaderPullToRefresh" = "下拉可以刷新";
+"HeaderReleaseToRefresh" = "松开立即刷新";
+"Today" = "今天";
+"LastUpDate" = "最后更新:";
+
+//选择照片
+"Cancel" = "取消";
+"SelectedMaxPhoto" = "最多选择%ld张照片";
+"NextStep" = "下一步(%ld)";
+"PhotoAlert" = "严禁上传色情裸露、暴力血腥图片，一经核实，立即封号。";
+"Format_photo" = "%ld 张照片";
+"Format_photos" = "%ld 张照片";
+"PhotoSelectedError" = "选择图片失败";
+
+//修改名称
+"Save" = "保存";
+"Add" = "添加";
+"Finish" = "完成";
+"Delete" = "删除";
+"Confirm" = "确定";
+"ShopNameLimit" = "最多10个字";
+
+"ClassDelete" = "该分类下包含产品不能被删除";
+"ColorDelete" = "该颜色下包含产品不能被删除";
+"SizeDelete" = "该尺码下包含产品不能被删除";
+
+"CreatClass" = "新建分类";
+"CreatColor" = "新建颜色";
+"CreatSize" = "新建尺码";
+
+"NoneColor" = "暂无颜色";
+"NoneSize" = "暂无尺码";
+
+"WQTextVC" = "请输入内容";
+
+"CNY" = "人民币";
+"USD" = "美元";
+"EUR" = "欧元";
+
+
+
+
+
+"MainVC" = "首页";
+
+"ShopVC" = "我的店铺";
+
+"ProductCode" = "产品编号";
+"ProductPrice" = "价格";
+"ProductDetail" = "描述";
+
+"AddProductColor" = "添加产品颜色";
+"RecommendProduct" = "推荐给客户";
+
+"SelectedCustomer" = "已选择%ld位客户";
+
+"AddProduct" = "完成创建";
+
+
+"ColorVC" = "颜色";
+"SizeVC" = "尺码";
