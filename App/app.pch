@@ -11,10 +11,12 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+    #import <SystemConfiguration/SystemConfiguration.h>
+    #import <MobileCoreServices/MobileCoreServices.h>
     #import "AppDelegate.h"
 
 #import "WQCommon.h"
-
+#import "WQAPIClient.h"
 
 #import "WQPopView.h"//弹出框
 
@@ -26,6 +28,9 @@
 #import "MBProgressHUD.h"
 #import "WQDataShare.h"
 #endif
+
+
+#define AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES
 
 //获取热卖展示
 #define HOTSALE @""

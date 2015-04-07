@@ -27,6 +27,36 @@
 
 @implementation WQClassifyVC
 
+-(void)dealloc {
+    SafeRelease(_tableView);
+    SafeRelease(_dataArray);
+    SafeRelease(_arrSelSection);
+}
+
+#pragma mark - 获取分类数据
+
+-(void)getClassList {
+    __unsafe_unretained typeof(self) weakSelf = self;
+    [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
+        if (!error) {
+            weakSelf.dataArray = nil;
+            weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
+            
+            //判断数据源
+            if (weakSelf.dataArray.count>0) {
+                [weakSelf.tableView reloadData];
+                [weakSelf setNoneText:nil animated:NO];
+                [weakSelf setToolImage:nil text:nil animated:NO];
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                [weakSelf setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"NewClass", @"") animated:YES];
+            }
+        }else {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+        }
+    }];
+}
+
 -(void)testData {
     NSDictionary *aDic = [Utility returnDicByPath:@"ClassList"];
     NSArray *array = [aDic objectForKey:@"classList"];
@@ -98,7 +128,7 @@
     [self.tableView addHeaderWithCallback:^{
         // 进入刷新状态就会回调这个Block
         
-        [weakSelf testData];
+        [weakSelf getClassList];
         
         // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

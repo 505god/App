@@ -12,4 +12,6 @@
 
 + (instancetype)sharedClient;
 
+///获取分类列表
++ (void)getClassListWithBlock:(void (^)(NSArray *array, NSError *error))block;
 @end
