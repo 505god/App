@@ -44,12 +44,13 @@
 {
     [self stopObservingContentOffset];
     
-    [self.view removeObserver:self forKeyPath:@"frame"];
+    SafeRelease(_viewControllers);
+    SafeRelease(_topBar);
+    SafeRelease(_scrollView.delegate);
+    SafeRelease(_scrollView);
+    SafeRelease(_pageIndicatorView);
     
-    SafeRelease(self.viewControllers);
-    SafeRelease(self.topBar);
-    SafeRelease(self.scrollView);
-    SafeRelease(self.pageIndicatorView);
+    [self.view removeObserver:self forKeyPath:@"frame"];
 }
 
 #pragma mark - View life cycle
@@ -61,7 +62,7 @@
     
     //标题栏
     self.topBar = [[DAPagesContainerTopBar alloc] initWithFrame:CGRectMake(0.,0.,self.view.width,NavgationHeight)];
-    self.topBar.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    self.topBar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     self.topBar.delegate = self;
     [self.view addSubview:self.topBar];
     
@@ -79,9 +80,7 @@
     
     //KVO监测scrollView的contentOffset变化
     [self startObservingContentOffsetForScrollView:self.scrollView];
-    
-    //KVO监测view的frame变化
-    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
+    [self.view addObserver:self forKeyPath:@"frame" options:0 context:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -95,21 +94,20 @@
     UIButton *previosSelectdItem = self.topBar.itemViews[self.selectedIndex];
     UIButton *nextSelectdItem = self.topBar.itemViews[selectedIndex];
     if (abs(self.selectedIndex - selectedIndex) <= 1) {
-        [self.scrollView setContentOffset:CGPointMake(selectedIndex * self.view.width, 0.)animated:YES];
+        [self.scrollView setContentOffset:CGPointMake(selectedIndex * self.scrollView.width, 0.)animated:YES];
         UIViewController *leftViewController = self.viewControllers[self.selectedIndex];
         if (selectedIndex == _selectedIndex) {
-            self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:selectedIndex].x,
-                                                        self.pageIndicatorView.center.y);
+            self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:selectedIndex].x,self.pageIndicatorView.center.y);
             [leftViewController viewWillAppear:YES];
         }else {
             
             [leftViewController viewWillDisappear:YES];
             UIViewController *rightViewController = self.viewControllers[selectedIndex];
+            rightViewController.view.frame = (CGRect){self.scrollView.width*selectedIndex,0,self.scrollView.width,self.scrollView.height};
             [rightViewController viewWillAppear:YES];
         }
         
-        [UIView animateWithDuration:(animated) ? 0.25 : 0. delay:0. options:UIViewAnimationOptionBeginFromCurrentState animations:^
-         {
+        [UIView animateWithDuration:(animated) ? 0.25 : 0. delay:0. options:UIViewAnimationOptionBeginFromCurrentState animations:^{
              [previosSelectdItem setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
              [nextSelectdItem setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
          } completion:nil];
@@ -127,12 +125,12 @@
         CGPoint targetOffset;
         if (scrollingRight) {
             self.scrollView.contentOffset = CGPointZero;
-            targetOffset = CGPointMake(self.view.width, 0.);
+            targetOffset = CGPointMake(self.scrollView.width, 0.);
             [leftViewController viewWillDisappear:YES];
             [rightViewController viewWillAppear:YES];
             
         } else {
-            self.scrollView.contentOffset = CGPointMake(self.view.width, 0.);
+            self.scrollView.contentOffset = CGPointMake(self.scrollView.width, 0.);
             targetOffset = CGPointZero;
             [leftViewController viewWillAppear:YES];
             [rightViewController viewWillDisappear:YES];
@@ -148,10 +146,11 @@
             for (NSUInteger i = 0; i < self.viewControllers.count; i++) {
                 UIViewController *viewController = self.viewControllers[i];
                 viewController.view.frame = CGRectMake(i * self.scrollView.width, 0., self.scrollView.width, self.scrollView.height);
+                viewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
                 [self.scrollView addSubview:viewController.view];
             }
             self.scrollView.contentSize = CGSizeMake(self.scrollView.width * self.viewControllers.count, self.scrollView.height);
-            [self.scrollView setContentOffset:CGPointMake(selectedIndex * self.view.width, 0.) animated:YES];
+            [self.scrollView setContentOffset:CGPointMake(selectedIndex * self.scrollView.width, 0.) animated:YES];
             self.scrollView.userInteractionEnabled = YES;
             self.shouldObserveContentOffset = YES;
         }];
@@ -169,6 +168,7 @@
     if (_viewControllers != viewControllers) {
         _viewControllers = viewControllers;
         self.topBar.itemTitles = [viewControllers valueForKey:@"title"];
+        
         for (UIViewController *viewController in viewControllers) {
             [viewController willMoveToParentViewController:self];
             viewController.view.frame = CGRectMake(0., 0., self.scrollView.width, self.scrollView.height);
@@ -177,17 +177,13 @@
         }
         [self layoutSubviews];
         self.selectedIndex = 0;
-        self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,
-                                                    self.pageIndicatorView.center.y);
+        self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,self.pageIndicatorView.center.y);
     }
 }
 
 #pragma mark - Private
 
 - (void)layoutSubviews {
-    self.topBar.frame = CGRectMake(0., 0.,self.view.width, NavgationHeight);
-    self.scrollView.frame = (CGRect){0.,NavgationHeight+10,self.view.width,self.view.height - NavgationHeight-10};
-    
     self.scrollView.contentSize = CGSizeMake(self.scrollView.width*self.viewControllers.count, self.scrollView.height);
     [self.scrollView setContentOffset:CGPointMake(self.selectedIndex * self.scrollView.width, 0.)];
     
@@ -198,7 +194,7 @@
     }
     
     self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,self.pageIndicatorView.center.y);
-
+    
     self.scrollView.userInteractionEnabled = YES;
 }
 
@@ -246,6 +242,13 @@
     
 }
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    
+    CGFloat x = 0.;
+    for (UIViewController *viewController in self.viewControllers) {
+        viewController.view.frame = CGRectMake(x, 0, self.scrollView.width, self.scrollView.height);
+        x += CGRectGetWidth(self.scrollView.frame);
+    }
+    
     [[NSNotificationCenter defaultCenter]postNotificationName:@"containerWillBeginDragging" object:nil];
 }
 #pragma mark - KVO
@@ -255,8 +258,7 @@
 						change:(NSDictionary *)change
                        context:(void *)context {
     if ([keyPath isEqualToString:@"frame"]) {
-        [self layoutSubviews];
-        [self.topBar layoutItemViews];
+        self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,self.pageIndicatorView.center.y);
     }else {
         if (self.scrollView.contentOffset.x < 0) {//左
             [[NSNotificationCenter defaultCenter]postNotificationName:@"showSidebarView" object:@"0"];

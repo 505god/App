@@ -6,25 +6,18 @@
 //  Copyright (c) 2015年 Just Do It. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "WQSwipTableHeader.h"
 
 #import "WQClassObj.h"
 
-@protocol WQClassHeaderDelegate;
+@interface WQClassHeader : WQSwipTableHeader
 
-@interface WQClassHeader : UITableViewHeaderFooterView
-
-@property (nonatomic, assign) id<WQClassHeaderDelegate>classDelegate;
 @property (nonatomic,assign) NSInteger aSection;
 @property (nonatomic,assign) BOOL isSelected;
 
 @property (nonatomic, strong) WQClassObj *classObj;
 
-@end
+@property (nonatomic, strong) UIImageView *deleteGreyImageView;
+@property (nonatomic, strong) UIImageView *deleteRedImageView;
 
-@protocol WQClassHeaderDelegate <NSObject>
-
-@optional
--(void)headerDidSelectCoverOption:(WQClassHeader *)header;
--(void)headerDidLongPressedOption:(WQClassHeader *)header;
 @end

@@ -19,6 +19,7 @@
 // Example: [view setShadow:[UIColor blackColor] opacity:0.5 offset:CGSizeMake(1.0, 1.0) blueRadius:3.0];
 - (void) setShadow : (UIColor *)color opacity:(CGFloat)opacity offset:(CGSize) offset blurRadius:(CGFloat)blurRadius;
 
-//设置view一边有投影
+///设置view一边有投影
 -(void)setShadow:(UIColor *)color rect:(CGRect)rect opacity:(CGFloat)opacity blurRadius:(CGFloat)blurRadius;
+
 @end

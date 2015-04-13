@@ -1,0 +1,23 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "type": 1,
+        "name": "篮球鞋",
+        "attributes": [
+                       {
+                       "image": "http://test.png",
+                       "colorId": 0,
+                       "colorName": "红色",
+                       "property": [
+                                    {
+                                    "sizeId": 0,
+                                    "sizeName": "42",
+                                    "price": "199",
+                                    "stock": 33223
+                                    }
+                                    ]
+                       }
+                       ]
+    }
+}

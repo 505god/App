@@ -1,0 +1,11 @@
+{
+  "status": "1",
+  "msg": "sss",
+  "returnObj": {
+    "classAId": "9",
+    "classAName": "服装",
+    "classBCount": "0",
+    "classBList": [
+    ]
+  }
+}

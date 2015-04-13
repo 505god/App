@@ -35,4 +35,5 @@
     l.shadowPath = [UIBezierPath bezierPathWithRect:rect].CGPath;
     l.shadowRadius = blurRadius;
 }
+
 @end

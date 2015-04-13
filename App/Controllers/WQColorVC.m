@@ -14,16 +14,16 @@
 
 #import "WQRightCell.h"
 
-#import "UIViewController+MJPopupViewController.h"
-#import "WQTextVC.h"
 
-@interface WQColorVC ()<UITableViewDelegate,UITableViewDataSource,WQNavBarViewDelegate,RMSwipeTableViewCellDelegate,WQTextVCDelegate>
+#import "BlockTextPromptAlertView.h"
+
+@interface WQColorVC ()<UITableViewDelegate,UITableViewDataSource,WQNavBarViewDelegate,RMSwipeTableViewCellDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
 @property (nonatomic, strong) NSMutableArray *dataArray;
 
-@property (nonatomic, strong) WQTextVC *textVC;
+@property (nonatomic, assign) NSInteger selectedIndex;
 @end
 
 @implementation WQColorVC
@@ -33,8 +33,7 @@
     SafeRelease(_tableView.dataSource);
     SafeRelease(_tableView);
     SafeRelease(_dataArray);
-    SafeRelease(_textVC);
-    SafeRelease(_selectedList);
+    SafeRelease(_selectedColorObj);
     SafeRelease(_delegate);
 }
 -(void)testData {
@@ -71,6 +70,7 @@
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
     
+    self.selectedIndex = -1;
     //集成刷新控件
     [self addHeader];
 }
@@ -110,7 +110,7 @@
 -(UITableView *)tableView {
     if (!_tableView) {
         _tableView = [[UITableView alloc]initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-20-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height} style:UITableViewStylePlain];
-        _tableView.backgroundColor = [UIColor whiteColor];
+        _tableView.backgroundColor = [UIColor clearColor];
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -142,12 +142,14 @@
     [self.tableView headerBeginRefreshing];
 }
 
--(void)setSelectedList:(NSMutableArray *)selectedList {
-    _selectedList = selectedList;
+-(void)setSelectedIndex:(NSInteger)selectedIndex {
+    _selectedIndex = selectedIndex;
     
-    self.toolControl.enabled = selectedList.count>0?YES:NO;
+    self.toolControl.enabled = self.selectedIndex>=0?YES:NO;
 }
-
+-(void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath {
+    _selectedIndexPath = selectedIndexPath;
+}
 #pragma mark - 导航栏代理
 //左侧边栏的代理
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
@@ -159,11 +161,27 @@
 }
 //右侧边栏的代理
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
-    self.textVC = LOADVC(@"WQTextVC");
-    self.textVC.delegate = self;
-    self.textVC.type = 1;
+    UITextField *textField;
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatColor", @"") message:nil textField:&textField block:^(BlockTextPromptAlertView *alert){
+        [alert.textField resignFirstResponder];
+        return YES;
+    }];
     
-    [self presentPopupViewController:self.textVC animationType:MJPopupViewAnimationSlideBottomTop];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        DLog(@"Text: %@", textField.text);
+        
+        WQColorObj *colorObj = [[WQColorObj alloc]init];
+        colorObj.colorName = textField.text;
+        [self.dataArray addObject:colorObj];
+        
+        NSIndexPath *idx = [NSIndexPath indexPathForRow:self.dataArray.count-1 inSection:0];
+        
+        [self.tableView beginUpdates];
+        [self.tableView insertRowsAtIndexPaths:@[idx] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+    }];
+    [alert show];
 }
 #pragma mark - UITableViewDataSource
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -180,27 +198,27 @@
         cell = [[WQRightCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                      reuseIdentifier:CellIdentifier];
     }
+    cell.delegate = self;
+    cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
+    [cell setSelectedType:0];
+    
     WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
+    
     if (self.isPresentVC) {//弹出选择分类
-        cell.revealDirection = RMSwipeTableViewCellRevealDirectionNone;
-        
-        BOOL isExit = NO;
-        for (int i=0; i<self.selectedList.count; i++) {
-            WQColorObj *colorTemp = (WQColorObj *)self.selectedList[i];
-            if (color.colorId == colorTemp.colorId) {
-                isExit = YES;
-                break;
+        if (self.selectedColorObj) {
+            if (color.colorId==self.selectedColorObj.colorId) {
+                [cell setSelectedType:2];
+                self.selectedIndex = indexPath.row;
+            }else {
+                [cell setSelectedType:1];
             }
+        }else {
+            [cell setSelectedType:1];
         }
-        
-        cell.accessoryType = isExit?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
-    }else {
-        cell.delegate = self;
-        cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
     }
     
     [cell setColorObj:color];
-    
+    [cell setIndexPath:indexPath];
     return cell;
 }
 
@@ -209,28 +227,23 @@
     
     if (self.isPresentVC) {
         WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
-        
-        WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
-        
-        if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-            
-            for (int i=0; i<self.selectedList.count; i++) {
-                WQColorObj *colorTemp = self.selectedList[i];
-                
-                if (color.colorId == colorTemp.colorId) {
-                    [self.selectedList removeObject:colorTemp];
-                    
-                    self.toolControl.enabled = self.selectedList.count>0?YES:NO;
-                    break;
-                }
-            }
+        if (indexPath.row == self.selectedIndex) {
+            [cell setSelectedType:1];
+            self.selectedIndex = -1;
+            self.selectedColorObj = nil;
         }else {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            color.sizeArray = nil;
-            color.productImg = nil;
-            [self.selectedList addObject:color];
-            self.toolControl.enabled = self.selectedList.count>0?YES:NO;
+            if (self.selectedIndex>=0) {
+                WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
+                [cellOld setSelectedType:1];
+                
+                [cell setSelectedType:2];
+                self.selectedIndex = indexPath.row;
+                self.selectedColorObj = (WQColorObj *)self.dataArray[indexPath.row];
+            }else {
+                [cell setSelectedType:2];
+                self.selectedIndex = indexPath.row;
+                self.selectedColorObj = (WQColorObj *)self.dataArray[indexPath.row];
+            }
         }
     }
 }
@@ -244,39 +257,58 @@
         if (color.productCount>0) {
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ColorDelete", @"")];
         }else {
-            swipeTableViewCell.shouldAnimateCellReset = NO;
-            [UIView animateWithDuration:0.25
-                                  delay:0
-                                options:UIViewAnimationOptionCurveLinear
-                             animations:^{
-                                 swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
-                             }
-                             completion:^(BOOL finished) {
-                                 
-                                 [self.dataArray removeObjectAtIndex:indexPath.row];
-                                 [self.tableView beginUpdates];
-                                 [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                                 [self.tableView endUpdates];
-                             }
-             ];
+            BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
+            
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                swipeTableViewCell.shouldAnimateCellReset = NO;
+                [UIView animateWithDuration:0.25
+                                      delay:0
+                                    options:UIViewAnimationOptionCurveLinear
+                                 animations:^{
+                                     swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
+                                 }
+                                 completion:^(BOOL finished) {
+                                     
+                                     [self.dataArray removeObjectAtIndex:indexPath.row];
+                                     [swipeTableViewCell setHidden:YES];
+                                     
+                                     [self.tableView beginUpdates];
+                                     [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                                     [self.tableView endUpdates];
+                                 }
+                 ];
+            }];
+            [alert show];
         }
     }
 }
 
+-(void)editDidLongPressedOption:(RMSwipeTableViewCell *)cell {
+    UITextField *textField;
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditColor", @"") message:nil defaultText:[(WQRightCell *)cell colorObj].colorName textField:&textField block:^(BlockTextPromptAlertView *alert){
+        [alert.textField resignFirstResponder];
+        return YES;
+    }];
+    
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        DLog(@"Text: %@", textField.text);
+        
+        WQColorObj *colorObj = (WQColorObj *)self.dataArray[[[(WQRightCell *)cell indexPath] row]];
+        colorObj.colorName = textField.text;
+        
+        [self.tableView beginUpdates];
+        [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+    }];
+    [alert show];
+}
 //确认选择
 -(void)toolControlPressed {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(colorVC:didSelectColor:)]) {
-        [self.delegate colorVC:self didSelectColor:self.selectedList];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(colorVC:selectedColor:)]) {
+        [self.delegate colorVC:self selectedColor:(WQColorObj *)self.dataArray[self.selectedIndex]];
     }
 }
 
-#pragma mark - WQTextVCDelegate
--(void)dismissTextVC:(WQTextVC *)textVC {
-    WQColorObj *colorObj = [[WQColorObj alloc]init];
-    colorObj.colorName = textVC.text.text;
-    [self.dataArray addObject:colorObj];
-    
-    [self.tableView reloadData];
-    [self dismissPopupViewControllerWithanimationType:MJPopupViewAnimationSlideBottomTop];
-}
 @end

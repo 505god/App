@@ -98,15 +98,11 @@ CGFloat const DAPagesContainerTopBarItemsOffset = 30.;
     CGFloat x = (self.width-DAPagesContainerTopBarItemViewWidth*self.itemViews.count)/(self.itemViews.count+1);
     for (NSUInteger i = 0; i < self.itemViews.count; i++) {
         UIView *itemView = self.itemViews[i];
-        itemView.frame = CGRectMake(x*(i+1)+itemView.width*i, 0., itemView.width, itemView.height);
+        itemView.frame = CGRectMake(x*(i+1)+itemView.width*i, 0, itemView.width, itemView.height);
+        itemView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin;
     }
 
     [self.delegate layoutIndicator];
 }
-
-//- (void)layoutSubviews {
-//    [super layoutSubviews];
-//    [self layoutItemViews];
-//}
 
 @end

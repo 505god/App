@@ -119,12 +119,9 @@
 -(void)showRootVC {
     self.mainVC = [[WQMainVC alloc]init];
     WQShopVC *shopVC = [[WQShopVC alloc]init];
-//    WQShopVC *shopVC = LOADVC(@"WQShopVC");
     WQOrderVC *orderVC = LOADVC(@"WQOrderVC");
     WQCustomerVC *customerVC = LOADVC(@"WQCustomerVC");
     WQSaleVC *saleVC = LOADVC(@"WQSaleVC");
-    
-//    self.mainVC.view.frame = (CGRect){0,0,[UIScreen mainScreen].bounds.size};
 
     self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
 
@@ -132,5 +129,7 @@
     self.navControl = [[UINavigationController alloc]initWithRootViewController:self.mainVC];
     
     self.window.rootViewController = self.navControl;
+    
+    SafeRelease(shopVC);SafeRelease(orderVC);SafeRelease(customerVC);SafeRelease(saleVC);
 }
 @end

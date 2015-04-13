@@ -34,4 +34,6 @@
 
 +(UIImage *) imageCompressForSize:(UIImage *)sourceImage targetSize:(CGSize)size;
 +(UIImage *)dealImageData:(UIImage *)image;
+
++ (NSString *) md5: (NSString *) input;
 @end

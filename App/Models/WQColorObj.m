@@ -21,12 +21,4 @@
     return NO;
 }
 
-+(WQColorObj *)returnColorWithDic:(NSDictionary *)aDic {
-    WQColorObj *color = [[WQColorObj alloc]init];
-    
-    [color mts_setValuesForKeysWithDictionary:aDic];
-
-    return color;
-}
-
 @end

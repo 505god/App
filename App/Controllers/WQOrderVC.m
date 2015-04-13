@@ -8,6 +8,8 @@
 
 #import "WQOrderVC.h"
 
+
+
 @interface WQOrderVC ()
 
 @end
@@ -15,7 +17,7 @@
 @implementation WQOrderVC
 
 -(void)dealloc {
-    [self.view removeObserver:self forKeyPath:@"frame"];
+    
 }
 
 #pragma mark - lifestyle
@@ -25,12 +27,12 @@
     
 //    self.title = NSLocalizedString(@"OrderVC", @"");
     
-    //KVO监测view的frame变化
-    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -50,12 +52,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - KVO
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    [self updateSubViews];
-}
--(void)updateSubViews {
-    
-}
+
 
 @end

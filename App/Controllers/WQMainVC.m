@@ -44,6 +44,9 @@
     SafeRelease(_tapGestureRec);
     SafeRelease(_panGestureRec);
     SafeRelease(_rightVC);
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showSidebarView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"creatProductNotification" object:nil];
 }
 
 #pragma mark - lifestyle
@@ -61,7 +64,7 @@
     //导航栏
     self.navBarView.navDelegate = self;
     [self.navBarView.leftBtn setHidden:YES];
-    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"CheckmarkGreen"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"mainNavRight"] forState:UIControlStateNormal];
     self.navBarView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.navBarView];
     
@@ -92,6 +95,9 @@
     
     //监测scrollview滑动到边缘
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showSidebarView:) name:@"showSidebarView" object:nil];
+    
+    //创建商品时候隐藏导航栏和侧边栏
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(creatProductNotification:) name:@"creatProductNotification" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -102,6 +108,7 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showSidebarView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"creatProductNotification" object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -300,7 +307,6 @@
                     self.showingLeft = NO;
                     self.showingRight = NO;
                     self.tapGestureRec.enabled = NO;
-                    
                     [self removeconfigureViewBlur];
                 }];
             }
@@ -323,6 +329,7 @@
                     self.showingLeft = NO;
                     self.showingRight = NO;
                     self.tapGestureRec.enabled = NO;
+                    self.leftBarView.userInteractionEnabled = NO;
                     [self removeconfigureViewBlur];
                 }];
             }
@@ -381,6 +388,7 @@
             self.tapGestureRec.enabled = NO;
             
             [self removeconfigureViewBlur];
+            self.leftBarView.userInteractionEnabled = NO;
         }];
     }else {
         [UIView animateWithDuration:0.25f animations:^{
@@ -458,6 +466,19 @@
         }else {
             [self showRightViewController];
         }
+    }
+}
+
+-(void)creatProductNotification:(NSNotification *)notification {
+    NSInteger type = [notification.object integerValue];
+    if (type==0) {//隐藏
+        [self.panGestureRec setEnabled:NO];
+        [self.navBarView setHidden:YES];
+        [self.leftBarView setHidden:YES];
+    }else if (type==1) {//出现
+        [self.panGestureRec setEnabled:YES];
+        [self.navBarView setHidden:NO];
+        [self.leftBarView setHidden:NO];
     }
 }
 @end

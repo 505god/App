@@ -16,8 +16,8 @@
 ///分类名称
 @property (nonatomic, strong) NSString *className;
 ///分类下产品数量
-@property (nonatomic, assign) NSInteger productCount;
+@property (nonatomic, assign) NSInteger levelClassCount;
 
 ///分类下产品数组
-@property (nonatomic, strong) NSMutableArray *productList;
+@property (nonatomic, strong) NSMutableArray *levelClassList;
 @end

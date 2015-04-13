@@ -13,6 +13,7 @@
 ///单选
 
 @class WQClassObj;
+@class WQClassLevelObj;
 
 @protocol WQClassVCDelegate;
 
@@ -22,12 +23,16 @@
 
 @property (nonatomic, assign) id<WQClassVCDelegate>delegate;
 
-@property (nonatomic, strong) WQClassObj *selectedClassObj;
+@property (nonatomic, strong) WQClassLevelObj *selectedClassBObj;
+
+///创建产品选择
+@property (nonatomic, strong) NSIndexPath *selectedIndexPath;
+
 @end
 
 @protocol WQClassVCDelegate <NSObject>
 
 @optional
 
--(void)selectedClass:(WQClassObj *)classObj;
+-(void)classVC:(WQClassVC *)classVC selectedClass:(WQClassLevelObj *)levelClassObj;
 @end

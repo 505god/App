@@ -36,9 +36,18 @@
 {
     // We need to set the contentView's background colour, otherwise the sides are clear on the swipe and animations
     [self.contentView setBackgroundColor:[UIColor whiteColor]];
+    //滑动手势
     UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     [panGestureRecognizer setDelegate:self];
     [self addGestureRecognizer:panGestureRecognizer];
+    SafeRelease(panGestureRecognizer);
+    
+    //长按编辑
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
+    longPress.minimumPressDuration = 0.5;
+    [self addGestureRecognizer:longPress];
+    SafeRelease(longPress);
+    
     
     self.revealDirection = RMSwipeTableViewCellRevealDirectionBoth;
     self.animationType = RMSwipeTableViewCellAnimationTypeBounce;
@@ -194,4 +203,16 @@
     _backView = nil;
 }
 
+
+- (void)longPress:(UILongPressGestureRecognizer *)recognizer {
+    //长按开始
+    if(recognizer.state == UIGestureRecognizerStateBegan) {
+        if ([self.delegate respondsToSelector:@selector(editDidLongPressedOption:)]) {
+            [self.delegate editDidLongPressedOption:self];
+        }
+    }//长按结束
+    else if(recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled){
+        
+    }
+}
 @end

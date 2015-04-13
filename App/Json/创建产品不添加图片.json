@@ -1,0 +1,11 @@
+{
+  "name": "描述",
+  "price": "价格",
+  "stock": "库存",
+  "class": "分类B的id",
+  "isHot": "热卖",
+  "customer": [
+    "客户id0",
+    "客户id0"
+  ]
+}

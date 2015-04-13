@@ -10,6 +10,7 @@
 
 ///创建分类、颜色、尺码
 
+#import "WQClassObj.h"
 
 @protocol WQTextVCDelegate;
 
@@ -19,9 +20,19 @@
 @property (nonatomic, weak) IBOutlet UITextField *text;
 @property (nonatomic, weak) IBOutlet UIButton *btn;
 
-
-@property (nonatomic, assign) NSInteger type;
+///标题
+@property (nonatomic, strong) NSString *titleString;
 @property (nonatomic, assign) id<WQTextVCDelegate>delegate;
+
+@property (nonatomic, assign) BOOL isLevelClass;
+///type        0:创建    1:修改
+@property (nonatomic, assign) NSInteger type;
+///标记header位置
+@property (nonatomic, strong) NSIndexPath *indexPath;
+///输入框内容
+@property (nonatomic, strong) NSString *textFieldText;
+
+@property (nonatomic, assign) BOOL isEditing;
 
 @end
 

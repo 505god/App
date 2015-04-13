@@ -47,5 +47,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSLocationWhenInUseDescription</key>
+	<string>需要定位</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>需要定位</string>
 </dict>
 </plist>

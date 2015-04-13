@@ -28,7 +28,6 @@
 @property (weak, nonatomic) id<DAPagesContainerTopBarDelegate> delegate;
 
 - (CGPoint)centerForSelectedItemAtIndex:(NSUInteger)index;
-//- (CGPoint)contentOffsetForSelectedItemAtIndex:(NSUInteger)index;
 
 - (void)layoutItemViews;
 @end

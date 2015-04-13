@@ -10,11 +10,11 @@
 
 @interface WQClassHeader ()
 
-@property (nonatomic, strong) UIButton *coverButton;
 @property (nonatomic, strong) UILabel *nameLab;
 @property (nonatomic, strong) UIImageView *arrawImage;
 
 @property (nonatomic, strong) UIImageView *lineView;
+
 @end
 
 @implementation WQClassHeader
@@ -22,28 +22,17 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.coverButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.coverButton addTarget:self action:@selector(coverButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.contentView addSubview:self.coverButton];
-        
         self.nameLab = [[UILabel alloc]initWithFrame:CGRectZero];
         self.nameLab.backgroundColor = [UIColor clearColor];
-        [self.contentView addSubview:self.nameLab];
+        [self.contextMenuView addSubview:self.nameLab];
         
         self.arrawImage = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.arrawImage.backgroundColor = [UIColor clearColor];
-        [self.contentView addSubview:self.arrawImage];
-        
-        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
-        longPress.minimumPressDuration = 0.5;
-        [self addGestureRecognizer:longPress];
-        SafeRelease(longPress);
+        [self.contextMenuView addSubview:self.arrawImage];
         
         self.lineView = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.lineView.image = [UIImage imageNamed:@"line"];
-        [self.contentView addSubview:self.lineView];
-        
-        self.contentView.backgroundColor = [UIColor whiteColor];
+        [self.contextMenuView addSubview:self.lineView];
     }
     return self;
 }
@@ -51,7 +40,7 @@
 -(void)setIsSelected:(BOOL)isSelected {
     _isSelected = isSelected;
     
-    self.arrawImage.image = isSelected?[UIImage imageNamed:@"navigationbar_arrow_down"]:[UIImage imageNamed:@"navigationbar_arrow_up"];
+    self.arrawImage.image = isSelected?[UIImage imageNamed:@"headerDown"]:[UIImage imageNamed:@"headerUp"];
 }
 
 -(void)setASection:(NSInteger)aSection {
@@ -61,36 +50,40 @@
 -(void)setClassObj:(WQClassObj *)classObj {
     _classObj = classObj;
     
-    self.nameLab.text = [NSString stringWithFormat:@"%@  (%d)",classObj.className,classObj.productCount];
-}
-
-
-- (void)coverButtonTapped {
-    if ([self.classDelegate respondsToSelector:@selector(headerDidSelectCoverOption:)]) {
-        [self.classDelegate headerDidSelectCoverOption:self];
-    }
-}
-
-- (void)longPress:(UILongPressGestureRecognizer *)recognizer {
-    //长按开始
-    if(recognizer.state == UIGestureRecognizerStateBegan) {
-        if ([self.classDelegate respondsToSelector:@selector(headerDidLongPressedOption:)]) {
-            [self.classDelegate headerDidLongPressedOption:self];
-        }
-    }//长按结束
-    else if(recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled){
-        
-    }
+    self.nameLab.text = [NSString stringWithFormat:@"%@  (%d)",classObj.className,classObj.levelClassCount];
 }
 
 -(void)layoutSubviews {
     [super layoutSubviews];
+   
+    self.contextMenuView.frame = (CGRect){0,0,self.width,self.height};
     
-    self.coverButton.frame = CGRectMake(0, 0, self.width, self.height);
     self.nameLab.frame = (CGRect){10,12,self.width-20,20};
     self.arrawImage.frame = (CGRect){self.width-30,12,20,20};
     
-    self.lineView.frame = (CGRect){10,self.height-1,self.width-10,2};
+    self.lineView.frame = (CGRect){0,self.height-1,self.width,2};
+}
+
+#pragma mark - property
+
+-(UIImageView*)deleteGreyImageView {
+    if (!_deleteGreyImageView) {
+        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contextMenuView.frame), 0, self.height, self.height)];
+        [_deleteGreyImageView setImage:[UIImage imageNamed:@"DeleteGrey"]];
+        [_deleteGreyImageView setContentMode:UIViewContentModeCenter];
+        [self.backView addSubview:_deleteGreyImageView];
+    }
+    return _deleteGreyImageView;
+}
+
+-(UIImageView*)deleteRedImageView {
+    if (!_deleteRedImageView) {
+        _deleteRedImageView = [[UIImageView alloc] initWithFrame:self.deleteGreyImageView.bounds];
+        [_deleteRedImageView setImage:[UIImage imageNamed:@"DeleteRed"]];
+        [_deleteRedImageView setContentMode:UIViewContentModeCenter];
+        [self.deleteGreyImageView addSubview:_deleteRedImageView];
+    }
+    return _deleteRedImageView;
 }
 
 -(void)prepareForReuse {
@@ -98,5 +91,48 @@
     self.arrawImage.image = nil;
     self.nameLab.text = nil;
     self.classObj = nil;
+    [self cleanupBackView];
 }
+-(void)cleanupBackView {
+    [super cleanupBackView];
+    [_deleteGreyImageView removeFromSuperview];
+    _deleteGreyImageView = nil;
+    [_deleteRedImageView removeFromSuperview];
+    _deleteRedImageView = nil;
+}
+
+#pragma mark -
+
+-(void)animateContentViewForPoint:(CGPoint)point velocity:(CGPoint)velocity {
+    [super animateContentViewForPoint:point velocity:velocity];
+    if (point.x < 0) {
+        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.contextMenuView.frame) - CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetMaxX(self.contextMenuView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
+        if (-point.x >= CGRectGetHeight(self.contextMenuView.frame)) {
+            [self.deleteRedImageView setAlpha:1];
+        } else {
+            [self.deleteRedImageView setAlpha:0];
+        }
+    }
+}
+
+-(void)resetCellFromPoint:(CGPoint)point velocity:(CGPoint)velocity {
+    [super resetCellFromPoint:point velocity:velocity];
+    if (point.x < 0) {
+        if (-point.x <= CGRectGetHeight(self.contextMenuView.frame)) {
+            [UIView animateWithDuration:self.animationDuration
+                             animations:^{
+                                 [self.deleteGreyImageView setFrame:CGRectMake(CGRectGetMaxX(self.contextMenuView.frame), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
+                             }];
+        } else {
+            [UIView animateWithDuration:self.animationDuration
+                             animations:^{
+                                 [self.deleteGreyImageView.layer setTransform:CATransform3DMakeScale(2, 2, 2)];
+                                 [self.deleteGreyImageView setAlpha:0];
+                                 [self.deleteRedImageView.layer setTransform:CATransform3DMakeScale(2, 2, 2)];
+                                 [self.deleteRedImageView setAlpha:0];
+                             }];
+        }
+    }
+}
+
 @end

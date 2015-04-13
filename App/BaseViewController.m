@@ -27,6 +27,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.view.clipsToBounds = YES;
+    self.view.autoresizesSubviews = YES;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -38,7 +41,7 @@
         self.edgesForExtendedLayout=UIRectEdgeNone;
     }
     
-    self.view.backgroundColor = COLOR(213, 213, 213, 1);
+    self.view.backgroundColor = COLOR(220, 220, 220, 1);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -81,7 +84,9 @@
 -(UIView *)noneView {
     if (!_noneView) {
         _noneView = [[UIView alloc]initWithFrame:self.view.bounds];
+        _noneView.backgroundColor = [UIColor clearColor];
         _noneView.hidden = YES;
+        _noneView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _noneView.userInteractionEnabled = NO;
         [self.view addSubview:_noneView];
     }
@@ -90,8 +95,9 @@
 
 -(UILabel *)noneLabel {
     if (!_noneLabel) {
-        _noneLabel = [[UILabel alloc]initWithFrame:(CGRect){(self.view.width-60)/2,(self.view.height-20)/2-30,60,20}];
+        _noneLabel = [[UILabel alloc]initWithFrame:(CGRect){(self.view.width-60)/2,(self.view.height-20)/2,60,20}];
         _noneLabel.backgroundColor = [UIColor clearColor];
+        _noneLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
         _noneLabel.textColor = [UIColor lightGrayColor];
         _noneLabel.font = [UIFont systemFontOfSize:15];
         [self.noneView addSubview:_noneLabel];
@@ -104,8 +110,10 @@
         _toolControl = [UIButton buttonWithType:UIButtonTypeCustom];
         _toolControl.frame = (CGRect){0,self.view.height-NavgationHeight,self.view.width,NavgationHeight};
         _toolControl.backgroundColor = [UIColor whiteColor];
+        _toolControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth;
         [_toolControl addTarget:self action:@selector(toolControlPressed) forControlEvents:UIControlEventTouchUpInside];
-        [_toolControl setShadow:[UIColor blackColor] rect:(CGRect){0,0,_toolControl.width,4} opacity:0.5 blurRadius:3];
+        [_toolControl setShadow:[UIColor blackColor] rect:(CGRect){0,0,400,4} opacity:0.5 blurRadius:3];
+        _toolControl.titleLabel.font = [UIFont systemFontOfSize:17];
         [_toolControl setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [_toolControl setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
         [_toolControl setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateDisabled];

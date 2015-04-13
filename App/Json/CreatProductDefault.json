@@ -1,0 +1,10 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "type": 0,
+        "name": "篮球鞋",
+        "price": "199",
+        "stock": 23443
+    }
+}

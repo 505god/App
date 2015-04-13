@@ -14,17 +14,17 @@
 
 @property (nonatomic, assign) NSInteger customerId;
 
-@property (nonatomic, copy) NSString *customerName;
+@property (nonatomic, strong) NSString *customerName;
 
-@property (nonatomic, copy) NSString *customerPhone;
+@property (nonatomic, strong) NSString *customerPhone;
 
-@property (nonatomic, copy) NSString *customerHeader;
+@property (nonatomic, strong) NSString *customerHeader;
 
 //客户等级
 @property (nonatomic, assign) NSInteger customerDegree;
 
 //邀请码
-@property (nonatomic, copy) NSString *customerCode;
+@property (nonatomic, strong) NSString *customerCode;
 
 +(WQCustomerObj *)returnCustomerWithDic:(NSDictionary *)aDic;
 @end

@@ -31,6 +31,4 @@
 ///商品是否上架
 @property (nonatomic, assign) NSInteger productIsSale;
 
-
-+(NSURLSessionDataTask *)getProductsWithBlock:(void (^)(NSArray *products, NSError *error))block;
 @end

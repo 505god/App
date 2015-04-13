@@ -1,0 +1,21 @@
+{
+  "name": "描述",
+  "isHot": "热卖",
+  "customer": [
+    "客户id0",
+    "客户id0"
+  ],
+  "imageArray": [
+    {
+      "image": "图片",
+      "color": "颜色id",
+      "sizeArray": [
+        {
+          "size": "尺码id",
+          "price": "价格",
+          "stock": "库存"
+        }
+      ]
+    }
+  ]
+}

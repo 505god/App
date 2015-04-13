@@ -55,3 +55,4 @@ typedef enum{
     WQCoinUSD = 1,        //美元
     WQCoinEUR = 2,          //欧元
 }WQCoinType;
+

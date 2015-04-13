@@ -18,8 +18,11 @@
 
 -(void)dealloc {
     SafeRelease(_whiteView);
+    SafeRelease(_nameTxt.delegate);
     SafeRelease(_nameTxt);
     SafeRelease(_delegate);
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
 }
 #pragma mark - lifestyle
 

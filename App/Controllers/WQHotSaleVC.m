@@ -56,9 +56,10 @@
     }
 }
 -(void)dealloc {
+    SafeRelease(_collectionView.delegate);
+    SafeRelease(_collectionView.dataSource);
     SafeRelease(_collectionView);
     SafeRelease(_dataArray);
-    [self.view removeObserver:self forKeyPath:@"frame"];
 }
 #pragma mark - lifestyle
 
@@ -68,9 +69,6 @@
     //集成刷新控件
     [self addHeader];
     [self addFooter];
-    
-    //KVO监测view的frame变化
-    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -148,6 +146,7 @@
         layout.scrollDirection = UICollectionViewScrollDirectionVertical;
         
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height) collectionViewLayout:layout];
+        _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
         _collectionView.backgroundColor = [UIColor whiteColor];
         [_collectionView registerClass:[WQHotSaleCell class] forCellWithReuseIdentifier:@"WQHotSaleCell"];
         _collectionView.delegate = self;
@@ -195,17 +194,5 @@
 #pragma mark - toolBar事件
 -(void)toolControlPressed {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"HotSaleVCShowNewProductVC" object:nil];
-}
-
-#pragma mark - KVO
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    [self updateSubViews];
-}
--(void)updateSubViews {
-    self.collectionView.frame = (CGRect){0, 0, self.view.width, self.view.height};
-    self.noneView.frame = (CGRect){0, 0, self.view.width, self.view.height};
-    self.noneLabel.frame = (CGRect){(self.view.width-60)/2,(self.view.height-20)/2-30,60,20};
-
-    self.toolControl.frame = (CGRect){0,self.view.height-NavgationHeight,self.view.width,NavgationHeight};
 }
 @end

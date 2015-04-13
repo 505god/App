@@ -80,15 +80,6 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
     
-    /*
-    self.toolLabel.frame = (CGRect){10,7,self.toolControl.width-20,30};
-    self.toolLabel.font = [UIFont systemFontOfSize:12];
-    self.toolLabel.numberOfLines = 2;
-    self.toolLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    self.toolLabel.textAlignment = NSTextAlignmentCenter;
-    [self setToolImage:nil text:NSLocalizedString(@"PhotoAlert", @"") animated:YES];
-     */
-    
     [self collectionView];
     [self loadAssetsGroups];
 }

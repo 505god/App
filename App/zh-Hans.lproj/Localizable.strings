@@ -13,8 +13,32 @@
 
 "HotSaleVC" = "热卖展示";
 "ProductClassifyVC" = "分类列表";
-"NewProductVC" = "创建产品";
 
+"NewProductVC" = "创建商品";
+"ProductHotSale" = "店长推荐";
+"AddMarque" = "添加商品型号";
+"AddProperty" = "添加更多商品规格";
+
+"ProductPrice" = "价格:";
+"ProductStock" = "库存:";
+"ProductSize" = "尺码:";
+"ProductDetail" = "描述:";
+"AddProductColor" = "选择颜色";
+"RecommendProduct" = "选择推荐客户";
+"SelectedProClass" = "选择分类";
+"SelectedCustomer" = "已选择%d位客户";
+"SelectedProSize" = "选择尺码";
+"AddProduct" = "完成创建";
+
+
+"NameError" = "请输入商品描述";
+"PriceError" = "请输入商品价格";
+"PriceConfirmError" = "请输入正确的商品价格";
+"StockError" = "请输入商品库存";
+"StockConfirmError" = "请输入正确的商品库存";
+"ImageError" = "请添加商品图片";
+"ColorError" = "请选择商品颜色";
+"SizeError" = "请选择商品尺码";
 //设置
 "SettingVC" = "设置";
 "Header" = "头像";
@@ -53,16 +77,22 @@
 "Add" = "添加";
 "Finish" = "完成";
 "Delete" = "删除";
+"ConfirmDelete" = "确定删除?";
 "Confirm" = "确定";
 "ShopNameLimit" = "最多10个字";
 
-"ClassDelete" = "该分类下包含产品不能被删除";
-"ColorDelete" = "该颜色下包含产品不能被删除";
-"SizeDelete" = "该尺码下包含产品不能被删除";
+"ClassDelete" = "该分类下包含子分类不能被删除";
+"ClassBDelete" = "该分类下包含商品不能被删除";
+"AddMoreLevelClass" = "添加更多子分类";
+"ColorDelete" = "该颜色下包含商品不能被删除";
+"SizeDelete" = "该尺码下包含商品不能被删除";
 
 "CreatClass" = "新建分类";
+"EditClass" = "修改分类";
 "CreatColor" = "新建颜色";
+"EditColor" = "修改颜色";
 "CreatSize" = "新建尺码";
+"EditSize" = "修改尺码";
 
 "NoneColor" = "暂无颜色";
 "NoneSize" = "暂无尺码";
@@ -82,16 +112,7 @@
 
 "ShopVC" = "我的店铺";
 
-"ProductCode" = "产品编号";
-"ProductPrice" = "价格";
-"ProductDetail" = "描述";
 
-"AddProductColor" = "添加产品颜色";
-"RecommendProduct" = "推荐给客户";
-
-"SelectedCustomer" = "已选择%ld位客户";
-
-"AddProduct" = "完成创建";
 
 
 "ColorVC" = "颜色";

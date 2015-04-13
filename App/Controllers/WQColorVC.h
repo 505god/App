@@ -10,6 +10,8 @@
 
 ///颜色设置
 
+@class WQColorObj;
+
 @protocol WQColorVCDelegate;
 
 @interface WQColorVC : BaseViewController
@@ -18,14 +20,16 @@
 
 @property (nonatomic, assign) BOOL isPresentVC;
 
-@property (nonatomic, strong) NSMutableArray *selectedList;
+@property (nonatomic, strong) WQColorObj *selectedColorObj;
+
+@property (nonatomic, strong) NSIndexPath *selectedIndexPath;
 @end
 
 @protocol WQColorVCDelegate <NSObject>
 
 @optional
 
-- (void)colorVC:(WQColorVC *)colorVC didSelectColor:(NSArray *)colors;
+-(void)colorVC:(WQColorVC *)colorVC selectedColor:(WQColorObj *)colorObj;
 
 
 @end

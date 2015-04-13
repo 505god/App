@@ -19,7 +19,6 @@
 
 
 @property (nonatomic, strong) UIImageView *lineView;
-@property (nonatomic, strong) UIImageView *directionImage;
 
 //头像链接
 -(void)setHeaderImageViewImage:(NSString *)header;

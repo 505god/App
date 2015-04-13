@@ -68,7 +68,7 @@
 -(UITableView *)tableView {
     if (!_tableView) {
         _tableView = [[UITableView alloc]initWithFrame:(CGRect){0,self.navBarView.height+10,self.view.width,self.view.height-self.navBarView.height-10} style:UITableViewStylePlain];
-        _tableView.backgroundColor = [UIColor whiteColor];
+        _tableView.backgroundColor = [UIColor clearColor];
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -117,6 +117,7 @@
             cell.titleLab.text = NSLocalizedString(@"ShopName", @"");
             cell.detailLab.text = @"龙舞精神";
         }
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }else if (indexPath.section==1) {
         if (indexPath.row==0) {
             cell.titleLab.text = NSLocalizedString(@"ClassifySetup", @"");
@@ -127,11 +128,12 @@
         }else if (indexPath.row==3) {
             cell.titleLab.text = NSLocalizedString(@"CurrencySetup", @"");
         }
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }else {
-        [cell.directionImage setHidden:YES];
         cell.textLabel.backgroundColor = [UIColor clearColor];
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.text = NSLocalizedString(@"LogOut", @"");
+        cell.accessoryType = UITableViewCellAccessoryNone;
     }
     
     return cell;
@@ -159,17 +161,19 @@
     }else if (indexPath.section==1) {
         if (indexPath.row==0) {
             WQClassVC *classVC = [[WQClassVC alloc]init];
-            [self.navControl pushViewController:classVC animated:YES];
-            SafeRelease(classVC);
+            classVC.isPresentVC = YES;
+            [self.view.window.rootViewController presentViewController:classVC animated:YES completion:^{
+            }];
+//            [self.navControl pushViewController:classVC animated:YES];
+//            SafeRelease(classVC);
         }else if (indexPath.row==1) {
             WQColorVC *colorVC = [[WQColorVC alloc]init];
-//            colorVC.isPresentVC = YES;
-//            colorVC.selectedList = [[NSMutableArray alloc]init];
-//            [self.view.window.rootViewController presentViewController:colorVC animated:YES completion:^{
-//            }];
-            
-            [self.navControl pushViewController:colorVC animated:YES];
-            SafeRelease(colorVC);
+            colorVC.isPresentVC = YES;
+            [self.view.window.rootViewController presentViewController:colorVC animated:YES completion:^{
+//                SafeRelease(imagePicker);
+            }];
+//            [self.navControl pushViewController:colorVC animated:YES];
+//            SafeRelease(colorVC);
         }else if (indexPath.row==2) {
             WQSizeVC *sizeVC = [[WQSizeVC alloc]init];
             [self.navControl pushViewController:sizeVC animated:YES];

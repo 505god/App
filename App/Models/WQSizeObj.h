@@ -18,11 +18,4 @@
 ///尺码下产品数量
 @property (nonatomic, assign) NSInteger productCount;
 
-+(WQSizeObj *)returnSizeWithDic:(NSDictionary *)aDic;
-
-
-////添加产品时候设置的尺码对应的库存
-@property (nonatomic, assign) NSInteger stockCount;
-
-
 @end

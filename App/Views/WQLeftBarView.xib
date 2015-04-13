@@ -15,7 +15,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="60" height="142"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="add_attention_btn" id="QbA-nt-3qf">
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shopNormal.png" highlightedImage="shopAct.png" id="QbA-nt-3qf">
                             <rect key="frame" x="10" y="51" width="40" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         </imageView>
@@ -36,7 +36,7 @@
                     <rect key="frame" x="0.0" y="142" width="60" height="142"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="alert-window" id="hJz-Z6-35S">
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="orderNormal.png" highlightedImage="orderAct.png" id="hJz-Z6-35S">
                             <rect key="frame" x="10" y="51" width="40" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </imageView>
@@ -57,7 +57,7 @@
                     <rect key="frame" x="0.0" y="426" width="60" height="142"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="camera_edit_cut_cancel" id="054-pN-Fq5">
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="saleNormal.png" highlightedImage="saleAct.png" id="054-pN-Fq5">
                             <rect key="frame" x="10" y="51" width="40" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </imageView>
@@ -72,7 +72,7 @@
                     <rect key="frame" x="0.0" y="284" width="60" height="142"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="back" id="SzN-UI-2J7">
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="customerNormal.png" highlightedImage="customerAct.png" id="SzN-UI-2J7">
                             <rect key="frame" x="10" y="51" width="40" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </imageView>
@@ -103,10 +103,14 @@
         </view>
     </objects>
     <resources>
-        <image name="add_attention_btn" width="150" height="150"/>
-        <image name="alert-window" width="280" height="51"/>
-        <image name="back" width="48" height="48"/>
-        <image name="camera_edit_cut_cancel" width="32" height="32"/>
+        <image name="customerAct.png" width="41" height="41"/>
+        <image name="customerNormal.png" width="41" height="41"/>
+        <image name="orderAct.png" width="41" height="41"/>
+        <image name="orderNormal.png" width="41" height="41"/>
+        <image name="saleAct.png" width="41" height="41"/>
+        <image name="saleNormal.png" width="41" height="41"/>
+        <image name="shopAct.png" width="41" height="41"/>
+        <image name="shopNormal.png" width="41" height="41"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

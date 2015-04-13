@@ -8,6 +8,7 @@
 
 #import "BaseViewController.h"
 
+@class WQSizeObj;
 ///尺码设置
 @protocol WQSizeVCDelegate;
 
@@ -17,14 +18,13 @@
 
 @property (nonatomic, assign) BOOL isPresentVC;
 
-@property (nonatomic, strong) NSMutableArray *selectedList;
+@property (nonatomic, strong) WQSizeObj *selectedSizeObj;
 
+@property (nonatomic, strong) NSIndexPath *selectedIndexPath;
 @end
 
 @protocol WQSizeVCDelegate <NSObject>
 @optional
 
-- (void)sizeVC:(WQSizeVC *)sizeVC didSelectSize:(NSArray *)sizes;
-
-
+-(void)sizeVC:(WQSizeVC *)sizeVC selectedSize:(WQSizeObj *)sizeObj;
 @end

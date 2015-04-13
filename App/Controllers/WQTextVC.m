@@ -21,9 +21,12 @@
     SafeRelease(_btn);
     SafeRelease(_titleLab);
     SafeRelease(_delegate);
+    SafeRelease(_textFieldText);
+    SafeRelease(_titleString);
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 #pragma mark - lifestyle
@@ -33,12 +36,10 @@
     
     [self.btn setTitle:NSLocalizedString(@"Confirm", @"") forState:UIControlStateNormal];
     
-    if (self.type==0) {
-        self.titleLab.text = NSLocalizedString(@"CreatClass", @"");
-    }else if (self.type==1) {
-        self.titleLab.text = NSLocalizedString(@"CreatColor", @"");
-    }else if (self.type==2) {
-        self.titleLab.text = NSLocalizedString(@"CreatSize", @"");
+    self.titleLab.text = self.titleString;
+    
+    if ([Utility checkString:self.textFieldText] && self.type==1) {
+        self.text.text = self.textFieldText;
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -49,6 +50,8 @@
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification
                                                object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -71,6 +74,7 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 #pragma mark - Keyboard notifications
 - (void)keyboardWillShow:(NSNotification *)notification {
     [UIView beginAnimations:nil context:nil];
@@ -87,16 +91,30 @@
     [UIView commitAnimations];
 }
 
+-(BOOL)validateChangeName {
+    
+    if (self.type==1) {
+        BOOL res = ![self.text.text isEqualToString:self.textFieldText];
+        
+        return res;
+    }
+    return NO;
+}
 #pragma mark - UITextFieldDelegate
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     [self.text resignFirstResponder];
     return YES;
 }
 
+-(void)textFieldDidChange:(NSNotification *)notification {
+    self.isEditing = [self validateChangeName];
+}
+
 -(IBAction)confirmPressed:(id)sender {
     if ([Utility checkString:self.text.text]) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
         
         if (self.delegate && [self.delegate respondsToSelector:@selector(dismissTextVC:)]) {
             [self.delegate dismissTextVC:self];

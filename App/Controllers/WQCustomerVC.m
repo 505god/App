@@ -22,6 +22,7 @@
 
 #import "JKUtil.h"
 
+
 @interface WQCustomerVC ()<WQCustomerTableDelegate,UISearchDisplayDelegate,WQCustomerCellDelegate>
 
 //通讯录列表
@@ -35,7 +36,6 @@
 @implementation WQCustomerVC
 
 -(void)dealloc {
-    [self.view removeObserver:self forKeyPath:@"frame"];
 }
 
 // 创建tableView
@@ -66,18 +66,17 @@
         }else
             [self.tableView reloadData];
     }else {
-        [[WQDataShare sharedService] getCustomerListCompleteBlock:^(BOOL finished) {
-            if (!self.tableView) {
-                [self createTableView];
-                
-                [self setupSearchBar];
-            }else
-                [self.tableView reloadData];
-        }];
+//        [[WQDataShare sharedService] getCustomerListCompleteBlock:^(BOOL finished) {
+//            if (!self.tableView) {
+//                [self createTableView];
+//                
+//                [self setupSearchBar];
+//            }else
+//                [self.tableView reloadData];
+//        }];
     }
     
-    //KVO监测view的frame变化
-    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -386,11 +385,4 @@
     }];
 }
 
-#pragma mark - KVO
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    [self updateSubViews];
-}
--(void)updateSubViews {
-   
-}
 @end

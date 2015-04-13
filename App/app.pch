@@ -32,9 +32,7 @@
 
 #define AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES
 
-//获取热卖展示
-#define HOTSALE @""
-
+#define AlertTitle @"提示"
 
 
 //信息

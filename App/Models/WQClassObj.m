@@ -8,15 +8,15 @@
 
 #import "WQClassObj.h"
 
-#import "WQProductObj.h"
+#import "WQClassLevelObj.h"
 
 @implementation WQClassObj
 
 + (NSDictionary*)mts_mapping {
-    return  @{@"classId": mts_key(classId),
-              @"className": mts_key(className),
-              @"productCount": mts_key(productCount),
-              @"productList": mts_key(productList)
+    return  @{@"classAId": mts_key(classId),
+              @"classAName": mts_key(className),
+              @"classBCount": mts_key(levelClassCount),
+              @"classBList": mts_key(levelClassList)
               };
 }
 
@@ -26,7 +26,7 @@
 
 + (NSDictionary*)mts_arrayClassMapping
 {
-    return @{mts_key(productList) : WQProductObj.class,
+    return @{mts_key(levelClassList) : WQClassLevelObj.class,
              };
 }
 @end

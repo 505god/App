@@ -22,12 +22,4 @@
     return NO;
 }
 
-+(WQSizeObj *)returnSizeWithDic:(NSDictionary *)aDic {
-    WQSizeObj *size = [[WQSizeObj alloc]init];
-    
-    [size mts_setValuesForKeysWithDictionary:aDic];
-    
-    return size;
-}
-
 @end

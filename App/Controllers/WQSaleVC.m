@@ -10,6 +10,7 @@
 
 #define ARC4RANDOM_MAX 0x100000000
 
+
 @interface WQSaleVC ()
 
 @end
@@ -17,7 +18,6 @@
 @implementation WQSaleVC
 
 -(void)dealloc {
-    [self.view removeObserver:self forKeyPath:@"frame"];
 }
 
 #pragma mark - lifestyle
@@ -33,12 +33,12 @@
 //    [self showCircleChart];
 //    [self showScatterChart];
     
-    //KVO监测view的frame变化
-    [self.view addObserver:self forKeyPath:@"frame" options:(NSKeyValueObservingOptionNew) context:Nil];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -207,13 +207,6 @@
 }
 - (void)userClickedOnBarAtIndex:(NSInteger)barIndex {
     DLog(@"bar");
-}
-#pragma mark - KVO
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    [self updateSubViews];
-}
--(void)updateSubViews {
-    
 }
 
 @end
