@@ -173,7 +173,7 @@ static void logNetworkStatus_(const char *name, int line, NetworkStatus status) 
 	
 	NSLog(@"%s (%d) \n\tNetwork Status: %@", name, line, statusString);
 	
-} // logNetworkStatus_()
+}//logNetworkStatus_()
 
 #else
 #define logReachabilityFlags(flags)

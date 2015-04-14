@@ -17,6 +17,10 @@
               @"customerHeader": mts_key(customerHeader),
               @"customerDegree": mts_key(customerDegree),
               @"customerCode": mts_key(customerCode),
+              @"customerArea": mts_key(customerArea),
+              @"customerRemark": mts_key(customerRemark),
+              @"customerShield": mts_key(customerShield),
+              
               };
 }
 
@@ -24,10 +28,4 @@
     return NO;
 }
 
-+(WQCustomerObj *)returnCustomerWithDic:(NSDictionary *)aDic {
-    WQCustomerObj *customer = [[WQCustomerObj alloc]init];
-    
-    [customer mts_setValuesForKeysWithDictionary:aDic];
-    return customer;
-}
 @end

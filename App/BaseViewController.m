@@ -41,7 +41,7 @@
         self.edgesForExtendedLayout=UIRectEdgeNone;
     }
     
-    self.view.backgroundColor = COLOR(220, 220, 220, 1);
+    self.view.backgroundColor = COLOR(235, 235, 241, 1);
 }
 
 - (void)viewDidAppear:(BOOL)animated {

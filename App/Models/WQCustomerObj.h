@@ -8,23 +8,26 @@
 
 #import <Foundation/Foundation.h>
 
-//客户属性
+///客户属性
 
 @interface WQCustomerObj : NSObject
-
+///客户id
 @property (nonatomic, assign) NSInteger customerId;
-
+///客户昵称
 @property (nonatomic, strong) NSString *customerName;
-
-@property (nonatomic, strong) NSString *customerPhone;
-
+///客户电话
+@property (nonatomic, strong) NSString *customerPhone;//+1
+///客户头像
 @property (nonatomic, strong) NSString *customerHeader;
-
-//客户等级
+///客户地区
+@property (nonatomic, strong) NSString *customerArea;//+1
+///客户等级
 @property (nonatomic, assign) NSInteger customerDegree;
+///客户邀请码
+@property (nonatomic, strong) NSString *customerCode;//+1
+///客户备注
+@property (nonatomic, strong) NSString *customerRemark;//+1
 
-//邀请码
-@property (nonatomic, strong) NSString *customerCode;
-
-+(WQCustomerObj *)returnCustomerWithDic:(NSDictionary *)aDic;
+///客户屏蔽
+@property (nonatomic, assign) NSInteger customerShield;
 @end

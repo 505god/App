@@ -161,19 +161,12 @@
     }else if (indexPath.section==1) {
         if (indexPath.row==0) {
             WQClassVC *classVC = [[WQClassVC alloc]init];
-            classVC.isPresentVC = YES;
-            [self.view.window.rootViewController presentViewController:classVC animated:YES completion:^{
-            }];
-//            [self.navControl pushViewController:classVC animated:YES];
-//            SafeRelease(classVC);
+            [self.navControl pushViewController:classVC animated:YES];
+            SafeRelease(classVC);
         }else if (indexPath.row==1) {
             WQColorVC *colorVC = [[WQColorVC alloc]init];
-            colorVC.isPresentVC = YES;
-            [self.view.window.rootViewController presentViewController:colorVC animated:YES completion:^{
-//                SafeRelease(imagePicker);
-            }];
-//            [self.navControl pushViewController:colorVC animated:YES];
-//            SafeRelease(colorVC);
+            [self.navControl pushViewController:colorVC animated:YES];
+            SafeRelease(colorVC);
         }else if (indexPath.row==2) {
             WQSizeVC *sizeVC = [[WQSizeVC alloc]init];
             [self.navControl pushViewController:sizeVC animated:YES];

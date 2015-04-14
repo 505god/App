@@ -119,9 +119,9 @@
 -(void)showRootVC {
     self.mainVC = [[WQMainVC alloc]init];
     WQShopVC *shopVC = [[WQShopVC alloc]init];
-    WQOrderVC *orderVC = LOADVC(@"WQOrderVC");
-    WQCustomerVC *customerVC = LOADVC(@"WQCustomerVC");
-    WQSaleVC *saleVC = LOADVC(@"WQSaleVC");
+    WQOrderVC *orderVC = [[WQOrderVC alloc]init];
+    WQCustomerVC *customerVC = [[WQCustomerVC alloc]init];
+    WQSaleVC *saleVC = [[WQSaleVC alloc]init];
 
     self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
 

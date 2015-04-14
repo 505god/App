@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void(^CompleteBlock)(BOOL finished);
+typedef void(^CompleteBlock)(NSArray *array);
 
 @interface WQDataShare : NSObject {
     CompleteBlock completeBlock;
@@ -19,14 +19,21 @@ typedef void(^CompleteBlock)(BOOL finished);
 //区分6、7statusBar高度
 @property (nonatomic, assign) NSInteger statusHeight;
 
-#pragma mark - 用户列表
+//TODO:分类、颜色、尺码 放到单列里面
+//分类
+@property (nonatomic, strong) NSMutableArray *classArray;
+//颜色
+@property (nonatomic, strong) NSMutableArray *colorArray;
+//尺码
+@property (nonatomic, strong) NSMutableArray *sizeArray;
+
+//客户户列表
 @property (nonatomic, strong) NSMutableArray *customerArray;//用于搜索
-@property (nonatomic, strong) NSMutableArray *customerList;//用于显示cell
+
 
 
 + (WQDataShare *)sharedService;
 
-//获取客户列表
-- (void)sortCustomers:(NSArray *)customers CompleteBlock:(CompleteBlock)complet;
+-(void)sortCustomers:(NSArray *)customers CompleteBlock:(CompleteBlock)complet;
 
 @end

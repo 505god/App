@@ -8,6 +8,8 @@
 
 #import "BaseViewController.h"
 
+//客户
+
 @protocol WQCustomerVCDelegate;
 
 @interface WQCustomerVC : BaseViewController
@@ -17,6 +19,8 @@
 @property (nonatomic, assign) BOOL isPresentVC;
 //推荐客户
 @property (nonatomic, strong) NSMutableArray *selectedList;
+///推荐客户选择
+@property (nonatomic, strong) NSIndexPath *selectedIndexPath;
 @end
 
 
@@ -24,7 +28,6 @@
 
 @optional
 
-- (void)customerVC:(WQCustomerVC *)customerVC didSelectCustomers:(NSArray *)customers;
-- (void)customerVCDidCancel:(WQCustomerVC *)customerVC;
+-(void)customerVC:(WQCustomerVC *)customerVC didSelectCustomers:(NSArray *)customers;
 
 @end

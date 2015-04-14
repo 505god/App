@@ -15,16 +15,12 @@
 @protocol ChatDelegate;
 
 @interface WQXMPPManager : NSObject
-{
-    XMPPStream *xmppStream;
-    XMPPReconnect *xmppReconnect;//重连模块
-    
-    BOOL isXmppConnected;
-    BOOL customCertEvaluation;
-}
 
-@property (nonatomic, strong, readonly) XMPPStream *xmppStream;
-@property (nonatomic, strong, readonly) XMPPReconnect *xmppReconnect;
+@property (nonatomic, strong) XMPPStream *xmppStream;
+@property (nonatomic, strong) XMPPReconnect *xmppReconnect;
+
+@property (nonatomic, assign) BOOL isXmppConnected;
+@property (nonatomic, assign) BOOL customCertEvaluation;
 
 @property (nonatomic, assign) id<ChatDelegate>chatDelegate;
 

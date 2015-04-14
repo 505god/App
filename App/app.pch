@@ -43,7 +43,6 @@
 #define kMESSAGE_DATE @"messageDate"
 #define kMESSAGE_ID @"messageId"
 
-#define LOADIMAGE(file,ext) [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:file ofType:ext]];
 
 #define PATH_OF_DOCUMENT    [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
 
@@ -73,7 +72,5 @@
 #define LOADVC(string) [[NSClassFromString(string) alloc]initWithNibName:string bundle:nil];
 
 #define Platform [[[UIDevice currentDevice] systemVersion] floatValue]
-
-#define AddProductImagesMax  1
 
 #define NavgationHeight 44

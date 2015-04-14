@@ -110,6 +110,7 @@
 	}
 }
 
+
 -(void)didStartSwiping {
     if ([self.delegate respondsToSelector:@selector(swipeTableViewCellDidStartSwiping:)]) {
         [self.delegate swipeTableViewCellDidStartSwiping:self];
@@ -176,7 +177,7 @@
     } else {
         [UIView animateWithDuration:self.animationDuration
                               delay:0
-                            options:self.animationType
+                            options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
                              self.contentView.frame = CGRectOffset(self.contentView.bounds, 0, 0);
                          }

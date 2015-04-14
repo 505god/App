@@ -173,6 +173,19 @@
 //左侧边栏的代理
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
     if (self.isPresentVC) {
+        /*
+        if (self.selectedClassBObj) {
+            BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmCancelSelected", @"")];
+            
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+            [alert show];
+        }else {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+         */
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {
         [self.navigationController popViewControllerAnimated:YES];
@@ -477,6 +490,17 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(classVC:selectedClass:)]) {
         WQClassObj *classObj = (WQClassObj *)self.dataArray[self.selectedIdx.section];
         [self.delegate classVC:self selectedClass:(WQClassLevelObj *)classObj.levelClassList[self.selectedIdx.row]];
+    }
+}
+//去掉UItableview headerview黏性(sticky)
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (scrollView == self.tableView) {
+        CGFloat sectionHeaderHeight = NavgationHeight;
+        if (scrollView.contentOffset.y<=sectionHeaderHeight&&scrollView.contentOffset.y>=0) {
+            scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0, 0);
+        } else if (scrollView.contentOffset.y>=sectionHeaderHeight) {
+            scrollView.contentInset = UIEdgeInsetsMake(-sectionHeaderHeight, 0, 0, 0);
+        }
     }
 }
 #pragma mark - section事件

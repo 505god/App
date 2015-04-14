@@ -12,7 +12,6 @@
 #import "WQIndexedCollationWithSearch.h"//检索
 #import "PinYinForObjc.h"
 
-
 @implementation WQDataShare
 
 - (id)init{
@@ -36,17 +35,28 @@
 
 -(NSMutableArray *)customerArray {
     if (!_customerArray) {
-        _customerArray = [NSMutableArray array];
+        _customerArray = [[NSMutableArray alloc]init];
     }
     return _customerArray;
 }
--(NSMutableArray *)customerList {
-    if (!_customerList) {
-        _customerList = [NSMutableArray array];
+-(NSMutableArray *)classArray {
+    if (!_classArray) {
+        _classArray = [[NSMutableArray alloc]init];
     }
-    return _customerList;
+    return _classArray;
 }
-
+-(NSMutableArray *)colorArray {
+    if (!_colorArray) {
+        _colorArray = [[NSMutableArray alloc]init];
+    }
+    return _colorArray;
+}
+-(NSMutableArray *)sizeArray {
+    if (!_sizeArray) {
+        _sizeArray = [[NSMutableArray alloc]init];
+    }
+    return _sizeArray;
+}
 
 #pragma mark -
 /**
@@ -73,7 +83,9 @@
  *  @param customers 按照A－Z排好序的客户列表
  */
 -(void)setupCustomerList:(NSArray *)customers {
-    self.customerList = nil;
+    
+    NSMutableArray *mutableArray = [[NSMutableArray alloc]init];
+    
     [customers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         NSArray *array = (NSArray *)obj;
         
@@ -93,13 +105,13 @@
                 [aDic setObject:@"#" forKey:@"indexTitle"];
             }
             
-            [self.customerList addObject:aDic];
+            [mutableArray addObject:aDic];
         }
     }];
     
     if (completeBlock) {
-        [MBProgressHUD hideAllHUDsForView:self.appDel.window animated:YES];
-        completeBlock(YES);
+        completeBlock(mutableArray);
+        SafeRelease(mutableArray);
     }
 }
 

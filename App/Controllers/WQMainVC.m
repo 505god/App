@@ -163,30 +163,13 @@
 }
 //设置标题
 -(void)setTitleWithPage {
-    switch (self.currentPage) {
-        case 0:
-            self.navBarView.titleLab.text = @"";
-            self.navBarView.backgroundColor = [UIColor clearColor];
-            self.navBarView.isShowShadow = NO;
-            break;
-        case 1:
-            self.navBarView.titleLab.text = NSLocalizedString(@"OrderVC", @"");
-            self.navBarView.backgroundColor = [UIColor whiteColor];
-            self.navBarView.isShowShadow = YES;
-            break;
-        case 2:
-            self.navBarView.titleLab.text = NSLocalizedString(@"CustomerVC", @"");
-            self.navBarView.backgroundColor = [UIColor whiteColor];
-            self.navBarView.isShowShadow = YES;
-            break;
-        case 3:
-            self.navBarView.titleLab.text = NSLocalizedString(@"SaleVC", @"");
-            self.navBarView.backgroundColor = [UIColor whiteColor];
-            self.navBarView.isShowShadow = YES;
-            break;
-            
-        default:
-            break;
+    if (self.currentPage==0) {
+        [self.navBarView setHidden:NO];
+        self.navBarView.titleLab.text = @"";
+        self.navBarView.backgroundColor = [UIColor clearColor];
+        self.navBarView.isShowShadow = NO;
+    }else {
+        [self.navBarView setHidden:YES];
     }
 }
 #pragma mark - 子controller之间切换

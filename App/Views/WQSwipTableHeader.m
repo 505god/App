@@ -164,7 +164,7 @@
     } else {
         [UIView animateWithDuration:self.animationDuration
                               delay:0
-                            options:self.animationType
+                            options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
                              self.contextMenuView.frame = CGRectOffset(self.contextMenuView.bounds, 0, 0);
                          }

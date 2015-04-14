@@ -45,19 +45,14 @@ typedef enum
     PageControlStyleThumb = 5
 } PageControlStyle;
 
-@interface StyledPageControl : UIControl {
-    int _currentPage, _numberOfPages;
-    BOOL hidesForSinglePage;
-    PageControlStyle _pageControlStyle;
-    int _strokeWidth, diameter, gapWidth;
-}
+@interface StyledPageControl : UIControl
 
 @property (nonatomic, retain) UIColor *coreNormalColor, *coreSelectedColor;
 @property (nonatomic, retain) UIColor *strokeNormalColor, *strokeSelectedColor;
-@property (nonatomic, assign) int _currentPage, _numberOfPages;
+@property (nonatomic, assign) int currentPage, numberOfPages;
 @property (nonatomic, assign) BOOL hidesForSinglePage;
-@property (nonatomic, assign) PageControlStyle _pageControlStyle;
-@property (nonatomic, assign) int _strokeWidth, diameter, gapWidth;
+@property (nonatomic, assign) PageControlStyle pageControlStyle;
+@property (nonatomic, assign) int strokeWidth, diameter, gapWidth;
 @property (nonatomic, retain) UIImage *thumbImage, *selectedThumbImage;
 
 - (void)setCurrentPage:(int)page;

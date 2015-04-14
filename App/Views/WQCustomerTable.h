@@ -19,6 +19,8 @@
 @property (nonatomic, assign) id<WQCustomerTableDelegate> delegate;
 
 - (void)reloadData;
+
+-(void)setHeaderAnimated:(BOOL)animated;
 @end
 
 @protocol WQCustomerTableDelegate <UITableViewDataSource,UITableViewDelegate,UISearchBarDelegate>

@@ -22,25 +22,25 @@ static WQXMPPManager *sharedManager;
 
 
 - (void)setupStream{
-    xmppStream = [[XMPPStream alloc] init];
+    self.xmppStream = [[XMPPStream alloc] init];
     
 #if !TARGET_IPHONE_SIMULATOR
     {
         xmppStream.enableBackgroundingOnSocket = YES;
     }
 #endif
-    xmppReconnect = [[XMPPReconnect alloc] init];
-    [xmppReconnect         activate:xmppStream];
+    self.xmppReconnect = [[XMPPReconnect alloc] init];
+    [self.xmppReconnect activate:self.xmppStream];
 
 
-    [xmppStream setHostName:@"58.211.5.17"];
-    [xmppStream setHostPort:5222];
+    [self.xmppStream setHostName:@"58.211.5.17"];
+    [self.xmppStream setHostPort:5222];
     
     // Add ourself as a delegate to anything we may be interested in
     
-    [xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
     
-    customCertEvaluation = YES;
+    self.customCertEvaluation = YES;
     
     BOOL hasConnect = [self.xmppStream isConnected];
     if (!hasConnect)
@@ -64,14 +64,14 @@ static WQXMPPManager *sharedManager;
 
 #pragma mark - 释放
 - (void)teardownStream{
-    [xmppStream removeDelegate:self];
+    [self.xmppStream removeDelegate:self];
     
-    [xmppReconnect         deactivate];
+    [self.xmppReconnect deactivate];
     
-    [xmppStream disconnect];
+    [self.xmppStream disconnect];
     
-    xmppStream = nil;
-    xmppReconnect = nil;
+    self.xmppStream = nil;
+    self.xmppReconnect = nil;
 }
 //发送在线状态
 - (void)goOnline{
@@ -108,13 +108,13 @@ static WQXMPPManager *sharedManager;
 }
 
 - (void)xmppStream:(XMPPStream *)sender willSecureWithSettings:(NSMutableDictionary *)settings{
-    NSString *expectedCertName = [xmppStream.myJID domain];
+    NSString *expectedCertName = [self.xmppStream.myJID domain];
     if (expectedCertName)
     {
         [settings setObject:expectedCertName forKey:(NSString *)kCFStreamSSLPeerName];
     }
     
-    if (customCertEvaluation)
+    if (self.customCertEvaluation)
     {
         [settings setObject:@(YES) forKey:GCDAsyncSocketManuallyEvaluateTrust];
     }
@@ -304,7 +304,7 @@ static WQXMPPManager *sharedManager;
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
 {
     //接收到别人的添加好友请求，默认自动添加为好友
-    XMPPJID *jid = presence.from;
+//    XMPPJID *jid = presence.from;
 //    [self.xmppRoster acceptPresenceSubscriptionRequestFrom:jid andAddToRoster:YES];//同意添加
 }
 #pragma mark - XMPPReconnectDelegate

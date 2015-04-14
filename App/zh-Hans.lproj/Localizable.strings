@@ -29,6 +29,17 @@
 "SelectedCustomer" = "已选择%d位客户";
 "SelectedProSize" = "选择尺码";
 "AddProduct" = "完成创建";
+"SelectedProCustomers" = "选择客户";
+"Search" = "搜索";
+"CustomerInfoDetail" = "详细资料";
+
+"CustomerPhone" = "手机";
+"CustomerRemark" = "备注";
+"customerArea" = "地区";
+"customerCode" = "邀请码";
+"customerOrder" = "订单记录";
+"customerChat" = "发消息";
+"customerPhoneCall" = "确定拨打客户电话?";
 
 
 "NameError" = "请输入商品描述";
@@ -43,9 +54,9 @@
 "SettingVC" = "设置";
 "Header" = "头像";
 "ShopName" = "店铺名称";
-"ClassifySetup" = "分类预设";
-"ColorSetup" = "颜色预设";
-"SizeSetup" = "尺码预设";
+"ClassifySetup" = "分类";
+"ColorSetup" = "颜色";
+"SizeSetup" = "尺码";
 "CurrencySetup" = "货币预设";
 "LogOut" = "退出";
 //热卖展示
@@ -53,7 +64,7 @@
 "NoneProducts" = "暂无商品";
 "NoneClass" = "暂无分类";
 "NewClass" = "创建分类";
-
+"NoneCustomer" = "暂无客户";
 //刷新控件
 "FooterPullToRefresh" = "上拉可以加载更多数据";
 "FooterReleaseToRefresh" = "松开立即加载更多数据";
@@ -80,6 +91,7 @@
 "ConfirmDelete" = "确定删除?";
 "Confirm" = "确定";
 "ShopNameLimit" = "最多10个字";
+"ConfirmCancelSelected" = "放弃选择?";
 
 "ClassDelete" = "该分类下包含子分类不能被删除";
 "ClassBDelete" = "该分类下包含商品不能被删除";

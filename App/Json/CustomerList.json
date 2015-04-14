@@ -9,103 +9,65 @@
                          "customerPhone": "13876483992",
                          "customerHeader": "http://",
                          "customerDegree": "3",
-                         "customerCode": "2N457YD90"
+                         "customerRemark": "邱成西",
+                         "customerArea": "江苏  苏州",
+                         "customerCode": "PDMS083JMSK",
+                         "customerShield": 0
                          },
                          {
                          "customerId": "1",
-                         "customerName": "王浩",
-                         "customerPhone": "13962159223",
+                         "customerName": "看见电视",
+                         "customerPhone": "18915410342",
                          "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "2",
-                         "customerName": "433王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
+                         "customerDegree": "3",
+                         "customerRemark": "er",
+                         "customerArea": "江苏  泰州",
+                         "customerCode": "PDMS083JMSK",
+                         "customerShield": 0
                          },
                          {
                          "customerId": "3",
-                         "customerName": "j王浩",
-                         "customerPhone": "13962159223",
+                         "customerName": "咯",
+                         "customerPhone": "15106154113",
                          "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "4",
-                         "customerName": "b王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
+                         "customerDegree": "3",
+                         "customerRemark": "豆腐",
+                         "customerArea": "江苏  无锡",
+                         "customerCode": "PDMS083JMSK",
+                         "customerShield": 0
                          },
                          {
                          "customerId": "5",
-                         "customerName": "c王浩",
-                         "customerPhone": "13962159223",
+                         "customerName": "祝",
+                         "customerPhone": "13876483992",
                          "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
+                         "customerDegree": "3",
+                         "customerRemark": "邱的西",
+                         "customerArea": "江苏  常州",
+                         "customerCode": "PDMS083JMSK",
+                         "customerShield": 0
                          },
                          {
                          "customerId": "6",
-                         "customerName": "z王浩",
-                         "customerPhone": "13962159223",
+                         "customerName": "hello",
+                         "customerPhone": "181572833",
                          "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "7",
-                         "customerName": "0王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "8",
-                         "customerName": "i王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
+                         "customerDegree": "3",
+                         "customerRemark": "",
+                         "customerArea": "河北  邯郸",
+                         "customerCode": "PDMS083JMSK",
+                         "customerShield": 1
                          },
                          {
                          "customerId": "9",
-                         "customerName": "e王浩",
-                         "customerPhone": "13962159223",
+                         "customerName": "1314",
+                         "customerPhone": "13876483992",
                          "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "10",
-                         "customerName": "j王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "11",
-                         "customerName": "g王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
-                         },
-                         {
-                         "customerId": "12",
-                         "customerName": "x王浩",
-                         "customerPhone": "13962159223",
-                         "customerHeader": "http://",
-                         "customerDegree": "2",
-                         "customerCode": "2N457YD90"
+                         "customerDegree": "3",
+                         "customerRemark": "邱成西",
+                         "customerArea": "上海",
+                         "customerCode": "PDMS083JMSK",
+                         "customerShield": 0
                          }
                          ]
     }

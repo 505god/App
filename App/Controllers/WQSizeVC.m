@@ -151,6 +151,19 @@
 //左侧边栏的代理
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
     if (self.isPresentVC) {
+        /*
+        if (self.selectedSizeObj) {
+            BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmCancelSelected", @"")];
+            
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+            [alert show];
+        }else {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+         */
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {
         [self.navigationController popViewControllerAnimated:YES];

@@ -28,12 +28,14 @@
 
 #import "BlockAlertView.h"
 
+#import "WQCustomerVC.h"
+
 ///一级
 static NSIndexPath *selectedProImageIndex = nil;
 ///二级  尺码
 static NSInteger selectedIndex = -1;
 
-@interface WQCreatProductVC ()<UITableViewDataSource, UITableViewDelegate,WQProAttributrFooterDelegate,WQProAttributeWithImgCellDelegate,WQColorVCDelegate,WQClassVCDelegate,WQSizeVCDelegate,JKImagePickerControllerDelegate,RMSwipeTableViewCellDelegate,WQProAttributeCellDelegate>
+@interface WQCreatProductVC ()<UITableViewDataSource, UITableViewDelegate,WQProAttributrFooterDelegate,WQProAttributeWithImgCellDelegate,WQColorVCDelegate,WQClassVCDelegate,WQSizeVCDelegate,JKImagePickerControllerDelegate,RMSwipeTableViewCellDelegate,WQProAttributeCellDelegate,WQCustomerVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
@@ -187,11 +189,16 @@ static NSInteger selectedIndex = -1;
 }
 -(NSMutableDictionary *)postDictionary {
     if (!_postDictionary) {
-        _postDictionary = [[NSMutableDictionary alloc]init];
+        _postDictionary = [NSMutableDictionary dictionary];
     }
     return _postDictionary;
 }
-
+-(NSMutableArray *)selectedCustomers {
+    if (!_selectedCustomers) {
+        _selectedCustomers = [NSMutableArray array];
+    }
+    return _selectedCustomers;
+}
 #pragma mark - tableView
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     NSArray *array = [self returnArray];
@@ -368,7 +375,14 @@ static NSInteger selectedIndex = -1;
     }else if (indexPath.section == array.count-2){//店长推荐
         
     }else if (indexPath.section == array.count-3){//推荐客户
-        
+        __block WQCustomerVC *customerVC = [[WQCustomerVC alloc]init];
+        customerVC.isPresentVC = YES;
+        customerVC.selectedList = self.selectedCustomers;
+        customerVC.delegate = self;
+        customerVC.selectedIndexPath = indexPath;
+        [self.view.window.rootViewController presentViewController:customerVC animated:YES completion:^{
+            SafeRelease(customerVC);
+        }];
     }else if (indexPath.section == array.count-4){//选择分类
         __block WQClassVC *classVC = [[WQClassVC alloc]init];
         classVC.delegate = self;
@@ -474,12 +488,7 @@ static NSInteger selectedIndex = -1;
         }
         
         if (self.selectedCustomers.count>0) {
-            NSMutableArray *temparray = [[NSMutableArray alloc]init];
-            [self.selectedCustomers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                WQCustomerObj *customerObj = (WQCustomerObj *)obj;
-                [temparray addObject:[NSNumber numberWithInteger:customerObj.customerId]];
-            }];
-            [self.postDictionary setObject:temparray forKey:@"customer"];
+            [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
         }
         
         [self.postDictionary setObject:[NSNumber numberWithBool:self.isHotting] forKey:@"isHot"];
@@ -616,12 +625,7 @@ static NSInteger selectedIndex = -1;
         }
         
         if (self.selectedCustomers.count>0) {
-            NSMutableArray *temparray = [[NSMutableArray alloc]init];
-            [self.selectedCustomers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                WQCustomerObj *customerObj = (WQCustomerObj *)obj;
-                [temparray addObject:[NSNumber numberWithInteger:customerObj.customerId]];
-            }];
-            [self.postDictionary setObject:temparray forKey:@"customer"];
+            [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
         }
         
         [self.postDictionary setObject:[NSNumber numberWithBool:self.isHotting] forKey:@"isHot"];
@@ -629,6 +633,22 @@ static NSInteger selectedIndex = -1;
     
     return isPost;
 }
+
+#pragma mark - 添加商品型号
+-(void)addMoreProType {
+    self.isContainProImg = YES;
+    
+    ///尺码、价格、库存
+    NSDictionary *aDic = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"priceDetail":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
+    NSArray *array = @[aDic];
+    
+    NSDictionary *aDic2 = @{@"image":@"",@"color":@"",@"property":array,@"status":@"2"};
+    
+    [self.dataArray insertObject:aDic2 atIndex:self.dataArray.count-4];
+    
+    [self.tableView reloadData];
+}
+
 #pragma mark - WQProAttributeWithImgCellDelegate 有图片
 #pragma mark - 选择颜色
 -(void)selectedProductColor:(WQProductBtn *)colorBtn {
@@ -813,20 +833,63 @@ static NSInteger selectedIndex = -1;
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:addBtn.idxPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
     [self.tableView endUpdates];
 }
-#pragma mark - 添加商品型号
--(void)addMoreProType {
-    self.isContainProImg = YES;
+
+#pragma mark - 选择分类
+-(void)classVC:(WQClassVC *)classVC selectedClass:(WQClassLevelObj *)classObj {
+    [classVC dismissViewControllerAnimated:YES completion:^{
+        self.selectedLevelClassObj = classObj;
+        
+        NSMutableDictionary *mutableDic = nil;
+        if (self.isContainProImg) {
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-4]];
+        }else {
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-4]];
+        }
+        [mutableDic setObject:classObj.levelClassName forKey:@"details"];
+        [self.originArray replaceObjectAtIndex:(self.originArray.count-4) withObject:mutableDic];
+        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-4) withObject:mutableDic];
+        
+        
+        [self.tableView beginUpdates];
+        [self.tableView reloadRowsAtIndexPaths:@[classVC.selectedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+    }];
     
-    ///尺码、价格、库存
-    NSDictionary *aDic = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"priceDetail":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
-    NSArray *array = @[aDic];
-    
-    NSDictionary *aDic2 = @{@"image":@"",@"color":@"",@"property":array,@"status":@"2"};
-    
-    [self.dataArray insertObject:aDic2 atIndex:self.dataArray.count-4];
-    
-    [self.tableView reloadData];
 }
+
+#pragma mark - 选择客户
+- (void)customerVC:(WQCustomerVC *)customerVC didSelectCustomers:(NSArray *)customers {
+    [customerVC dismissViewControllerAnimated:YES completion:^{
+        self.selectedCustomers = [NSMutableArray arrayWithArray:customers];
+        
+        NSMutableDictionary *mutableDic = nil;
+        if (self.isContainProImg) {
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-3]];
+        }else {
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-3]];
+        }
+        [mutableDic setObject:[NSNumber numberWithInt:customers.count] forKey:@"details"];
+        [self.originArray replaceObjectAtIndex:(self.originArray.count-3) withObject:mutableDic];
+        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-3) withObject:mutableDic];
+        
+        [self.tableView beginUpdates];
+        [self.tableView reloadRowsAtIndexPaths:@[customerVC.selectedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+        
+    }];
+}
+
+#pragma mark - 热卖
+
+-(void)proAttributeCell:(WQProAttributeCell *)cell changeSwitch:(BOOL)isHot {
+    NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[cell.idxPath.section]];
+    
+    [mutableDic setObject:[NSNumber numberWithBool:isHot] forKey:@"isOn"];
+    [self.dataArray replaceObjectAtIndex:cell.idxPath.section withObject:mutableDic];
+    
+    self.isHotting = isHot;
+}
+
 #pragma mark - Keyboard notifications
 
 - (void)keyboardWillShow:(NSNotification *)notification {
@@ -851,7 +914,7 @@ static NSInteger selectedIndex = -1;
                      }];
 }
 - (void)keyboardWillHide:(NSNotification *)notification {
-
+    
     NSDictionary *userInfo = [notification userInfo];
     NSValue *animationDurationValue = [userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey];
     NSTimeInterval animationDuration;
@@ -865,14 +928,14 @@ static NSInteger selectedIndex = -1;
                          self.tableView.frame = frame;
                          
                          self.keyboardHeight = 0;
-                    
+                         
                      }];
 }
 
 - (void)scrollToIndex:(NSIndexPath *)indexPath animated:(BOOL)animated {
     [self.tableView scrollToRowAtIndexPath:indexPath
-                      atScrollPosition:UITableViewScrollPositionBottom
-                              animated:animated];
+                          atScrollPosition:UITableViewScrollPositionBottom
+                                  animated:animated];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -951,42 +1014,5 @@ static NSInteger selectedIndex = -1;
 
 -(void)containerWillBeginDragging:(NSNotification *)notification {
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
-}
-
-#pragma mark - 选择分类
--(void)classVC:(WQClassVC *)classVC selectedClass:(WQClassLevelObj *)classObj {
-    [classVC dismissViewControllerAnimated:YES completion:^{
-        self.selectedLevelClassObj = classObj;
-        
-        NSMutableDictionary *mutableDic = nil;
-        if (self.isContainProImg) {
-            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-3]];
-        }else {
-            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-3]];
-        }
-        [mutableDic setObject:classObj.levelClassName forKey:@"details"];
-        [self.originArray replaceObjectAtIndex:(self.originArray.count-3) withObject:mutableDic];
-        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-3) withObject:mutableDic];
-        
-        
-        [self.tableView beginUpdates];
-        [self.tableView reloadRowsAtIndexPaths:@[classVC.selectedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
-    }];
-    
-}
-
-
-///选择客户代理回调
-
-#pragma mark - 热卖
-
--(void)proAttributeCell:(WQProAttributeCell *)cell changeSwitch:(BOOL)isHot {
-    NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[cell.idxPath.section]];
-    
-    [mutableDic setObject:[NSNumber numberWithBool:isHot] forKey:@"isOn"];
-    [self.dataArray replaceObjectAtIndex:cell.idxPath.section withObject:mutableDic];
-    
-    self.isHotting = isHot;
 }
 @end

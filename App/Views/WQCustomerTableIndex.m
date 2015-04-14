@@ -21,6 +21,12 @@
 
 @implementation WQCustomerTableIndex
 
+-(void)dealloc {
+    SafeRelease(_letters);
+    SafeRelease(_indexes);
+    SafeRelease(_tableViewIndexDelegate);
+}
+
 - (id)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = [UIColor clearColor];
