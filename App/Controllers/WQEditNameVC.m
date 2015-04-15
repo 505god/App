@@ -30,7 +30,7 @@
     [super viewDidLoad];
     
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"ShopName", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"ShopName", @"")];
     self.navBarView.navDelegate = self;
     [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Save", @"") forState:UIControlStateNormal];
     self.navBarView.rightBtn.enabled = NO;

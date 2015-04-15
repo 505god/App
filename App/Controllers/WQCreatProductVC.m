@@ -199,7 +199,9 @@ static NSInteger selectedIndex = -1;
     }
     return _selectedCustomers;
 }
+
 #pragma mark - tableView
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     NSArray *array = [self returnArray];
     if (section==0) {
@@ -413,7 +415,9 @@ static NSInteger selectedIndex = -1;
     }
     return self.originArray;
 }
-
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
+}
 #pragma mark -
 #pragma mark - 整合数据传给后台
 

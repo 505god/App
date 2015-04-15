@@ -1,0 +1,21 @@
+{
+    "发给后台信息": "",
+  "remark": "备注",
+  "degree": "评级",
+  "shield": "屏蔽",
+  "id": "用户id",
+  "前端接受信息,返回该客户所有信息": "",
+  "status": "1",
+    "msg": "",
+    "returnObj": {
+    "customerId": "0",
+    "customerName": "邱大侠",
+    "customerPhone": "13876483992",
+    "customerHeader": "http://",
+    "customerDegree": "3",
+    "customerRemark": "邱成西",
+    "customerArea": "江苏  苏州",
+    "customerCode": "PDMS083JMSK",
+    "customerShield": 0
+  }
+}

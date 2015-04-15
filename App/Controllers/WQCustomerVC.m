@@ -17,15 +17,12 @@
 #import "ChineseInclude.h"
 #import "PinYinForObjc.h"
 
-#import "WQCustomerInfoVC.h"
-#import "WQNewCustomerVC.h"
-
 #import "MJRefresh.h"
 #import "BlockAlertView.h"
 
 #import "WQCustomerDetailVC.h"
 
-@interface WQCustomerVC ()<WQCustomerTableDelegate,UISearchDisplayDelegate,WQNavBarViewDelegate>
+@interface WQCustomerVC ()<WQCustomerTableDelegate,UISearchDisplayDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate>
 
 //通讯录列表
 @property (nonatomic, strong) WQCustomerTable *tableView;
@@ -82,7 +79,7 @@
     [super viewDidLoad];
     
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"CustomerVC", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"CustomerVC", @"")];
     [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
     [self.navBarView.leftBtn setHidden:YES];
     self.navBarView.navDelegate = self;
@@ -97,10 +94,10 @@
     [super viewWillAppear:animated];
     
     if (self.isPresentVC) {
-        self.navBarView.titleLab.text = NSLocalizedString(@"SelectedProCustomers", @"");
-        [self.navBarView.leftBtn setHidden:NO];
-        
+        [self.navBarView setTitleString:NSLocalizedString(@"SelectedProCustomers", @"")];
         [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
+        
+        self.toolControl.enabled = self.selectedList.count>0?YES:NO;
     }
 }
 
@@ -276,6 +273,9 @@
     }else {
         //详细信息页面
         WQCustomerDetailVC *detailVC = [[WQCustomerDetailVC alloc]init];
+        detailVC.indexPath = indexPath;
+        detailVC.delegate = self;
+        detailVC.customerVC = self;
         detailVC.customerObj = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
         [self.navigationController pushViewController:detailVC animated:YES];
         SafeRelease(detailVC);
@@ -287,6 +287,62 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(customerVC:didSelectCustomers:)]) {
         [self.delegate customerVC:self didSelectCustomers:self.selectedList];
     }
+}
+
+///客户信息被修改
+-(void)customerDetailVC:(WQCustomerDetailVC *)detail customer:(WQCustomerObj *)customer {
+    NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[detail.indexPath.section]];
+    
+    NSMutableArray *mutableArray = [[NSMutableArray alloc]initWithArray:mutableDic[@"data"]];
+    
+    [mutableArray replaceObjectAtIndex:detail.indexPath.row withObject:customer];
+    [mutableDic setObject:mutableArray forKey:@"data"];
+    [self.dataArray replaceObjectAtIndex:detail.indexPath.section withObject:mutableDic];
+    
+    [self.tableView.tableView beginUpdates];
+    [self.tableView.tableView reloadRowsAtIndexPaths:@[detail.indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView.tableView endUpdates];
+    
+    for (int i=0; i<self.customerList.count; i++) {
+        WQCustomerObj *customerObj = (WQCustomerObj *)self.customerList[i];
+        if (customerObj.customerId == customer.customerId) {
+            [self.customerList replaceObjectAtIndex:i withObject:customer];
+            [[WQDataShare sharedService].customerArray replaceObjectAtIndex:i withObject:customer];
+            break;
+        }
+    }
+    
+    SafeRelease(mutableDic);SafeRelease(mutableArray);
+}
+
+//删除客户
+-(void)deleteCustomer:(WQCustomerObj *)customer index:(NSIndexPath *)indexPath {
+    NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[indexPath.section]];
+    
+    NSMutableArray *mutableArray = [[NSMutableArray alloc]initWithArray:mutableDic[@"data"]];
+    
+    [mutableArray removeObjectAtIndex:indexPath.row];
+    
+    if (mutableArray.count==0) {
+        [self.dataArray removeObjectAtIndex:indexPath.section];
+    }else {
+        [mutableDic setObject:mutableArray forKey:@"data"];
+        
+        [self.dataArray replaceObjectAtIndex:indexPath.section withObject:mutableDic];
+    }
+    [self.tableView reloadData];
+    
+    
+    for (int i=0; i<self.customerList.count; i++) {
+        WQCustomerObj *customerObj = (WQCustomerObj *)self.customerList[i];
+        if (customerObj.customerId == customer.customerId) {
+            [self.customerList removeObjectAtIndex:i];
+            [[WQDataShare sharedService].customerArray removeObjectAtIndex:i];
+            break;
+        }
+    }
+    
+    SafeRelease(mutableDic);SafeRelease(mutableArray);
 }
 #pragma mark - search代理
 

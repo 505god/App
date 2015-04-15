@@ -10,9 +10,14 @@
 #import "WQCustomerDetailHeader.h"
 #import "WQCustomerDetailCell.h"
 
+#import "WQCustomerDetailEditVC.h"
+
 #import "BlockAlertView.h"
 
-@interface WQCustomerDetailVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource>
+#import "WQCustomerVC.h"
+#import "WQCustomerOrderVC.h"
+
+@interface WQCustomerDetailVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource,WQCustomerDetailEditVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
@@ -20,8 +25,15 @@
 @end
 
 @implementation WQCustomerDetailVC
+
 -(void)dealloc {
-    
+    SafeRelease(_customerObj);
+    SafeRelease(_tableView.delegate);
+    SafeRelease(_tableView.dataSource);
+    SafeRelease(_dataArray);
+    SafeRelease(_indexPath);
+    SafeRelease(_delegate);
+    SafeRelease(_customerVC);
 }
 #pragma mark - lifestyle
 
@@ -29,7 +41,7 @@
     [super viewDidLoad];
     
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"CustomerInfoDetail", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"CustomerInfoDetail", @"")];
     [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
@@ -122,6 +134,9 @@
     footerView=nil;quitBtn = nil;
 }
 
+-(void)setIndexPath:(NSIndexPath *)indexPath {
+    _indexPath = indexPath;
+}
 #pragma mark - 导航栏代理
 
 //左侧边栏的代理
@@ -130,6 +145,13 @@
 }
 //右侧边栏的代理
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    WQCustomerDetailEditVC *editVC = [[WQCustomerDetailEditVC alloc]init];
+    editVC.customerObj = self.customerObj;
+    editVC.indexPath = self.indexPath;
+    editVC.delegate = self;
+    editVC.customerVC = self.customerVC;
+    [self.navigationController pushViewController:editVC animated:YES];
+    SafeRelease(editVC);
 }
 
 #pragma mark - tableView
@@ -169,7 +191,7 @@
 //去掉UItableview headerview黏性(sticky)
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (scrollView == self.tableView) {
-        CGFloat sectionHeaderHeight = NavgationHeight;
+        CGFloat sectionHeaderHeight = 70;
         if (scrollView.contentOffset.y<=sectionHeaderHeight&&scrollView.contentOffset.y>=0) {
             scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0, 0);
         } else if (scrollView.contentOffset.y>=sectionHeaderHeight) {
@@ -195,6 +217,10 @@
         }];
         [alert show];
     }else if ([title isEqualToString:NSLocalizedString(@"customerOrder", @"")]){
+        WQCustomerOrderVC *orderVC = [[WQCustomerOrderVC alloc]init];
+        orderVC.customerObj = self.customerObj;
+        [self.navigationController pushViewController:orderVC animated:YES];
+        SafeRelease(orderVC);
     }
     
 }
@@ -202,5 +228,17 @@
 
 -(void)chatWithCustomer:(id)sender {
     
+}
+
+#pragma mark - 编辑用户信息
+//保存
+-(void)saveCustomerInfo:(WQCustomerObj *)customer {
+    self.customerObj = customer;
+    
+    [self dealData];
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(customerDetailVC:customer:)]) {
+        [self.delegate customerDetailVC:self customer:customer];
+    }
 }
 @end

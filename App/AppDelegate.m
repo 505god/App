@@ -33,7 +33,6 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [application setStatusBarStyle:UIStatusBarStyleLightContent];
     
     //statusBar
     if (Platform>=7.0) {

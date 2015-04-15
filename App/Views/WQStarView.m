@@ -24,6 +24,8 @@
     SafeRelease(_viewColor);
     SafeRelease(_bottomView);
     SafeRelease(_topView);
+    SafeRelease(_delegate);
+    SafeRelease(_idxPath);
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -89,6 +91,10 @@
     [self.bottomView setHidden:!showNormal];
 }
 
+-(void)setIdxPath:(NSIndexPath *)idxPath {
+    _idxPath = idxPath;
+}
+
 -(void)tap:(UITapGestureRecognizer *)gesture{
     if(self.enable){
         CGPoint point = [gesture locationInView:self];
@@ -99,6 +105,10 @@
         }else{
             self.starNumber = count-1;
         }
+        
+        if (self.delegate && [self.delegate respondsToSelector:@selector(startView:number:)]) {
+            [self.delegate startView:self number:self.starNumber];
+        }
     }
 }
 -(void)pan:(UIPanGestureRecognizer *)gesture{
@@ -108,6 +118,10 @@
         if(count>=0 && count<=5 && self.starNumber!=count){
             self.topView.frame = CGRectMake(0, 0, self.starWidth*(count+1), self.bounds.size.height);
             self.starNumber = count;
+            
+            if (self.delegate && [self.delegate respondsToSelector:@selector(startView:number:)]) {
+                [self.delegate startView:self number:self.starNumber];
+            }
         }
     }
 }

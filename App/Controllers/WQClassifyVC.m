@@ -64,21 +64,16 @@
 -(void)getClassList {
     __unsafe_unretained typeof(self) weakSelf = self;
     [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
-        if (!error) {
-            weakSelf.dataArray = nil;
-            weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
-            
-            //判断数据源
-            if (weakSelf.dataArray.count>0) {
-                [weakSelf.tableView reloadData];
-                [weakSelf setNoneText:nil animated:NO];
-            }else {
-                [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
-            }
-        }else {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
-        }
+        weakSelf.dataArray = nil;
+        weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
         
+        //判断数据源
+        if (weakSelf.dataArray.count>0) {
+            [weakSelf.tableView reloadData];
+            [weakSelf setNoneText:nil animated:NO];
+        }else {
+            [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        }
         [weakSelf.tableView headerEndRefreshing];
     }];
 }

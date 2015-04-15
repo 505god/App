@@ -64,7 +64,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"SizeSetup", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"SizeSetup", @"")];
     [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Add", @"") forState:UIControlStateNormal];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;

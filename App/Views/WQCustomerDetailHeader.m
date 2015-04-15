@@ -37,7 +37,9 @@
         self.nameLab.font = [UIFont systemFontOfSize:15];
         [self addSubview:self.nameLab];
         
-        self.starView = [[WQStarView alloc]initWithFrame:CGRectZero];
+        self.starView = [[WQStarView alloc]initWithFrame:(CGRect){0,0,140,30}];
+        self.starView.enable = NO;
+        self.starView.showNormal = NO;
         [self addSubview:self.starView];
         
         self.contentView.backgroundColor = COLOR(235, 235, 241, 1);
@@ -53,7 +55,7 @@
     [self.nameLab sizeToFit];
     self.nameLab.frame = (CGRect){self.headerImage.right+20,self.headerImage.top+10,self.nameLab.width,self.nameLab.height};
     
-    self.starView.frame = (CGRect){self.headerImage.right+20,self.nameLab.bottom+5,120,20};
+    self.starView.frame = (CGRect){self.headerImage.right-5,self.nameLab.bottom,self.starView.width,self.starView.height};
 }
 
 -(void)setCustomerObj:(WQCustomerObj *)customerObj {
@@ -62,5 +64,7 @@
     [self.headerImage setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     self.nameLab.text = customerObj.customerName;
+    
+    self.starView.starNumber = customerObj.customerDegree;
 }
 @end

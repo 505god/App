@@ -78,14 +78,14 @@
 #pragma mark -
 //店铺
 -(void)initShopView {
-    self.shopView = [[UIView alloc]initWithFrame:(CGRect){0,0,self.view.width,120}];
+    self.shopView = [[UIView alloc]initWithFrame:(CGRect){0,0,self.view.width,140}];
     [self.shopView setShadow:[UIColor blackColor] rect:(CGRect){0,self.shopView.height,self.view.width,4} opacity:0.5 blurRadius:3];
     self.shopView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.shopView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.shopView];
     
     //店铺logo
-    self.shopLogoImage = [[UIImageView alloc]initWithFrame:(CGRect){(self.view.width-60)/2,NavgationHeight/2,60,60}];
+    self.shopLogoImage = [[UIImageView alloc]initWithFrame:(CGRect){(self.view.width-60)/2,NavgationHeight,60,60}];
     self.shopLogoImage.contentMode = UIViewContentModeScaleAspectFill;
     self.shopLogoImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin;
     self.shopLogoImage.image = [UIImage imageNamed:@"assets_placeholder_picture"];

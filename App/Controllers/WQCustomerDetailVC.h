@@ -12,8 +12,25 @@
 
 #import "WQCustomerObj.h"
 
+@class WQCustomerVC;
+
+@protocol WQCustomerDetailVCDelegate;
+
 @interface WQCustomerDetailVC : BaseViewController
 
+@property (nonatomic, strong) NSIndexPath *indexPath;
+
 @property (nonatomic, strong) WQCustomerObj *customerObj;
+
+@property (nonatomic, assign) id<WQCustomerDetailVCDelegate>delegate;
+
+@property (nonatomic, strong) WQCustomerVC *customerVC;
+@end
+
+@protocol WQCustomerDetailVCDelegate <NSObject>
+
+@optional
+
+-(void)customerDetailVC:(WQCustomerDetailVC *)detail customer:(WQCustomerObj *)customer;
 
 @end

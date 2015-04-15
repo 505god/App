@@ -72,11 +72,8 @@
 
 -(WQNavBarView *)navBarView {
     if (!_navBarView) {
-        NSArray *bundles = [[NSBundle mainBundle] loadNibNamed:@"WQNavBarView" owner:self options:nil];
-        _navBarView = (WQNavBarView*)[bundles objectAtIndex:0];
-        _navBarView.titleLab.text = @"";
-        _navBarView.backgroundColor = [UIColor whiteColor];
-        _navBarView.frame = (CGRect){0,0,self.view.width,NavgationHeight};
+        _navBarView = [[WQNavBarView alloc]initWithFrame:(CGRect){0,0,self.view.width, NavgationHeight+[WQDataShare sharedService].statusHeight}];
+        _navBarView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     }
     return _navBarView;
 }

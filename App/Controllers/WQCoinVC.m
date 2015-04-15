@@ -22,7 +22,7 @@
     [super viewDidLoad];
     
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"CurrencySetup", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"CurrencySetup", @"")];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];

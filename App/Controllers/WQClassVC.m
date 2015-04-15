@@ -76,7 +76,7 @@
     [super viewDidLoad];
     
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"ClassifySetup", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"ClassifySetup", @"")];
     [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Add", @"") forState:UIControlStateNormal];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;

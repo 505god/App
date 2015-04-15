@@ -8,11 +8,13 @@
 
 #import "BaseViewController.h"
 
+#import "WQCustomerDetailEditVC.h"
+
 //客户
 
 @protocol WQCustomerVCDelegate;
 
-@interface WQCustomerVC : BaseViewController
+@interface WQCustomerVC : BaseViewController<WQCustomerDetailEditVCDelegate>
 
 @property (nonatomic, assign) id<WQCustomerVCDelegate>delegate;
 

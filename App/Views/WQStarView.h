@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol WQStarViewDelegate;
+
 @interface WQStarView : UIView
 
 @property (nonatomic, assign) NSInteger starNumber;
@@ -20,5 +22,14 @@
 
 //显示灰色五角星
 @property (nonatomic, assign) BOOL showNormal;
+
+@property (nonatomic, assign) id<WQStarViewDelegate>delegate;
+
+@property (nonatomic, strong) NSIndexPath *idxPath;
+@end
+
+@protocol WQStarViewDelegate <NSObject>
+
+-(void)startView:(WQStarView *)startView number:(NSInteger)start;
 
 @end

@@ -370,7 +370,6 @@
         [_addBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [_addBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
         _addBtn.idxPath = self.indexPath;
-        DLog(@"%d",self.indexPath.section);
         [_addBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateDisabled];
         [_addBtn addTarget:self action:@selector(addMoreSize:) forControlEvents:UIControlEventTouchUpInside];
     }

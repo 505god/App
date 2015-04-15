@@ -26,6 +26,18 @@
 
 @implementation WQSwitch
 
+-(void)dealloc {
+    SafeRelease(_inactiveColor);
+    SafeRelease(_activeColor);
+    SafeRelease(_onColor);
+    SafeRelease(_borderColor);
+    SafeRelease(_knobColor);
+    SafeRelease(_shadowColor);
+    SafeRelease(_onImage);
+    SafeRelease(_offImage);
+    SafeRelease(_idxPath);
+}
+
 - (id)init {
     self = [super initWithFrame:CGRectMake(0, 0, 50, 30)];
     if (self) {
@@ -333,7 +345,9 @@
     }
 }
 
-
+-(void)setIdxPath:(NSIndexPath *)idxPath {
+    _idxPath = idxPath;
+}
 #pragma mark Getters
 
 /*

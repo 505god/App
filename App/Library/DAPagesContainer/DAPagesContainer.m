@@ -55,8 +55,7 @@
 
 #pragma mark - View life cycle
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     self.shouldObserveContentOffset = YES;
     
@@ -83,8 +82,7 @@
     [self.view addObserver:self forKeyPath:@"frame" options:0 context:nil];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 }
 
@@ -146,7 +144,6 @@
             for (NSUInteger i = 0; i < self.viewControllers.count; i++) {
                 UIViewController *viewController = self.viewControllers[i];
                 viewController.view.frame = CGRectMake(i * self.scrollView.width, 0., self.scrollView.width, self.scrollView.height);
-                viewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
                 [self.scrollView addSubview:viewController.view];
             }
             self.scrollView.contentSize = CGSizeMake(self.scrollView.width * self.viewControllers.count, self.scrollView.height);
@@ -190,7 +187,7 @@
     CGFloat x = 0.;
     for (UIViewController *viewController in self.viewControllers) {
         viewController.view.frame = CGRectMake(x, 0, self.scrollView.width, self.scrollView.height);
-        x += CGRectGetWidth(self.scrollView.frame);
+        x += self.scrollView.width;
     }
     
     self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,self.pageIndicatorView.center.y);
@@ -243,12 +240,6 @@
 }
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     
-    CGFloat x = 0.;
-    for (UIViewController *viewController in self.viewControllers) {
-        viewController.view.frame = CGRectMake(x, 0, self.scrollView.width, self.scrollView.height);
-        x += CGRectGetWidth(self.scrollView.frame);
-    }
-    
     [[NSNotificationCenter defaultCenter]postNotificationName:@"containerWillBeginDragging" object:nil];
 }
 #pragma mark - KVO
@@ -258,7 +249,7 @@
 						change:(NSDictionary *)change
                        context:(void *)context {
     if ([keyPath isEqualToString:@"frame"]) {
-        self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,self.pageIndicatorView.center.y);
+        [self layoutSubviews];
     }else {
         if (self.scrollView.contentOffset.x < 0) {//左
             [[NSNotificationCenter defaultCenter]postNotificationName:@"showSidebarView" object:@"0"];

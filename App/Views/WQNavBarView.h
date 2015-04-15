@@ -19,13 +19,15 @@
 @interface WQNavBarView : UIView
 
 //title
-@property (nonatomic, weak) IBOutlet UILabel *titleLab;
+@property (nonatomic, strong) UILabel *titleLab;
 
 //左侧按钮
-@property (nonatomic, weak) IBOutlet UIButton *leftBtn;
+@property (nonatomic, strong) UIButton *leftBtn;
 
 //右侧按钮
-@property (nonatomic, weak) IBOutlet UIButton *rightBtn;
+@property (nonatomic, strong) UIButton *rightBtn;
+
+@property (nonatomic, strong) NSString *titleString;
 
 @property (nonatomic, assign) BOOL isShowShadow;
 

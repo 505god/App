@@ -1,0 +1,38 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "pageCount": 0,
+    "totalPrice": "总的成交额",
+    "orderList": [
+                      {
+                      "orderId": 0,
+                      "proName": "邱大侠",
+                      "proImg": "http://",
+                      "proNumber": 3,
+                      "orderTime": "2014-03-11"
+                      },
+                      {
+                      "orderId": 0,
+                      "proName": "句话",
+                      "proImg": "http://",
+                      "proNumber": 2,
+                      "orderTime": "2014-08-11"
+                      },
+                      {
+                      "orderId": 0,
+                      "proName": "侠",
+                      "proImg": "http://",
+                      "proNumber": 3,
+                      "orderTime": "2015-03-17"
+                      },
+                      {
+                      "orderId": 0,
+                      "proName": "大侠",
+                      "proImg": "http://",
+                      "proNumber": 30,
+                      "orderTime": "2014-04-11"
+                      }
+                      ]
+    }
+}

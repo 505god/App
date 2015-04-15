@@ -34,7 +34,7 @@
     [super viewDidLoad];
     
     //导航栏
-    self.navBarView.titleLab.text = NSLocalizedString(@"SettingVC", @"");
+    [self.navBarView setTitleString:NSLocalizedString(@"SettingVC", @"")];
     [self.navBarView.rightBtn setHidden:YES];
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];

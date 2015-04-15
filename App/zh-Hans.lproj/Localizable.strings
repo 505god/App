@@ -32,6 +32,10 @@
 "SelectedProCustomers" = "选择客户";
 "Search" = "搜索";
 "CustomerInfoDetail" = "详细资料";
+"CustomerInfoDetailEdit" = "资料设置";
+"ProNumber" = "数量:%ld";
+
+"ProTotalPrice" = "成交额:%.2f";
 
 "CustomerPhone" = "手机";
 "CustomerRemark" = "备注";
@@ -40,7 +44,8 @@
 "customerOrder" = "订单记录";
 "customerChat" = "发消息";
 "customerPhoneCall" = "确定拨打客户电话?";
-
+"CustomerLevel" = "评级";
+"CustomerShield" = "屏蔽";
 
 "NameError" = "请输入商品描述";
 "PriceError" = "请输入商品价格";
@@ -57,7 +62,7 @@
 "ClassifySetup" = "分类";
 "ColorSetup" = "颜色";
 "SizeSetup" = "尺码";
-"CurrencySetup" = "货币预设";
+"CurrencySetup" = "货币";
 "LogOut" = "退出";
 //热卖展示
 "HasSale" = "已售出";
@@ -92,6 +97,10 @@
 "Confirm" = "确定";
 "ShopNameLimit" = "最多10个字";
 "ConfirmCancelSelected" = "放弃选择?";
+
+"SaveEdit" = "保存此次编辑?";
+"DontSave" = "不保存";
+"DeleteCustomer" = "删除客户";
 
 "ClassDelete" = "该分类下包含子分类不能被删除";
 "ClassBDelete" = "该分类下包含商品不能被删除";

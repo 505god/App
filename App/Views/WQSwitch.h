@@ -84,4 +84,7 @@
  *	@return	BOOL YES if switch is on. NO if switch is off
  */
 - (BOOL)isOn;
+
+
+@property (nonatomic, strong) NSIndexPath *idxPath;
 @end
