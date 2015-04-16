@@ -35,7 +35,7 @@
 "CustomerInfoDetailEdit" = "资料设置";
 "ProNumber" = "数量:%ld";
 
-"ProTotalPrice" = "成交额:%.2f";
+"ProTotalPrice" = "成交额:%@";
 
 "CustomerPhone" = "手机";
 "CustomerRemark" = "备注";
@@ -127,14 +127,8 @@
 
 "InterfaceError" = "连接失败";
 
-
-
-"MainVC" = "首页";
-
-"ShopVC" = "我的店铺";
-
-
-
-
-"ColorVC" = "颜色";
-"SizeVC" = "尺码";
+//订单
+"orderCode" = "订单号:%@";
+"orderPrice" = "交易额:%.2f";
+"orderSale" = "价格优惠:%.2f";
+"proDiscount" = "折优惠";

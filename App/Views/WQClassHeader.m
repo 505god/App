@@ -33,6 +33,8 @@
         self.lineView = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.lineView.image = [UIImage imageNamed:@"line"];
         [self.contextMenuView addSubview:self.lineView];
+        
+        self.contentView.backgroundColor = [UIColor whiteColor];
     }
     return self;
 }

@@ -360,6 +360,9 @@
 		5D9B03231ACAFB01008ADDAE /* UIButton+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D9B031E1ACAFB01008ADDAE /* UIButton+AFNetworking.m */; };
 		5D9B03241ACAFB01008ADDAE /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D9B03201ACAFB01008ADDAE /* UIImageView+AFNetworking.m */; };
 		5D9B03251ACAFB01008ADDAE /* UIProgressView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D9B03221ACAFB01008ADDAE /* UIProgressView+AFNetworking.m */; };
+		5DA4BD801ADF4CBD000C75A5 /* WQCustomerOrderProObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD7F1ADF4CBD000C75A5 /* WQCustomerOrderProObj.m */; };
+		5DA4BD841ADF522B000C75A5 /* CustomerOrderList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DA4BD831ADF522B000C75A5 /* CustomerOrderList.json */; };
+		5DA4BD871ADF546C000C75A5 /* WQOrderHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD861ADF546C000C75A5 /* WQOrderHeader.m */; };
 		5DA9A0601A8C76C000E59380 /* WQSizeObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */; };
 		5DA9A0621A8C789500E59380 /* SizeList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DA9A0611A8C789500E59380 /* SizeList.json */; };
 		5DA9A0651A8C7BC100E59380 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */; };
@@ -1019,6 +1022,11 @@
 		5D9B03201ACAFB01008ADDAE /* UIImageView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+AFNetworking.m"; sourceTree = "<group>"; };
 		5D9B03211ACAFB01008ADDAE /* UIProgressView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIProgressView+AFNetworking.h"; sourceTree = "<group>"; };
 		5D9B03221ACAFB01008ADDAE /* UIProgressView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIProgressView+AFNetworking.m"; sourceTree = "<group>"; };
+		5DA4BD7E1ADF4CBD000C75A5 /* WQCustomerOrderProObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQCustomerOrderProObj.h; sourceTree = "<group>"; };
+		5DA4BD7F1ADF4CBD000C75A5 /* WQCustomerOrderProObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQCustomerOrderProObj.m; sourceTree = "<group>"; };
+		5DA4BD831ADF522B000C75A5 /* CustomerOrderList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CustomerOrderList.json; sourceTree = "<group>"; };
+		5DA4BD851ADF546C000C75A5 /* WQOrderHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQOrderHeader.h; sourceTree = "<group>"; };
+		5DA4BD861ADF546C000C75A5 /* WQOrderHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQOrderHeader.m; sourceTree = "<group>"; };
 		5DA9A05E1A8C76C000E59380 /* WQSizeObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQSizeObj.h; sourceTree = "<group>"; };
 		5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQSizeObj.m; sourceTree = "<group>"; };
 		5DA9A0611A8C789500E59380 /* SizeList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SizeList.json; sourceTree = "<group>"; };
@@ -1144,6 +1152,8 @@
 				5D8187701A81E69F00DF3BFA /* WQCustomerObj.m */,
 				5D8B8A561ADE3C8400B501C5 /* WQCustomerOrderObj.h */,
 				5D8B8A571ADE3C8400B501C5 /* WQCustomerOrderObj.m */,
+				5DA4BD7E1ADF4CBD000C75A5 /* WQCustomerOrderProObj.h */,
+				5DA4BD7F1ADF4CBD000C75A5 /* WQCustomerOrderProObj.m */,
 			);
 			name = "客户";
 			sourceTree = "<group>";
@@ -1165,6 +1175,8 @@
 				5D345EFA1ADD11C500BD71B0 /* WQCustomerDetailCell.m */,
 				5D8B8A481ADDF5FB00B501C5 /* WQCustomerDetailEditCell.h */,
 				5D8B8A491ADDF5FB00B501C5 /* WQCustomerDetailEditCell.m */,
+				5DA4BD851ADF546C000C75A5 /* WQOrderHeader.h */,
+				5DA4BD861ADF546C000C75A5 /* WQOrderHeader.m */,
 				5D8B8A5D1ADE4F0800B501C5 /* WQCustomerOrderCell.h */,
 				5D8B8A5E1ADE4F0800B501C5 /* WQCustomerOrderCell.m */,
 			);
@@ -1341,9 +1353,15 @@
 		5D7324251A7EFC5600949D93 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				5D6D81F41ABC27BD00071116 /* WQMainVC.h */,
+				5D6D81F51ABC27BD00071116 /* WQMainVC.m */,
+				5DA9A0661A8C946500E59380 /* MainRightVC */,
+				5D8187011A81A50A00DF3BFA /* ShopVC */,
+				5D8187021A81A51700DF3BFA /* CustomerVC */,
+				5D8187031A81A52800DF3BFA /* OrderVC */,
+				5D8187041A81A52F00DF3BFA /* SaleVC */,
 				5D7DECC61A80718F00496850 /* InitVC */,
 				5D7327241A7F562800949D93 /* LogInVC */,
-				5D7327201A7F559900949D93 /* MainVC */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1391,10 +1409,11 @@
 			children = (
 				5D6D81F31ABC273500071116 /* 加载页 */,
 				5D6D81EA1ABC212E00071116 /* 首页 */,
+				5D6B93AF1AD3B5A20044FA1A /* 右侧边栏 */,
 				5D9B02EA1ACADF08008ADDAE /* 店铺 */,
+				5D345EEB1ADCBDF600BD71B0 /* 客户 */,
 				5D7E39391A8A48B000690975 /* WQPopView.h */,
 				5D7E393A1A8A48B000690975 /* WQPopView.m */,
-				5D6B93AF1AD3B5A20044FA1A /* 右侧边栏 */,
 				5D7DECCF1A80A32F00496850 /* WQInputText.h */,
 				5D7DECD01A80A32F00496850 /* WQInputText.m */,
 				5D759D1D1A86003D001920FA /* WQProductText.h */,
@@ -1405,7 +1424,6 @@
 				5D7DECED1A80CB7700496850 /* WQTapImg.m */,
 				5D345EA11ADB8C7600BD71B0 /* WQSwitch.h */,
 				5D345EA21ADB8C7600BD71B0 /* WQSwitch.m */,
-				5D345EEB1ADCBDF600BD71B0 /* 客户 */,
 				5D759D281A877E59001920FA /* WQCellSelectedBackground.h */,
 				5D759D291A877E59001920FA /* WQCellSelectedBackground.m */,
 			);
@@ -2362,20 +2380,6 @@
 			path = Category;
 			sourceTree = "<group>";
 		};
-		5D7327201A7F559900949D93 /* MainVC */ = {
-			isa = PBXGroup;
-			children = (
-				5D6D81F41ABC27BD00071116 /* WQMainVC.h */,
-				5D6D81F51ABC27BD00071116 /* WQMainVC.m */,
-				5DA9A0661A8C946500E59380 /* MainRightVC */,
-				5D8187011A81A50A00DF3BFA /* ShopVC */,
-				5D8187021A81A51700DF3BFA /* CustomerVC */,
-				5D8187031A81A52800DF3BFA /* OrderVC */,
-				5D8187041A81A52F00DF3BFA /* SaleVC */,
-			);
-			name = MainVC;
-			sourceTree = "<group>";
-		};
 		5D7327241A7F562800949D93 /* LogInVC */ = {
 			isa = PBXGroup;
 			children = (
@@ -2454,6 +2458,7 @@
 				5D7DECD81A80B95200496850 /* checkPhone.json */,
 				5D8187721A81E8E800DF3BFA /* CustomerList.json */,
 				5DA9A0611A8C789500E59380 /* SizeList.json */,
+				5DA4BD831ADF522B000C75A5 /* CustomerOrderList.json */,
 			);
 			path = Json;
 			sourceTree = "<group>";
@@ -2760,6 +2765,7 @@
 				5D345E911ADAC90900BD71B0 /* shopAct.png in Resources */,
 				5D345ED61ADBE96A00BD71B0 /* button-cancel-d@2x.png in Resources */,
 				5D7327291A7F570200949D93 /* WQLogVC.xib in Resources */,
+				5DA4BD841ADF522B000C75A5 /* CustomerOrderList.json in Resources */,
 				5D54AC341AA5BD4F008C9586 /* LaunchScreen.xib in Resources */,
 				5D7DECEB1A80C85500496850 /* WQInfoVC.xib in Resources */,
 				5D7E39301A8A335400690975 /* ColorList.json in Resources */,
@@ -2919,6 +2925,7 @@
 				5D759CCA1A83AA35001920FA /* PNScatterChartData.m in Sources */,
 				5D703EA41A8887BD00647713 /* WQCustomerTable.m in Sources */,
 				5D7325E41A7F008F00949D93 /* NSXMLElement+XEP_0059.m in Sources */,
+				5DA4BD871ADF546C000C75A5 /* WQOrderHeader.m in Sources */,
 				5D7DECCA1A8071B700496850 /* WQInitVC.m in Sources */,
 				5D6C6CAF1ACBC3A1002E3252 /* MJRefreshConst.m in Sources */,
 				5D6C6CB01ACBC3A1002E3252 /* MJRefreshFooterView.m in Sources */,
@@ -2929,6 +2936,7 @@
 				5D7326C21A7F19CF00949D93 /* Utility.m in Sources */,
 				5D7325A71A7F008F00949D93 /* NSXMLElement+XMPP.m in Sources */,
 				5D7325A51A7F008F00949D93 /* NSData+XMPP.m in Sources */,
+				5DA4BD801ADF4CBD000C75A5 /* WQCustomerOrderProObj.m in Sources */,
 				5D9B03241ACAFB01008ADDAE /* UIImageView+AFNetworking.m in Sources */,
 				5D7325FE1A7F008F00949D93 /* XMPPPresence+XEP_0172.m in Sources */,
 				5D8D1E731AD60815007B2500 /* WQProAttributeCell.m in Sources */,

@@ -11,12 +11,16 @@
 @interface WQCustomerOrderObj : NSObject
 
 @property (nonatomic, assign) NSInteger orderId;
-///产品图片
-@property (nonatomic, strong) NSString *proImg;
-///产品名称
-@property (nonatomic, strong) NSString *proName;
-///产品数量
-@property (nonatomic, assign) NSInteger proNumber;
-
 @property (nonatomic, strong) NSString *orderTime;
+///订单价格
+@property (nonatomic, assign) CGFloat orderPrice;
+///订单号
+@property (nonatomic, strong) NSString *orderCode;
+///订单状态
+@property (nonatomic, assign) NSInteger orderStatus;
+
+@property (nonatomic, strong) NSMutableArray *productList;
+
+@property (nonatomic, assign) NSInteger customerId;
+@property (nonatomic, strong) NSString *customerName;
 @end

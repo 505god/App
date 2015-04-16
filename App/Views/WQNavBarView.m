@@ -40,7 +40,7 @@
         
         self.rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         self.rightBtn.frame = (CGRect){frame.size.width-90,frame.size.height-37,80,30};
-        [self.rightBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [self.rightBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
         [self.rightBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
         [self.rightBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateDisabled];
         

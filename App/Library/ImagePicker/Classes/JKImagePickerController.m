@@ -56,6 +56,24 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
 
 @implementation JKImagePickerController
 
+-(void)dealloc {
+    SafeRelease(_delegate);
+    SafeRelease(_selectedAssetArray);
+    SafeRelease(_assetsLibrary);
+    SafeRelease(_groupTypes);
+    SafeRelease(_titleLabel);
+    SafeRelease(_titleButton);
+    SafeRelease(_arrowImageView);
+    SafeRelease(_touchButton);
+    SafeRelease(_overlayView);
+    SafeRelease(_assetsGroupsView);
+    SafeRelease(_selectAssetsGroup);
+    SafeRelease(_assetsArray);
+    SafeRelease(_collectionView.delegate);
+    SafeRelease(_collectionView.dataSource);
+    SafeRelease(_collectionView);
+}
+
 - (id)init
 {
     self = [super init];
@@ -86,10 +104,6 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    
-    UINavigationBar *navBar = self.navigationController.navigationBar;
-    [navBar setBarTintColor:[UIColor whiteColor]];
-    [navBar setShadow:[UIColor blackColor] rect:(CGRect){0,navBar.height,navBar.width,4} opacity:0.5 blurRadius:3];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -499,6 +513,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
     asset.assetPropertyURL = assetURL;
     [self.selectedAssetArray addObject:asset];
     [self.assetsGroupsView addAssetSelected:asset];
+    SafeRelease(asset);
 }
 
 - (BOOL)assetIsSelected:(NSURL *)assetURL
@@ -534,7 +549,7 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 - (UIButton *)titleButton{
     if (!_titleButton) {
         _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _titleButton.frame = CGRectMake((self.navBarView.width-120)/2, (self.navBarView.height-30)/2, 120, 30);
+        _titleButton.frame = CGRectMake((self.navBarView.width-120)/2, (self.navBarView.height-30-[WQDataShare sharedService].statusHeight)/2+[WQDataShare sharedService].statusHeight, 120, 30);
         UIImage  *img =[UIImage imageNamed:@"navigationbar_title_highlighted"];
         [_titleButton setBackgroundImage:nil forState:UIControlStateNormal];
         [_titleButton setBackgroundImage:[JKUtil stretchImage:img capInsets:UIEdgeInsetsMake(5, 2, 5, 2) resizingMode:UIImageResizingModeStretch] forState:UIControlStateHighlighted];

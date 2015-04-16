@@ -42,7 +42,6 @@
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CustomerInfoDetailEdit", @"")];
     [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Finish", @"") forState:UIControlStateNormal];
-    [self.navBarView.rightBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
     self.navBarView.rightBtn.enabled = NO;
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;

@@ -7,18 +7,28 @@
 //
 
 #import "WQCustomerOrderObj.h"
+#import "WQCustomerOrderProObj.h"
 
 @implementation WQCustomerOrderObj
 + (NSDictionary*)mts_mapping {
     return  @{@"orderId": mts_key(orderId),
-              @"proImg": mts_key(proImg),
-              @"proName": mts_key(proName),
-              @"proNumber": mts_key(proNumber),
               @"orderTime": mts_key(orderTime),
+              @"orderPrice": mts_key(orderPrice),
+              @"orderCode": mts_key(orderCode),
+              @"orderStatus": mts_key(orderStatus),
+              @"productList": mts_key(productList),
+              @"customerId": mts_key(customerId),
+              @"customerName": mts_key(customerName),
               };
 }
 
 + (BOOL)mts_shouldSetUndefinedKeys {
     return NO;
+}
+
++ (NSDictionary*)mts_arrayClassMapping
+{
+    return @{mts_key(productList) : WQCustomerOrderProObj.class,
+             };
 }
 @end

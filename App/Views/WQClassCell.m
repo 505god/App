@@ -69,7 +69,7 @@
     
     self.nameLab.frame = (CGRect){20,(self.contentView.height-20)/2,self.contentView.width-40,20};
     
-    self.lineView.frame = (CGRect){self.nameLab.right,self.contentView.height-1,self.nameLab.width,2};
+    self.lineView.frame = (CGRect){self.nameLab.left,self.contentView.height-1,self.nameLab.width,2};
 }
 
 

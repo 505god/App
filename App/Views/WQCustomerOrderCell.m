@@ -12,7 +12,8 @@
 
 @property (nonatomic, strong) UIImageView *lineView;
 
-@property (nonatomic, strong) UILabel *timeLab;
+@property (nonatomic, strong) UILabel *priceLab;
+@property (nonatomic, strong) UILabel *saleLab;
 @end
 
 @implementation WQCustomerOrderCell
@@ -24,20 +25,26 @@
         self.contentView.backgroundColor = [UIColor whiteColor];
         self.backgroundColor = [UIColor clearColor];
         
-        self.textLabel.font = [UIFont systemFontOfSize:16];
+        self.textLabel.font = [UIFont systemFontOfSize:15];
         self.textLabel.backgroundColor = [UIColor clearColor];
         
         self.imageView.layer.masksToBounds = YES;
         self.imageView.layer.cornerRadius = 4;
         
-        self.timeLab = [[UILabel alloc]initWithFrame:CGRectZero];
-        self.timeLab.backgroundColor = [UIColor clearColor];
-        self.timeLab.font = [UIFont systemFontOfSize:12];
-        self.timeLab.textColor = [UIColor lightGrayColor];
-        [self.contentView addSubview:self.timeLab];
+        self.priceLab = [[UILabel alloc]initWithFrame:CGRectZero];
+        self.priceLab.backgroundColor = [UIColor clearColor];
+        self.priceLab.font = [UIFont systemFontOfSize:15];
+        self.priceLab.textColor = COLOR(251, 0, 41, 1);
+        [self.contentView addSubview:self.priceLab];
+        
+        self.saleLab = [[UILabel alloc]initWithFrame:CGRectZero];
+        self.saleLab.backgroundColor = [UIColor clearColor];
+        self.saleLab.textColor = [UIColor lightGrayColor];
+        self.saleLab.font = [UIFont systemFontOfSize:13];
+        [self.contentView addSubview:self.saleLab];
         
         self.detailTextLabel.backgroundColor = [UIColor clearColor];
-        self.detailTextLabel.font = [UIFont systemFontOfSize:12];
+        self.detailTextLabel.font = [UIFont systemFontOfSize:13];
         self.detailTextLabel.textColor = [UIColor lightGrayColor];
         
         self.lineView = [[UIImageView alloc]initWithFrame:CGRectZero];
@@ -55,13 +62,18 @@
     
     [self.textLabel sizeToFit];
     [self.detailTextLabel sizeToFit];
-    [self.timeLab sizeToFit];
+    [self.saleLab sizeToFit];
+    [self.priceLab sizeToFit];
     
     self.textLabel.frame = (CGRect){self.imageView.right+10,(self.contentView.height-self.textLabel.height-self.detailTextLabel.height)/2,self.textLabel.width,self.textLabel.height};
     
     self.detailTextLabel.frame = (CGRect){self.imageView.right+10,self.textLabel.bottom,self.detailTextLabel.width,self.detailTextLabel.height};
     
-    self.timeLab.frame = (CGRect){self.contentView.width-self.timeLab.width-10,self.imageView.top,self.timeLab.width,self.timeLab.height};
+    CGFloat width = self.textLabel.right>=self.detailTextLabel.right?self.textLabel.right:self.detailTextLabel.right;
+    
+    self.saleLab.frame = (CGRect){width+20,(self.contentView.height-self.saleLab.height)/2,self.saleLab.width,self.saleLab.height};
+    
+    self.priceLab.frame = (CGRect){self.contentView.width-self.priceLab.width-10,(self.contentView.height-self.priceLab.height)/2,self.priceLab.width,self.priceLab.height};
     
     self.lineView.frame = (CGRect){self.imageView.left,self.contentView.height-1,self.contentView.width-self.imageView.left,2};
 }
@@ -69,19 +81,32 @@
 -(void)prepareForReuse {
     [super prepareForReuse];
     self.textLabel.text = @"";
-    self.timeLab.text = @"";
+    self.saleLab.text = @"";
     self.detailTextLabel.text = @"";
+    self.orderProductObj = nil;
+    self.priceLab.text = @"";
 }
 
--(void)setOrderObj:(WQCustomerOrderObj *)orderObj {
-    _orderObj = orderObj;
+-(void)setOrderProductObj:(WQCustomerOrderProObj *)orderProductObj {
+    _orderProductObj = orderProductObj;
     
-    [self.imageView setImageWithURL:[NSURL URLWithString:orderObj.proImg] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.imageView setImageWithURL:[NSURL URLWithString:orderProductObj.proImg] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
-    self.textLabel.text = [NSString stringWithFormat:@"%@",orderObj.proName];
+    self.textLabel.text = [NSString stringWithFormat:@"%@",orderProductObj.proName];
     
-    self.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"ProNumber", @""),orderObj.proNumber];
     
-    self.timeLab.text = [NSString stringWithFormat:@"%@",orderObj.orderTime];
+    self.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"ProNumber", @""),orderProductObj.proNumber];
+    
+    
+    if (orderProductObj.proSaleType ==0) {
+        self.saleLab.text = @"";
+        self.priceLab.text = [NSString stringWithFormat:@"%.2f",orderProductObj.proPrice*orderProductObj.proNumber];
+    }else if (orderProductObj.proSaleType ==1) {
+        self.saleLab.text = [NSString stringWithFormat:@"%d%@",(int)(orderProductObj.proDiscount*10),NSLocalizedString(@"proDiscount", @"")];
+        self.priceLab.text = [NSString stringWithFormat:@"%.2f",(orderProductObj.proPrice*orderProductObj.proDiscount)*orderProductObj.proNumber];
+    }else if (orderProductObj.proSaleType ==2) {
+        self.saleLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderSale", @""),orderProductObj.proNumber*orderProductObj.proReducePrice];
+        self.priceLab.text = [NSString stringWithFormat:@"%.2f",(orderProductObj.proPrice-orderProductObj.proReducePrice)*orderProductObj.proNumber];
+    }
 }
 @end

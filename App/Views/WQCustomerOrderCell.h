@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "WQCustomerOrderObj.h"
+#import "WQCustomerOrderProObj.h"
 
 @interface WQCustomerOrderCell : UITableViewCell
 
-@property (nonatomic, strong) WQCustomerOrderObj *orderObj;
+@property (nonatomic, strong) WQCustomerOrderProObj *orderProductObj;
 
 @end
