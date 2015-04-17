@@ -216,10 +216,6 @@
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
             [weakSelf saveShopHeaderWithImg:image];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                WQMainRightCell *cell = (WQMainRightCell *)[weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-                cell.headerImageView.image = image;
-            });
         });
     }];
 }
@@ -242,27 +238,43 @@
 -(void)saveShopHeaderWithImg:(UIImage *)image {
     self.hud.mode = MBProgressHUDModeDeterminate;
     
-    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/store/uploadHeader" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-        [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile" mimeType:@"image/jpeg"];
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/user/uploadHeader" parameters:@{@"test":@"fuck"} constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile.jpeg" mimeType:@"image/jpeg"];
     } error:nil];
     
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-    manager.securityPolicy = [AFSecurityPolicy defaultPolicy];
     manager.securityPolicy.allowInvalidCertificates = YES;
-    
+
     NSProgress *progress = nil;
     
-    self.uploadTask = [manager uploadTaskWithRequest:request fromData:UIImageJPEGRepresentation(image, 1) progress:&progress completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
-        DLog(@"Progress is %f", progress.fractionCompleted);
+    self.uploadTask = [manager uploadTaskWithStreamedRequest:request progress:&progress completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
         [progress removeObserver:self forKeyPath:@"fractionCompleted"];
-        
         [self.hud hide:YES];
         [self.hud removeFromSuperview];
         self.hud = nil;
+        if (!error) {
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        WQMainRightCell *cell = (WQMainRightCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                        cell.headerImageView.image = image;
+                        
+                        
+                    });
+                }else {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+        }else {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+        }
     }];
     [self.uploadTask resume];
     
     [progress addObserver:self forKeyPath:@"fractionCompleted" options:NSKeyValueObservingOptionNew context:NULL];
+    
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -271,6 +283,7 @@
         NSProgress *progress = (NSProgress *)object;
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            DLog(@"%f",progress.fractionCompleted);
             self.hud.progress = progress.fractionCompleted;
         });
         

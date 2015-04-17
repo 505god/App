@@ -7,7 +7,7 @@
 //
 
 #import "BaseViewController.h"
-
+#import "AFHTTPRequestOperationManager.h"
 //首页右侧边栏
 
 @interface WQMainRightVC : BaseViewController

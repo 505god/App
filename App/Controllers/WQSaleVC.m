@@ -16,7 +16,7 @@
 @end
 
 @implementation WQSaleVC
-
+/*
 -(void)dealloc {
 }
 
@@ -208,5 +208,5 @@
 - (void)userClickedOnBarAtIndex:(NSInteger)barIndex {
     DLog(@"bar");
 }
-
+*/
 @end

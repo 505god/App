@@ -7,7 +7,6 @@
 //
 
 #import "AFHTTPSessionManager.h"
-#import "AFURLResponseSerialization.h"
 
 #import "WQClassObj.h"
 #import "WQClassLevelObj.h"

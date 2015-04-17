@@ -8,8 +8,6 @@
 
 #import "WQAPIClient.h"
 
-
-
 static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.net:8443";
 
 @implementation WQAPIClient
