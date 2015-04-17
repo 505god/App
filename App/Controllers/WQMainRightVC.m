@@ -20,10 +20,11 @@
 
 #import "WQCoinVC.h"
 
-@interface WQMainRightVC ()<UITableViewDataSource, UITableViewDelegate,WQNavBarViewDelegate,JKImagePickerControllerDelegate,WQEditNameVCDelegate>
+@interface WQMainRightVC ()<UITableViewDataSource, UITableViewDelegate,WQNavBarViewDelegate,JKImagePickerControllerDelegate,WQEditNameVCDelegate,MBProgressHUDDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
+@property (nonatomic, strong) MBProgressHUD *hud;
 @end
 
 @implementation WQMainRightVC
@@ -75,6 +76,15 @@
         
     }
     return _tableView;
+}
+-(MBProgressHUD *)hud {
+    if (!_hud) {
+        _hud = [[MBProgressHUD alloc]initWithView:self.view];
+        _hud.mode = MBProgressHUDModeIndeterminate;
+        _hud.animationType = MBProgressHUDAnimationZoom;
+        [self.view addSubview:_hud];
+    }
+    return _hud;
 }
 #pragma mark - tableView
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -184,7 +194,7 @@
 #pragma mark - JKImagePickerControllerDelegate
 
 - (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAssets:(NSArray *)assets{
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    [self.hud show:YES];
     
     __weak typeof(self) weakSelf = self;
     JKAssets *asset = (JKAssets *)assets[0];
@@ -203,11 +213,14 @@
     }];
     
     [imagePicker dismissViewControllerAnimated:YES completion:^{
-        //TODO:上传图片
-        WQMainRightCell *cell = (WQMainRightCell *)[weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-        cell.headerImageView.image = image;
         
-        [MBProgressHUD hideAllHUDsForView:weakSelf.view animated:YES];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+            [weakSelf saveShopHeaderWithImg:image];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                WQMainRightCell *cell = (WQMainRightCell *)[weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                cell.headerImageView.image = image;
+            });
+        });
     }];
 }
 - (void)imagePickerControllerDidCancel:(JKImagePickerController *)imagePicker {
@@ -223,5 +236,44 @@
 - (void)editNameVCDidCancel:(WQEditNameVC *)editNameVC {
     [editNameVC dismissViewControllerAnimated:YES completion:^{
     }];
+}
+
+#pragma mark - 上传图像：头像、店铺logo
+-(void)saveShopHeaderWithImg:(UIImage *)image {
+    self.hud.mode = MBProgressHUDModeDeterminate;
+    
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/store/uploadHeader" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile" mimeType:@"image/jpeg"];
+    } error:nil];
+    
+    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    manager.securityPolicy = [AFSecurityPolicy defaultPolicy];
+    manager.securityPolicy.allowInvalidCertificates = YES;
+    
+    NSProgress *progress = nil;
+    
+    self.uploadTask = [manager uploadTaskWithRequest:request fromData:UIImageJPEGRepresentation(image, 1) progress:&progress completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
+        DLog(@"Progress is %f", progress.fractionCompleted);
+        [progress removeObserver:self forKeyPath:@"fractionCompleted"];
+        
+        [self.hud hide:YES];
+        [self.hud removeFromSuperview];
+        self.hud = nil;
+    }];
+    [self.uploadTask resume];
+    
+    [progress addObserver:self forKeyPath:@"fractionCompleted" options:NSKeyValueObservingOptionNew context:NULL];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    
+    if ([keyPath isEqualToString:@"fractionCompleted"] && [object isKindOfClass:[NSProgress class]]) {
+        NSProgress *progress = (NSProgress *)object;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.hud.progress = progress.fractionCompleted;
+        });
+        
+    }
 }
 @end

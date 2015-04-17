@@ -97,8 +97,8 @@
     self.shopNameLab.backgroundColor = [UIColor clearColor];
     self.shopNameLab.font = [UIFont systemFontOfSize:17];
     self.shopNameLab.text = @"龙舞精神";
-    CGFloat width = [self.shopNameLab.text sizeWithFont:[UIFont systemFontOfSize:17]].width;
-    self.shopNameLab.frame = (CGRect){(self.view.width-width)/2,self.shopLogoImage.bottom+2,width,20};
+    [self.shopNameLab sizeToFit];
+    self.shopNameLab.frame = (CGRect){(self.view.width-self.shopNameLab.width)/2,self.shopLogoImage.bottom+2,self.shopNameLab.width,self.shopNameLab.height};
     self.shopNameLab.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin;
     [self.shopView addSubview:self.shopNameLab];
 }

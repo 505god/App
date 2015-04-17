@@ -362,7 +362,7 @@ forHTTPHeaderField:(NSString *)field
     mutableRequest.HTTPMethod = method;
 
 #warning 设置cookies
-    ///设置cookies
+    //设置cookies
     NSArray *arcCookies = [NSKeyedUnarchiver unarchiveObjectWithData: [[NSUserDefaults standardUserDefaults] objectForKey: @"sessionCookies"]];
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     for (NSHTTPCookie *cookie in arcCookies){

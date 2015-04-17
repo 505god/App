@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, RMSwipeTableViewCellAnimationType) {
 @protocol RMSwipeTableViewCellDelegate;
 
 @interface RMSwipeTableViewCell : UITableViewCell <UIGestureRecognizerDelegate>
-
+@property (nonatomic, strong) UIView *contextMenuView;
 @property (nonatomic, strong) UIView *backView;
 @property (nonatomic, readwrite) RMSwipeTableViewCellRevealDirection revealDirection; // default is RMSwipeTableViewCellRevealDirectionBoth
 @property (nonatomic, readwrite) RMSwipeTableViewCellAnimationType animationType; // default is RMSwipeTableViewCellAnimationTypeBounce

@@ -8,11 +8,11 @@
                       {
                       "orderId": 0,
                       "orderTime": "2014-03-11",
-                      "orderPrice": "540",
+                      "orderPrice": "5409836",
                       "orderCode": "23435564733543",
                       "orderStatus": "0",
                       "customerId": "0",
-                      "customerName": "结婚时",
+                      "customerName": "",
                       "productList": [
                                       {
                                       "proId": "1",
@@ -43,7 +43,7 @@
                       "orderCode": "099970435",
                       "orderStatus": "0",
                       "customerId": "0",
-                      "customerName": "领导",
+                      "customerName": "",
                       "productList": [
                                       {
                                       "proId": "1",

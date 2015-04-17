@@ -170,7 +170,7 @@
 -(void)animateContentViewForPoint:(CGPoint)point velocity:(CGPoint)velocity {
     [super animateContentViewForPoint:point velocity:velocity];
     if (point.x < 0) {
-        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.contentView.frame) - CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetMaxX(self.contentView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetHeight(self.deleteGreyImageView.frame))];
+        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.frame) - CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetMaxX(self.contentView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetHeight(self.deleteGreyImageView.frame))];
         if (-point.x >= CGRectGetHeight(self.contentView.frame)) {
             [self.deleteRedImageView setAlpha:1];
         } else {

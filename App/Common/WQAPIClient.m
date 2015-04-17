@@ -30,8 +30,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 #pragma mark -
 #pragma mark - 店铺
 ///修改店铺名称
-+(void)editShopNameWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)editShopNameWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -54,8 +54,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 #pragma mark - 分类
 
 ///获取分类列表
-+(void)getClassListWithBlock:(void (^)(NSArray *array, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)getClassListWithBlock:(void (^)(NSArray *array, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -87,8 +87,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 }
 
 ///添加一级分类
-+(void)addClassAWithParameters:(NSDictionary *)parameters block:(void (^)(WQClassObj *classObject, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)addClassAWithParameters:(NSDictionary *)parameters block:(void (^)(WQClassObj *classObject, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -113,8 +113,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 }
 
 ///修改一级分类
-+(void)editClassAWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)editClassAWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -137,8 +137,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///删除一级分类
-+(void)deleteClassAWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)deleteClassAWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -161,8 +161,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///添加二级分类
-+(void)addClassBWithParameters:(NSDictionary *)parameters block:(void (^)(WQClassLevelObj *classObject, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)addClassBWithParameters:(NSDictionary *)parameters block:(void (^)(WQClassLevelObj *classObject, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -187,8 +187,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 }
 
 ///修改二级分类
-+(void)editClassBWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)editClassBWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -211,8 +211,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///删除二级分类
-+(void)deleteClassBWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)deleteClassBWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -238,8 +238,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 #pragma mark -
 #pragma mark - 颜色
 ///获取颜色列表
-+ (void)getColorListWithBlock:(void (^)(NSArray *array, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
++ (NSURLSessionDataTask *)getColorListWithBlock:(void (^)(NSArray *array, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -270,8 +270,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///添加颜色
-+(void)addColorWithParameters:(NSDictionary *)parameters block:(void (^)(WQColorObj *colorObject, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)addColorWithParameters:(NSDictionary *)parameters block:(void (^)(WQColorObj *colorObject, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -296,8 +296,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 }
 
 ///修改颜色
-+(void)editColorWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)editColorWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -316,8 +316,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///删除颜色
-+(void)deleteColorWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)deleteColorWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -340,8 +340,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 #pragma mark -
 #pragma mark - 尺寸
 ///获取尺寸列表
-+ (void)getSizeListWithBlock:(void (^)(NSArray *array, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
++ (NSURLSessionDataTask *)getSizeListWithBlock:(void (^)(NSArray *array, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -372,8 +372,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///添加尺寸
-+(void)addSizeWithParameters:(NSDictionary *)parameters block:(void (^)(WQSizeObj *sizeObject, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)addSizeWithParameters:(NSDictionary *)parameters block:(void (^)(WQSizeObj *sizeObject, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -398,8 +398,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 }
 
 ///修改尺寸
-+(void)editSizeWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)editSizeWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -418,8 +418,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///删除尺寸
-+(void)deleteSizeWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)deleteSizeWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -441,8 +441,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
 #pragma mark -
 #pragma mark - 用户
 
-+ (void)getCustomerListWithBlock:(void (^)(NSArray *array, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
++ (NSURLSessionDataTask *)getCustomerListWithBlock:(void (^)(NSArray *array, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -473,8 +473,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///修改用户信息
-+(void)editCustomerWithParameters:(NSDictionary *)parameters block:(void (^)(WQCustomerObj *customer, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)editCustomerWithParameters:(NSDictionary *)parameters block:(void (^)(WQCustomerObj *customer, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -498,8 +498,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///删除用户
-+(void)deleteCustomerWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)deleteCustomerWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -518,8 +518,8 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"https://barryhippo.xicp.
     }];
 }
 ///获取用户订单记录
-+(void)getCustomerOrderListWithParameters:(NSDictionary *)parameters block:(void (^)(NSArray *array,NSInteger pageCount,CGFloat totalPrice, NSError *error))block {
-    [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
++(NSURLSessionDataTask *)getCustomerOrderListWithParameters:(NSDictionary *)parameters block:(void (^)(NSArray *array,NSInteger pageCount,CGFloat totalPrice, NSError *error))block {
+    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;

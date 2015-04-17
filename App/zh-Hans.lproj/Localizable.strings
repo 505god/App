@@ -132,3 +132,8 @@
 "orderPrice" = "交易额:%.2f";
 "orderSale" = "价格优惠:%.2f";
 "proDiscount" = "折优惠";
+
+
+"orderDeal" = "待处理";
+"orderPay" = "待付款";
+"orderFinish" = "已完成";

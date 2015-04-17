@@ -63,7 +63,7 @@
 
 -(void)getClassList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
+    self.interfaceTask = [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
         weakSelf.dataArray = nil;
         weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
         
@@ -105,6 +105,10 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.tableView headerEndRefreshing];
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -122,7 +126,7 @@
     __unsafe_unretained typeof(self) weakSelf = self;
     // 添加下拉刷新头部控件
     [self.tableView addHeaderWithCallback:^{
-        [weakSelf testData];
+        [weakSelf getClassList];
     } dateKey:@"WQClassifyVC"];
 }
 

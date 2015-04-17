@@ -363,6 +363,9 @@
 		5DA4BD801ADF4CBD000C75A5 /* WQCustomerOrderProObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD7F1ADF4CBD000C75A5 /* WQCustomerOrderProObj.m */; };
 		5DA4BD841ADF522B000C75A5 /* CustomerOrderList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DA4BD831ADF522B000C75A5 /* CustomerOrderList.json */; };
 		5DA4BD871ADF546C000C75A5 /* WQOrderHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD861ADF546C000C75A5 /* WQOrderHeader.m */; };
+		5DA4BD941ADFC61C000C75A5 /* WQOrderDealVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD931ADFC61C000C75A5 /* WQOrderDealVC.m */; };
+		5DA4BD971ADFC62D000C75A5 /* WQOrderPayVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD961ADFC62D000C75A5 /* WQOrderPayVC.m */; };
+		5DA4BD9A1ADFC639000C75A5 /* WQOrderFinishVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA4BD991ADFC639000C75A5 /* WQOrderFinishVC.m */; };
 		5DA9A0601A8C76C000E59380 /* WQSizeObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */; };
 		5DA9A0621A8C789500E59380 /* SizeList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DA9A0611A8C789500E59380 /* SizeList.json */; };
 		5DA9A0651A8C7BC100E59380 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */; };
@@ -1027,6 +1030,12 @@
 		5DA4BD831ADF522B000C75A5 /* CustomerOrderList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CustomerOrderList.json; sourceTree = "<group>"; };
 		5DA4BD851ADF546C000C75A5 /* WQOrderHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQOrderHeader.h; sourceTree = "<group>"; };
 		5DA4BD861ADF546C000C75A5 /* WQOrderHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQOrderHeader.m; sourceTree = "<group>"; };
+		5DA4BD921ADFC61C000C75A5 /* WQOrderDealVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQOrderDealVC.h; sourceTree = "<group>"; };
+		5DA4BD931ADFC61C000C75A5 /* WQOrderDealVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQOrderDealVC.m; sourceTree = "<group>"; };
+		5DA4BD951ADFC62D000C75A5 /* WQOrderPayVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQOrderPayVC.h; sourceTree = "<group>"; };
+		5DA4BD961ADFC62D000C75A5 /* WQOrderPayVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQOrderPayVC.m; sourceTree = "<group>"; };
+		5DA4BD981ADFC639000C75A5 /* WQOrderFinishVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQOrderFinishVC.h; sourceTree = "<group>"; };
+		5DA4BD991ADFC639000C75A5 /* WQOrderFinishVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQOrderFinishVC.m; sourceTree = "<group>"; };
 		5DA9A05E1A8C76C000E59380 /* WQSizeObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQSizeObj.h; sourceTree = "<group>"; };
 		5DA9A05F1A8C76C000E59380 /* WQSizeObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQSizeObj.m; sourceTree = "<group>"; };
 		5DA9A0611A8C789500E59380 /* SizeList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SizeList.json; sourceTree = "<group>"; };
@@ -2509,6 +2518,12 @@
 			children = (
 				5D81870F1A81A56C00DF3BFA /* WQOrderVC.h */,
 				5D8187101A81A56C00DF3BFA /* WQOrderVC.m */,
+				5DA4BD921ADFC61C000C75A5 /* WQOrderDealVC.h */,
+				5DA4BD931ADFC61C000C75A5 /* WQOrderDealVC.m */,
+				5DA4BD951ADFC62D000C75A5 /* WQOrderPayVC.h */,
+				5DA4BD961ADFC62D000C75A5 /* WQOrderPayVC.m */,
+				5DA4BD981ADFC639000C75A5 /* WQOrderFinishVC.h */,
+				5DA4BD991ADFC639000C75A5 /* WQOrderFinishVC.m */,
 			);
 			name = OrderVC;
 			sourceTree = "<group>";
@@ -2793,6 +2808,7 @@
 				5D73261D1A7F008F00949D93 /* DDFileLogger.m in Sources */,
 				5D7325AC1A7F008F00949D93 /* XMPPMessage.m in Sources */,
 				5D7326CD1A7F1C5700949D93 /* WQDataShare.m in Sources */,
+				5DA4BD971ADFC62D000C75A5 /* WQOrderPayVC.m in Sources */,
 				5D7DECCE1A8072E300496850 /* WQInitView.m in Sources */,
 				5D8187931A82165100DF3BFA /* HanyuPinyinOutputFormat.m in Sources */,
 				5D759CCB1A83AA35001920FA /* PNScatterChartDataItem.m in Sources */,
@@ -2968,6 +2984,7 @@
 				5D7326BF1A7F19B100949D93 /* BaseViewController.m in Sources */,
 				5D759CC31A83AA35001920FA /* PNColor.m in Sources */,
 				5D8D1E901AD771FC007B2500 /* WQProductBtn.m in Sources */,
+				5DA4BD941ADFC61C000C75A5 /* WQOrderDealVC.m in Sources */,
 				5D7325FA1A7F008F00949D93 /* XMPPMessageArchivingCoreDataStorage.m in Sources */,
 				5D6C6C9B1ACBC25F002E3252 /* WQHotSaleCell.m in Sources */,
 				5D7326851A7F043D00949D93 /* JKUtil.m in Sources */,
@@ -2997,6 +3014,7 @@
 				5D8A8E791AD4B725003B813F /* WQProImgItem.m in Sources */,
 				5D5536F41AC04B44008636F6 /* UIImage+ImageEffects.m in Sources */,
 				5D7326001A7F008F00949D93 /* XMPPMessageDeliveryReceipts.m in Sources */,
+				5DA4BD9A1ADFC639000C75A5 /* WQOrderFinishVC.m in Sources */,
 				5D0762DF1A879A7100F8576C /* StyledPageControl.m in Sources */,
 				5D81879A1A8217DF00DF3BFA /* ChineseInclude.m in Sources */,
 				5D81876D1A81D02700DF3BFA /* WQCustomerCell.m in Sources */,
@@ -3199,7 +3217,7 @@
 					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3232,7 +3250,7 @@
 					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = App/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

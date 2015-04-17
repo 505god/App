@@ -47,11 +47,7 @@ static UIFont *buttonFont = nil;
 
         if (title)
         {
-            CGSize size = [title sizeWithFont:titleFont
-                            constrainedToSize:CGSizeMake(frame.size.width-kActionSheetBorder*2, 1000)
-                                lineBreakMode:NSLineBreakByCharWrapping];
-            
-            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(kActionSheetBorder, _height, frame.size.width-kActionSheetBorder*2, size.height)];
+            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectZero];
             labelView.font = titleFont;
             labelView.numberOfLines = 0;
             labelView.lineBreakMode = NSLineBreakByCharWrapping;
@@ -61,10 +57,14 @@ static UIFont *buttonFont = nil;
             labelView.shadowColor = kActionSheetTitleShadowColor;
             labelView.shadowOffset = kActionSheetTitleShadowOffset;
             labelView.text = title;
-            [_view addSubview:labelView];
-            [labelView release];
             
-            _height += size.height + 5;
+            [labelView sizeToFit];
+            labelView.frame = (CGRect){kActionSheetBorder, _height, frame.size.width-kActionSheetBorder*2, labelView.height};
+            [_view addSubview:labelView];
+            
+            
+            _height += labelView.height + 5;
+            [labelView release];
         }
         _vignetteBackground = NO;
     }

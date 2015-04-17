@@ -254,8 +254,9 @@
     NSInteger kMaxLength = 20;
     
     NSString *toBeString = text.text;
-    
-    NSString *lang = [[UITextInputMode currentInputMode] primaryLanguage];
+#warning check
+    NSString *lang = text.textInputMode.primaryLanguage;
+//    NSString *lang = [[UITextInputMode currentInputMode] primaryLanguage];
     if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
         UITextRange *selectedRange = [text markedTextRange];
         UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];

@@ -8,9 +8,15 @@
 
 #import "WQOrderVC.h"
 
+#import "DAPagesContainer.h"
+#import "WQOrderDealVC.h"
+#import "WQOrderPayVC.h"
+#import "WQOrderFinishVC.h"
 
+@interface WQOrderVC ()<WQNavBarViewDelegate>
 
-@interface WQOrderVC ()
+//待处理、待付款、已完成容器
+@property (strong, nonatomic) DAPagesContainer *pagesContainer;
 
 @end
 
@@ -25,9 +31,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-//    self.title = NSLocalizedString(@"OrderVC", @"");
+    //导航栏
+    [self.navBarView setTitleString:NSLocalizedString(@"OrderVC", @"")];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+    [self.navBarView.leftBtn setHidden:YES];
+    self.navBarView.navDelegate = self;
+    self.navBarView.isShowShadow = YES;
+    [self.view addSubview:self.navBarView];
     
-    
+    [self initContainerView];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -52,6 +64,29 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+//商品类页面容器
+-(void)initContainerView {
+    self.pagesContainer = [[DAPagesContainer alloc] init];
+    [self.pagesContainer willMoveToParentViewController:self];
+    self.pagesContainer.view.frame = (CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height};
+    self.pagesContainer.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    [self.view addSubview:self.pagesContainer.view];
+    [self.pagesContainer didMoveToParentViewController:self];
+    
+    //待处理
+    WQOrderDealVC *dealVC = [[WQOrderDealVC alloc]init];
+    dealVC.title = NSLocalizedString(@"orderDeal", @"");
+    
+    //待付款
+    WQOrderPayVC *payVC = [[WQOrderPayVC alloc]init];
+    payVC.title = NSLocalizedString(@"orderPay", @"");
+    
+    //已完成
+    WQOrderFinishVC *finishVC = [[WQOrderFinishVC alloc]init];;
+    finishVC.title = NSLocalizedString(@"orderFinish", @"");
+    
+    self.pagesContainer.viewControllers = @[dealVC,payVC,finishVC];
+    SafeRelease(dealVC);SafeRelease(payVC);SafeRelease(finishVC);
+}
 
 @end

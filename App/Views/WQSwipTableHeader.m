@@ -103,7 +103,6 @@
         [self.delegate swipeTableViewHeaderDidStartSwiping:self];
     }
     [self.backgroundView addSubview:self.backView];
-    [self.backView setAutoresizingMask:UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth];
 }
 
 #pragma mark - Gesture animations

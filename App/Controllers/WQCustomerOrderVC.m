@@ -229,7 +229,8 @@
     [header setOrderObj:orderObj];
     header.delegate = self;
     header.aSection = section;
-
+    header.type=0;
+//    header.revealDirection = WQSwipTableHeaderRevealDirectionNone;
     BOOL isSelSection = NO;
     for (int i = 0; i < self.arrSelSection.count; i++) {
         if (section == [self.arrSelSection[i] integerValue]) {

@@ -33,8 +33,7 @@
         self.lineView = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.lineView.image = [UIImage imageNamed:@"line"];
         [self.contextMenuView addSubview:self.lineView];
-        
-        self.contentView.backgroundColor = [UIColor whiteColor];
+
     }
     return self;
 }
@@ -108,7 +107,7 @@
 -(void)animateContentViewForPoint:(CGPoint)point velocity:(CGPoint)velocity {
     [super animateContentViewForPoint:point velocity:velocity];
     if (point.x < 0) {
-        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.contextMenuView.frame) - CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetMaxX(self.contextMenuView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
+        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.frame) - CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetMaxX(self.contextMenuView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
         if (-point.x >= CGRectGetHeight(self.contextMenuView.frame)) {
             [self.deleteRedImageView setAlpha:1];
         } else {

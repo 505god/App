@@ -32,4 +32,10 @@
 @property (nonatomic, assign) BOOL isFirstShow;
 
 -(void)setToolImage:(NSString *)imageString text:(NSString *)text animated:(BOOL)animated;
+
+
+///请求
+@property (nonatomic, strong) NSURLSessionDataTask *interfaceTask;
+
+@property (nonatomic, strong) NSURLSessionUploadTask *uploadTask;
 @end

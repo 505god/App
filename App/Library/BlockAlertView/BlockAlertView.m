@@ -55,11 +55,7 @@ static UIFont *buttonFont = nil;
 
         if (title)
         {
-            CGSize size = [title sizeWithFont:titleFont
-                            constrainedToSize:CGSizeMake(frame.size.width-kAlertViewBorder*2, 1000)
-                                lineBreakMode:NSLineBreakByCharWrapping];
-
-            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(kAlertViewBorder, _height, frame.size.width-kAlertViewBorder*2, size.height)];
+            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectZero];
             labelView.font = titleFont;
             labelView.numberOfLines = 0;
             labelView.lineBreakMode = NSLineBreakByCharWrapping;
@@ -67,19 +63,20 @@ static UIFont *buttonFont = nil;
             labelView.backgroundColor = [UIColor clearColor];
             labelView.textAlignment = NSTextAlignmentCenter;
             labelView.text = title;
-            [_view addSubview:labelView];
-            [labelView release];
             
-            _height += size.height + kAlertViewBorder;
+            [labelView sizeToFit];
+            labelView.frame = (CGRect){kAlertViewBorder,_height,frame.size.width-kAlertViewBorder*2,labelView.height};
+            
+            [_view addSubview:labelView];
+            
+            _height += labelView.height + kAlertViewBorder;
+            
+            [labelView release];
         }
         
         if (message)
         {
-            CGSize size = [message sizeWithFont:messageFont
-                              constrainedToSize:CGSizeMake(frame.size.width-kAlertViewBorder*2, 1000)
-                                  lineBreakMode:NSLineBreakByCharWrapping];
-            
-            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(kAlertViewBorder, _height, frame.size.width-kAlertViewBorder*2, size.height)];
+            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectZero];
             labelView.font = messageFont;
             labelView.numberOfLines = 0;
             labelView.lineBreakMode = NSLineBreakByCharWrapping;
@@ -87,10 +84,15 @@ static UIFont *buttonFont = nil;
             labelView.backgroundColor = [UIColor clearColor];
             labelView.textAlignment = NSTextAlignmentCenter;
             labelView.text = message;
-            [_view addSubview:labelView];
-            [labelView release];
             
-            _height += size.height + kAlertViewBorder;
+            [labelView sizeToFit];
+            labelView.frame = (CGRect){kAlertViewBorder, _height, frame.size.width-kAlertViewBorder*2, labelView.height};
+            
+            [_view addSubview:labelView];
+            
+            
+            _height += labelView.height + kAlertViewBorder;
+            [labelView release];
         }
         
         _vignetteBackground = NO;
@@ -163,22 +165,29 @@ static UIFont *buttonFont = nil;
         {
             // In this case there's another button.
             // Let's check if they fit on the same line.
-            CGSize size = [title sizeWithFont:buttonFont 
-                                  minFontSize:10 
-                               actualFontSize:nil
-                                     forWidth:_view.bounds.size.width-kAlertViewBorder*2 
-                                lineBreakMode:NSLineBreakByClipping];
+            
+             CGSize size = [title boundingRectWithSize:CGSizeMake(_view.bounds.size.width-kAlertViewBorder*2 , CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:buttonFont,NSFontAttributeName, nil] context:nil].size;
+            
+            
+//            CGSize size = [title sizeWithFont:buttonFont
+//                                  minFontSize:10 
+//                               actualFontSize:nil
+//                                     forWidth:_view.bounds.size.width-kAlertViewBorder*2 
+//                                lineBreakMode:NSLineBreakByClipping];
             
             if (size.width < maxHalfWidth - kAlertViewBorder)
             {
                 // It might fit. Check the next Button
                 NSArray *block2 = [_blocks objectAtIndex:i+1];
                 NSString *title2 = [block2 objectAtIndex:1];
-                size = [title2 sizeWithFont:buttonFont 
-                                minFontSize:10 
-                             actualFontSize:nil
-                                   forWidth:_view.bounds.size.width-kAlertViewBorder*2 
-                              lineBreakMode:NSLineBreakByClipping];
+                
+                size = [title2 boundingRectWithSize:CGSizeMake(_view.bounds.size.width-kAlertViewBorder*2 , CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:buttonFont,NSFontAttributeName, nil] context:nil].size;
+                
+//                size = [title2 sizeWithFont:buttonFont 
+//                                minFontSize:10 
+//                             actualFontSize:nil
+//                                   forWidth:_view.bounds.size.width-kAlertViewBorder*2 
+//                              lineBreakMode:NSLineBreakByClipping];
                 
                 if (size.width < maxHalfWidth - kAlertViewBorder)
                 {
@@ -191,11 +200,14 @@ static UIFont *buttonFont = nil;
         else if (_blocks.count  == 1)
         {
             // In this case this is the ony button. We'll size according to the text
-            CGSize size = [title sizeWithFont:buttonFont 
-                                  minFontSize:10 
-                               actualFontSize:nil
-                                     forWidth:_view.bounds.size.width-kAlertViewBorder*2 
-                                lineBreakMode:NSLineBreakByClipping];
+            
+            CGSize size = [title boundingRectWithSize:CGSizeMake(_view.bounds.size.width-kAlertViewBorder*2 , CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:buttonFont,NSFontAttributeName, nil] context:nil].size;
+            
+//            CGSize size = [title sizeWithFont:buttonFont 
+//                                  minFontSize:10 
+//                               actualFontSize:nil
+//                                     forWidth:_view.bounds.size.width-kAlertViewBorder*2 
+//                                lineBreakMode:NSLineBreakByClipping];
 
             size.width = MAX(size.width, 80);
             if (size.width + 2 * kAlertViewBorder < width)

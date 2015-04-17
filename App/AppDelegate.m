@@ -94,7 +94,7 @@
     DLog( @"%@" , currentLanguage);
     if ([currentLanguage isEqualToString:@"zh-Hans"]) {
         
-    }else if ([currentLanguage isEqualToString:@"zh-Hans"]) {
+    }else if ([currentLanguage isEqualToString:@"en-US"]) {
         
     }else if ([currentLanguage isEqualToString:@"zh-Hans"]) {
         

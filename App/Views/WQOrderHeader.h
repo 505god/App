@@ -15,6 +15,13 @@
 @property (nonatomic,assign) NSInteger aSection;
 @property (nonatomic,assign) BOOL isSelected;
 
+@property (nonatomic, assign) NSInteger type;
+
 @property (nonatomic, strong) WQCustomerOrderObj *orderObj;
 
+@property (nonatomic, strong) UIImageView *editGreyImageView;
+@property (nonatomic, strong) UIImageView *editRedImageView;
+
+@property (nonatomic, strong) UIImageView *deleteGreyImageView;
+@property (nonatomic, strong) UIImageView *deleteRedImageView;
 @end

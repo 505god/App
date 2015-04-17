@@ -235,7 +235,16 @@
             
                 NSString *pageNumber = [NSString stringWithFormat:@"%i", i+1];
                 CGContextSetFillColorWithColor(myContext, [[UIColor whiteColor] CGColor]);
-                [pageNumber drawInRect:CGRectMake(x,(self.frame.size.height-kcurrentPageDiameter)/2-1,kcurrentPageDiameter,kcurrentPageDiameter) withFont:[UIFont systemFontOfSize:kcurrentPageDiameter-2] lineBreakMode:NSLineBreakByWordWrapping alignment:NSTextAlignmentCenter];
+                
+                
+                NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+                paragraph.alignment = NSTextAlignmentCenter;
+                
+                NSDictionary *dic = @{NSFontAttributeName:[UIFont systemFontOfSize:kcurrentPageDiameter-2],
+                                      NSParagraphStyleAttributeName:paragraph
+                                      };
+                
+                [pageNumber drawInRect:CGRectMake(x,(self.frame.size.height-kcurrentPageDiameter)/2-1,kcurrentPageDiameter,kcurrentPageDiameter) withAttributes:dic];
             }
             else
             {
