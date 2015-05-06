@@ -15,13 +15,12 @@
 @property (nonatomic,assign) NSInteger aSection;
 @property (nonatomic,assign) BOOL isSelected;
 
+///type:0=客户1=待处理2=待付款3=已完成
 @property (nonatomic, assign) NSInteger type;
 
 @property (nonatomic, strong) WQCustomerOrderObj *orderObj;
 
-@property (nonatomic, strong) UIImageView *editGreyImageView;
-@property (nonatomic, strong) UIImageView *editRedImageView;
 
-@property (nonatomic, strong) UIImageView *deleteGreyImageView;
-@property (nonatomic, strong) UIImageView *deleteRedImageView;
+
+
 @end

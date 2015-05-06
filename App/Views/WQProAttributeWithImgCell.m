@@ -13,6 +13,7 @@
 #import "WQProductText.h"
 
 #import "WQCreatProductVC.h"
+#import "WQProductDetailVC.h"
 
 @interface WQProAttributeWithImgCell ()<WQTapImgDelegate>
 
@@ -40,6 +41,10 @@
     _productVC = productVC;
 }
 
+-(void)setDetailVC:(WQProductDetailVC *)detailVC {
+    _detailVC = detailVC;
+}
+
 -(void)setIndexPath:(NSIndexPath *)indexPath {
     _indexPath = indexPath;
 }
@@ -58,6 +63,8 @@
     if ([[dictionary objectForKey:@"image"]isKindOfClass:[UIImage class]] && [dictionary objectForKey:@"image"]!=nil) {
         UIImage *image = (UIImage *)[dictionary objectForKey:@"image"];
         self.proImgView.image = image;
+    }else if (![[dictionary objectForKey:@"image"]isKindOfClass:[NSNull class]] && [dictionary objectForKey:@"image"]!=nil){
+        [self.proImgView sd_setImageWithURL:[NSURL URLWithString:[dictionary objectForKey:@"image"]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     }else {
         self.proImgView.image = [UIImage imageNamed:@"assets_placeholder_picture"];
     }
@@ -130,7 +137,12 @@
         priceTxt.text = [Utility checkString:[aDic objectForKey:@"priceDetail"]]?[aDic objectForKey:@"priceDetail"]:@"";
         priceTxt.idxPath = self.indexPath;
         priceTxt.tag = PriceTextFieldTag+i;
-        priceTxt.delegate = self.productVC;
+        if (self.productVC) {
+            priceTxt.delegate = self.productVC;
+        }else {
+            priceTxt.delegate = self.detailVC;
+        }
+        
         priceTxt.returnKeyType = UIReturnKeyNext;
         priceTxt.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
         [self.contentView addSubview:priceTxt];
@@ -145,10 +157,14 @@
         [self.contentView addSubview:stockLab];
         
         WQProductText *stockTxt = [self addText:(CGRect){stockLab.right+5,stockLab.top,[UIScreen mainScreen].bounds.size.width-stockLab.right-10,20}];
-        stockTxt.text = [Utility checkString:[aDic objectForKey:@"stockDetail"]]?[aDic objectForKey:@"stockDetail"]:@"";
+        stockTxt.text = [NSString stringWithFormat:@"%@",[aDic objectForKey:@"stockDetail"]];
         stockTxt.idxPath = self.indexPath;
         stockTxt.tag = StockTextFieldTag+i;
-        stockTxt.delegate = self.productVC;
+        if (self.productVC) {
+            stockTxt.delegate = self.productVC;
+        }else {
+            stockTxt.delegate = self.detailVC;
+        }
         stockTxt.returnKeyType = UIReturnKeyDone;
         stockTxt.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
         [self.contentView addSubview:stockTxt];
@@ -235,8 +251,8 @@
 -(void)animateContentViewForPoint:(CGPoint)point velocity:(CGPoint)velocity {
     [super animateContentViewForPoint:point velocity:velocity];
     if (point.x < 0) {
-        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.frame) - CGRectGetWidth(self.deleteGreyImageView.frame), CGRectGetMaxX(self.contentView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
-        if (-point.x >= 60) {
+        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.frame) - self.deleteGreyImageView.width, CGRectGetMaxX(self.contentView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
+        if (-point.x >= 50) {
             [self.deleteRedImageView setAlpha:1];
         } else {
             [self.deleteRedImageView setAlpha:0];
@@ -304,7 +320,7 @@
 #pragma mark - property
 -(UIImageView*)deleteGreyImageView {
     if (!_deleteGreyImageView) {
-        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contentView.frame), 0, 60, self.contentView.height)];
+        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contentView.frame), (self.height-40)/2, 40, 40)];
         [_deleteGreyImageView setImage:[UIImage imageNamed:@"DeleteGrey"]];
         [_deleteGreyImageView setContentMode:UIViewContentModeCenter];
         [self.backView addSubview:_deleteGreyImageView];
@@ -365,7 +381,8 @@
 -(WQProductBtn *)addBtn {
     if (!_addBtn) {
         _addBtn = [WQProductBtn buttonWithType:UIButtonTypeCustom];
-        [_addBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+        [_addBtn setImage:[UIImage imageNamed:@"addProImg"] forState:UIControlStateNormal];
+        [_addBtn setImage:[UIImage imageNamed:@"addProImgNormal"] forState:UIControlStateHighlighted];
         _addBtn.titleLabel.font = [UIFont systemFontOfSize:16];
         [_addBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [_addBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];

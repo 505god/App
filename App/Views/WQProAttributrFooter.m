@@ -26,7 +26,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         UIImageView *img = [[UIImageView alloc]initWithFrame:(CGRect){10,10,20,20}];
-        img.image = [UIImage imageNamed:@"addProImg"];
+        img.image = [UIImage imageNamed:@"addProperty"];
         [self.contentView addSubview:img];
        
         UILabel *lab = [[UILabel alloc]initWithFrame:(CGRect){img.right+10,img.top,200,20}];

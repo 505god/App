@@ -30,7 +30,7 @@ CGFloat const DAPagesContainerTopBarItemsOffset = 30.;
         
         self.backgroundColor = [UIColor whiteColor];
         
-        UIView *lineView = [[UIView alloc]initWithFrame:(CGRect){10,self.height-7,self.width-20,1}];
+        UIView *lineView = [[UIView alloc]initWithFrame:(CGRect){10,self.height-7,self.width-20,0.75}];
         lineView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         lineView.backgroundColor = [UIColor lightGrayColor];
         [self addSubview:lineView];

@@ -12,15 +12,19 @@
 
 #import "Reachability.h"
 
-
+#import "WQLogVC.h"
 //首页子ViewController
 #import "WQShopVC.h"
 #import "WQOrderVC.h"
 #import "WQCustomerVC.h"
 #import "WQSaleVC.h"
 
+#import "WQLocalDB.h"
 
-@interface AppDelegate ()
+#import "WQXMPPManager.h"
+#import "WQMessageVC.h"
+
+@interface AppDelegate ()<ChatDelegate>
 
 @property (strong, nonatomic) Reachability *hostReach;//网络监听所用
 
@@ -53,7 +57,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     
-    WQInitVC *initVC = LOADVC(@"WQInitVC");
+    WQInitVC *initVC = [[WQInitVC alloc]init];
     self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
     self.window.rootViewController = self.navControl;
     
@@ -80,11 +84,13 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    [self.xmppManager goOffline];
+    [self.xmppManager teardownStream];
+    self.xmppManager = nil;
 }
 
 #pragma mark - 获取当前语言
@@ -92,14 +98,19 @@
     NSArray *languages = [NSLocale preferredLanguages];
     NSString *currentLanguage = [languages objectAtIndex:0];
     DLog( @"%@" , currentLanguage);
-    if ([currentLanguage isEqualToString:@"zh-Hans"]) {
+    if ([currentLanguage isEqualToString:@"zh-Hans"]) {//汉语
         
-    }else if ([currentLanguage isEqualToString:@"en-US"]) {
+    }else if ([currentLanguage isEqualToString:@"en"]) {//英语
         
-    }else if ([currentLanguage isEqualToString:@"zh-Hans"]) {
+    }else if ([currentLanguage isEqualToString:@"it"]) {//意大利语
         
+    }else {
+        currentLanguage = @"en";
     }
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [WQAPIClient postLanguageWithParameters:@{@"language":currentLanguage} block:^(NSInteger status, NSError *error) {
+        }];
+    });
 }
 #pragma mark - 网络
 - (void)reachabilityChanged:(NSNotification *)note {
@@ -116,19 +127,55 @@
 
 #pragma mark - 加载RootViewController
 -(void)showRootVC {
-    self.mainVC = [[WQMainVC alloc]init];
-    WQShopVC *shopVC = [[WQShopVC alloc]init];
-    WQOrderVC *orderVC = [[WQOrderVC alloc]init];
-    WQCustomerVC *customerVC = [[WQCustomerVC alloc]init];
-    WQSaleVC *saleVC = [[WQSaleVC alloc]init];
-
-    self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
-
-    [self.mainVC setCurrentPageVC:0];
-    self.navControl = [[UINavigationController alloc]initWithRootViewController:self.mainVC];
     
-    self.window.rootViewController = self.navControl;
+    [[WQLocalDB sharedWQLocalDB] getLocalUserDataWithCompleteBlock:^(NSArray *array) {
+        if (array.count==0) {//未登录
+            WQLogVC *logVC = [[WQLogVC alloc]init];
+            self.navControl = [[UINavigationController alloc]initWithRootViewController:logVC];
+            self.window.rootViewController = self.navControl;
+            SafeRelease(logVC);
+            
+            
+        }else {//已登录
+            [WQDataShare sharedService].userObj = (WQUserObj *)[array firstObject];
+            
+            //登录成功之后连接XMPP
+            self.xmppManager = [WQXMPPManager sharedInstance];
+            
+            [self.xmppManager setupStream];
+            self.xmppManager.chatDelegate = self;
+            //xmpp连接
+            if (![self.xmppManager.xmppStream isConnected]) {
+                [self.xmppManager myConnect];
+            }
+            
+            self.mainVC = [[WQMainVC alloc]init];
+            WQShopVC *shopVC = [[WQShopVC alloc]init];
+            WQOrderVC *orderVC = [[WQOrderVC alloc]init];
+            WQCustomerVC *customerVC = [[WQCustomerVC alloc]init];
+            WQSaleVC *saleVC = [[WQSaleVC alloc]init];
+            
+            self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
+            
+            [self.mainVC setCurrentPageVC:0];
+            self.navControl = [[UINavigationController alloc]initWithRootViewController:self.mainVC];
+            
+            self.window.rootViewController = self.navControl;
+            
+            SafeRelease(shopVC);SafeRelease(orderVC);SafeRelease(customerVC);SafeRelease(saleVC);
+        }
+    }];
+}
+
+#pragma mark - chatDelegate
+-(void)getNewMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
     
-    SafeRelease(shopVC);SafeRelease(orderVC);SafeRelease(customerVC);SafeRelease(saleVC);
+}
+
+-(void)didSendMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
+    
+}
+-(void)senMessageFailed:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
+    
 }
 @end

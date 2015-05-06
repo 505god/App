@@ -64,6 +64,9 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
 }
 
@@ -254,9 +257,7 @@
     NSInteger kMaxLength = 20;
     
     NSString *toBeString = text.text;
-#warning check
     NSString *lang = text.textInputMode.primaryLanguage;
-//    NSString *lang = [[UITextInputMode currentInputMode] primaryLanguage];
     if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
         UITextRange *selectedRange = [text markedTextRange];
         UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];
@@ -314,41 +315,29 @@
     
     [mutableDic setObject:[NSNumber numberWithInteger:self.customerObj.customerId] forKey:@"id"];
     
-    if (self.delegate && [self.delegate respondsToSelector:@selector(saveCustomerInfo:)]) {
-        [self.delegate saveCustomerInfo:self.customerObj];
-    }
-    [self.navigationController popViewControllerAnimated:YES];
-    /*
-     __unsafe_unretained typeof(self) weakSelf = self;
-     [WQAPIClient editCustomerWithParameters:mutableDic block:^(WQCustomerObj *customer, NSError *error) {
-     if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(saveCustomerInfo:)]) {
-     [weakSelf.delegate saveCustomerInfo:customer];
-     }
-     [weakSelf.navigationController popViewControllerAnimated:YES];
-     SafeRelease(mutableDic);
-     }];
-     */
+    __unsafe_unretained typeof(self) weakSelf = self;
+    self.interfaceTask = [WQAPIClient editCustomerWithParameters:mutableDic block:^(WQCustomerObj *customer, NSError *error) {
+        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(saveCustomerInfo:)]) {
+            [weakSelf.delegate saveCustomerInfo:customer];
+        }
+        [weakSelf.navigationController popViewControllerAnimated:YES];
+        SafeRelease(mutableDic);
+    }];
 }
 
 #pragma mark - 删除客户
 
 -(void)deleteCustomer:(id)sender {
     self.delegate = self.customerVC;
-    if (self.delegate && [self.delegate respondsToSelector:@selector(deleteCustomer:index:)]) {
-        [self.delegate deleteCustomer:self.customerObj index:self.indexPath];
-    }
-    [self.navigationController popToRootViewControllerAnimated:YES];
-    /*
-     __unsafe_unretained typeof(self) weakSelf = self;
-     NSDictionary *dic = @{@"id":[NSNumber numberWithInteger:self.customerObj.customerId]};
-     [WQAPIClient deleteCustomerWithParameters:dic block:^(NSInteger finished, NSError *error) {
-     weakSelf.delegate = weakSelf.customerVC;
-     if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(deleteCustomer:index:)]) {
-     [weakSelf.delegate deleteCustomer:weakSelf.customerObj index:self.indexPath];
-     }
-     
-     [weakSelf.navigationController popToRootViewControllerAnimated:YES];
-     }];
-     */
+    __unsafe_unretained typeof(self) weakSelf = self;
+    NSDictionary *dic = @{@"userId":[NSNumber numberWithInteger:self.customerObj.customerId]};
+    self.interfaceTask = [WQAPIClient deleteCustomerWithParameters:dic block:^(NSInteger finished, NSError *error) {
+        weakSelf.delegate = weakSelf.customerVC;
+        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(deleteCustomer:index:)]) {
+            [weakSelf.delegate deleteCustomer:weakSelf.customerObj index:self.indexPath];
+        }
+        
+        [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+    }];
 }
 @end

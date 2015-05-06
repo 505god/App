@@ -30,6 +30,8 @@
     
     self.view.clipsToBounds = YES;
     self.view.autoresizesSubviews = YES;
+    
+    self.view.backgroundColor = COLOR(235, 235, 241, 1);
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -41,7 +43,7 @@
         self.edgesForExtendedLayout=UIRectEdgeNone;
     }
     
-    self.view.backgroundColor = COLOR(235, 235, 241, 1);
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {

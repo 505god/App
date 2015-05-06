@@ -23,42 +23,47 @@
 
 
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText {
-    return [self promptWithTitle:title message:message defaultText:defaultText block:nil];
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText type:(NSInteger)type{
+    return [self promptWithTitle:title message:message defaultText:defaultText type:type block:nil];
 }
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText block:(TextFieldReturnCallBack)block {
-    return [[[BlockTextPromptAlertView alloc] initWithTitle:title message:message defaultText:defaultText block:block] autorelease];
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText type:(NSInteger)type block:(TextFieldReturnCallBack)block {
+    return [[[BlockTextPromptAlertView alloc] initWithTitle:title message:message defaultText:defaultText type:type block:block] autorelease];
 }
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField {
-    return [self promptWithTitle:title message:message textField:textField block:nil];
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField type:(NSInteger)type{
+    return [self promptWithTitle:title message:message textField:textField type:type block:nil];
 }
 
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField block:(TextFieldReturnCallBack) block{
-    BlockTextPromptAlertView *prompt = [[[BlockTextPromptAlertView alloc] initWithTitle:title message:message defaultText:nil block:block] autorelease];
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField type:(NSInteger)type block:(TextFieldReturnCallBack) block{
+    BlockTextPromptAlertView *prompt = [[[BlockTextPromptAlertView alloc] initWithTitle:title message:message defaultText:nil type:type block:block] autorelease];
     
     *textField = prompt.textField;
     
     return prompt;
 }
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText textField:(out UITextField**)textField block:(TextFieldReturnCallBack) block{
-    BlockTextPromptAlertView *prompt = [[[BlockTextPromptAlertView alloc] initWithTitle:title message:message defaultText:defaultText block:block] autorelease];
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText textField:(out UITextField**)textField type:(NSInteger)type block:(TextFieldReturnCallBack) block{
+    BlockTextPromptAlertView *prompt = [[[BlockTextPromptAlertView alloc] initWithTitle:title message:message defaultText:defaultText type:type block:block] autorelease];
     
     *textField = prompt.textField;
     
     return prompt;
 }
 
-- (id)initWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText block: (TextFieldReturnCallBack) block {
+- (id)initWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText type:(NSInteger)type block: (TextFieldReturnCallBack) block {
     
     self = [super initWithTitle:title message:message];
     
     if (self) {
         UITextField *theTextField = [[[UITextField alloc] initWithFrame:CGRectMake(kTextBoxHorizontalMargin, _height, _view.bounds.size.width - kTextBoxHorizontalMargin * 2, kTextBoxHeight)] autorelease]; 
         
+        if (type==0) {
+            theTextField.keyboardType = UIKeyboardTypeNamePhonePad;
+        }else {
+            theTextField.keyboardType = UIKeyboardTypeNumberPad;
+        }
         [theTextField setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
         [theTextField setAutocapitalizationType:UITextAutocapitalizationTypeWords];
         [theTextField setBorderStyle:UITextBorderStyleRoundedRect];

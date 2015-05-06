@@ -24,6 +24,7 @@
 
 @property (nonatomic, assign) id<ChatDelegate>chatDelegate;
 
+- (BOOL)myConnect;
 
 - (void)setupStream;
 - (void)teardownStream;
@@ -38,6 +39,7 @@
 
 
 @protocol ChatDelegate <NSObject>
+
 @optional
 -(void)friendStatusChange:(WQXMPPManager *)xmppManager Presence:(XMPPPresence *)presence;
 -(void)getNewMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message;

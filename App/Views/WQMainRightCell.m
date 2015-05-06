@@ -69,7 +69,7 @@
 }
 
 -(void)setHeaderImageViewImage:(NSString *)header {
-    [self.headerImageView setImageWithURL:[NSURL URLWithString:header] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.headerImageView sd_setImageWithURL:[NSURL URLWithString:header] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
 }
 
 //头像固定为60x60

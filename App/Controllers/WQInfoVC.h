@@ -12,7 +12,5 @@
 
 //手机号码
 @property (nonatomic, strong) NSString *phoneNumber;
-//0:注册  1:忘记密码
-@property (nonatomic, assign) NSInteger type;
 
 @end

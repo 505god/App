@@ -24,7 +24,7 @@
 @property (nonatomic, assign) id<WQClassVCDelegate>delegate;
 
 @property (nonatomic, strong) WQClassLevelObj *selectedClassBObj;
-
+@property (nonatomic, strong) WQClassObj *selectedClassAObj;
 ///创建产品选择
 @property (nonatomic, strong) NSIndexPath *selectedIndexPath;
 
@@ -34,5 +34,5 @@
 
 @optional
 
--(void)classVC:(WQClassVC *)classVC selectedClass:(WQClassLevelObj *)levelClassObj;
+-(void)classVC:(WQClassVC *)classVC classA:(WQClassObj *)classObj classB:(WQClassLevelObj *)levelClassObj;
 @end

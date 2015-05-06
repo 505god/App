@@ -19,6 +19,7 @@
 #import "WQSizeVC.h"
 
 #import "WQCoinVC.h"
+#import "WQLocalDB.h"
 
 @interface WQMainRightVC ()<UITableViewDataSource, UITableViewDelegate,WQNavBarViewDelegate,JKImagePickerControllerDelegate,WQEditNameVCDelegate,MBProgressHUDDelegate>
 
@@ -122,10 +123,11 @@
     if (indexPath.section==0) {
         if (indexPath.row==0) {
             [cell.headerImageView setHidden:NO];
+            [cell.headerImageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,[WQDataShare sharedService].userObj.userHead]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
             cell.titleLab.text = NSLocalizedString(@"Header", @"");
         }else if (indexPath.row==1) {
             cell.titleLab.text = NSLocalizedString(@"ShopName", @"");
-            cell.detailLab.text = @"龙舞精神";
+            cell.detailLab.text = [NSString stringWithFormat:@"%@",[WQDataShare sharedService].userObj.userName];
         }
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }else if (indexPath.section==1) {
@@ -187,7 +189,20 @@
             SafeRelease(coinVC);
         }
     }else {
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         
+        [WQAPIClient logOutWithBlock:^(NSInteger status, NSError *error) {
+            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+                if (finished) {
+                    //TODO:xmpp退出
+                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+
+                    [self.appDel showRootVC];
+                }
+            }];
+        }];
     }
 }
 
@@ -202,8 +217,7 @@
     ALAssetsLibrary   *lib = [[ALAssetsLibrary alloc] init];
     [lib assetForURL:asset.assetPropertyURL resultBlock:^(ALAsset *asset) {
         if (asset) {
-            UIImage *tempImg = [UIImage imageWithCGImage:asset.thumbnail];//157x157
-            
+            UIImage *tempImg = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]];
             image = [Utility dealImageData:tempImg];//图片处理
             SafeRelease(tempImg);
         }
@@ -227,7 +241,17 @@
 #pragma mark - WQEditNameVCDelegate
 - (void)editNameVCDidChange:(WQEditNameVC *)editNameVC {
     WQMainRightCell *cell = (WQMainRightCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
-    cell.detailLab.text = @"测试测试";
+    cell.detailLab.text = editNameVC.nameTxt.text;
+    
+    [WQDataShare sharedService].userObj.userName = editNameVC.nameTxt.text;
+    
+    [editNameVC dismissViewControllerAnimated:YES completion:^{
+        [[WQLocalDB sharedWQLocalDB] saveUserDataToLocal:[WQDataShare sharedService].userObj completeBlock:^(BOOL finished) {
+            if (finished) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"editShopProperty" object:@"1"];
+            }
+        }];
+    }];
 }
 - (void)editNameVCDidCancel:(WQEditNameVC *)editNameVC {
     [editNameVC dismissViewControllerAnimated:YES completion:^{
@@ -238,10 +262,10 @@
 -(void)saveShopHeaderWithImg:(UIImage *)image {
     self.hud.mode = MBProgressHUDModeDeterminate;
     
-    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/user/uploadHeader" parameters:@{@"test":@"fuck"} constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/img/uploadHeader" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile.jpeg" mimeType:@"image/jpeg"];
     } error:nil];
-    
+    [request setValue:@"test" forHTTPHeaderField:@"registractionid"];
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     manager.securityPolicy.allowInvalidCertificates = YES;
 
@@ -261,7 +285,13 @@
                         WQMainRightCell *cell = (WQMainRightCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
                         cell.headerImageView.image = image;
                         
+                        NSDictionary *aDic = (NSDictionary *)[jsonData objectForKey:@"returnObj"];
                         
+                        [WQDataShare sharedService].userObj.userHead = [aDic objectForKey:@"img"];
+                        
+                        [[WQLocalDB sharedWQLocalDB] saveUserDataToLocal:[WQDataShare sharedService].userObj completeBlock:^(BOOL finished) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:@"editShopProperty" object:@"0"];
+                        }];
                     });
                 }else {
                     [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
@@ -283,7 +313,6 @@
         NSProgress *progress = (NSProgress *)object;
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            DLog(@"%f",progress.fractionCompleted);
             self.hud.progress = progress.fractionCompleted;
         });
         

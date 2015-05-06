@@ -20,16 +20,16 @@ typedef BOOL(^TextFieldReturnCallBack)(BlockTextPromptAlertView *);
 
 @property (nonatomic, retain) UITextField *textField;
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText;
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText block:(TextFieldReturnCallBack) block;
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText type:(NSInteger)type;
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText type:(NSInteger)type block:(TextFieldReturnCallBack) block;
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField;
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField type:(NSInteger)type;
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField block:(TextFieldReturnCallBack) block;
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message textField:(out UITextField**)textField type:(NSInteger)type block:(TextFieldReturnCallBack) block;
 
-+ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText textField:(out UITextField**)textField block:(TextFieldReturnCallBack) block;
++ (BlockTextPromptAlertView *)promptWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText textField:(out UITextField**)textField type:(NSInteger)type block:(TextFieldReturnCallBack) block;
 
-- (id)initWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText block: (TextFieldReturnCallBack) block;
+- (id)initWithTitle:(NSString *)title message:(NSString *)message defaultText:(NSString*)defaultText type:(NSInteger)type block: (TextFieldReturnCallBack) block;
 
 
 - (void)setAllowableCharacters:(NSString*)accepted;

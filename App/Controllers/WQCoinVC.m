@@ -7,15 +7,25 @@
 //
 
 #import "WQCoinVC.h"
-
+#import "BlockAlertView.h"
 #import "WQRightCell.h"
 
 @interface WQCoinVC ()<WQNavBarViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
+@property (nonatomic, assign) NSInteger selectedIndex;
+
 @end
+
+
 @implementation WQCoinVC
+
+-(void)dealloc {
+    SafeRelease(_tableView.delegate);
+    SafeRelease(_tableView.dataSource);
+    SafeRelease(_tableView);
+}
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
@@ -23,19 +33,18 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CurrencySetup", @"")];
+    
+    [self.navBarView.rightBtn setTitle:@"保存" forState:UIControlStateNormal];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
+    [self.navBarView.rightBtn setEnabled:NO];
     
     [self.tableView reloadData];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    if (self.isPresentVC) {
-        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
-    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -44,6 +53,9 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.interfaceTask cancel];
+    self.interfaceTask= nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -58,7 +70,7 @@
 #pragma mark - property
 -(UITableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-20-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height} style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height} style:UITableViewStylePlain];
         _tableView.backgroundColor = [UIColor clearColor];
         _tableView.delegate = self;
         _tableView.dataSource = self;
@@ -69,16 +81,32 @@
 }
 
 #pragma mark - 导航栏代理
-
+-(void)changeTheCoin {
+    self.interfaceTask = [WQAPIClient selectedCoinWithParameters:@{} block:^(NSInteger finished, NSError *error) {
+        [WQDataShare sharedService].userObj.moneyType = self.selectedIndex;
+        [self.navigationController popViewControllerAnimated:YES];
+    }];
+}
 //左侧边栏的代理
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
-    if (self.isPresentVC) {
-        [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.selectedIndex != [WQDataShare sharedService].userObj.moneyType) {
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"SaveEdit", @"")];
+        
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"DontSave", @"") block:^{
+            [self.navigationController popViewControllerAnimated:YES];
+        }];
+        [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [self changeTheCoin];
+        }];
+        [alert show];
     }else {
-        [self.navigationController popViewControllerAnimated:YES];
+       [self.navigationController popViewControllerAnimated:YES];
     }
 }
-
+//右侧边栏的代理
+-(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    [self changeTheCoin];
+}
 #pragma mark - tableView
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return NavgationHeight;
@@ -97,6 +125,13 @@
     //判断用户对应的货币
     cell.revealDirection = RMSwipeTableViewCellRevealDirectionNone;
     
+    if (indexPath.row == [WQDataShare sharedService].userObj.moneyType) {
+        [cell setSelectedType:2];
+        self.selectedIndex = indexPath.row;
+    }else {
+        [cell setSelectedType:0];
+    }
+    
     if (indexPath.row== 0) {
         cell.titleLab.text = NSLocalizedString(@"CNY", @"");
     }else if (indexPath.row== 1) {
@@ -111,27 +146,23 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-//    if (self.isPresentVC) {
-//        WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
-//        if (indexPath.row == self.selectedIndex) {
-//            cell.accessoryType = UITableViewCellAccessoryNone;
-//            self.selectedIndex = -1;
-//            self.selectedClassObj = nil;
-//        }else {
-//            if (self.selectedIndex>=0) {
-//                WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
-//                cellOld.accessoryType = UITableViewCellAccessoryNone;
-//                
-//                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-//                self.selectedIndex = indexPath.row;
-//                self.selectedClassObj = (WQClassObj *)self.dataArray[indexPath.row];
-//            }else {
-//                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-//                self.selectedIndex = indexPath.row;
-//                self.selectedClassObj = (WQClassObj *)self.dataArray[indexPath.row];
-//            }
-//        }
-//    }
+    if (indexPath.row == self.selectedIndex) {
+        
+    }else {
+        WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
+        [cell setSelectedType:2];
+        
+        WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
+        [cellOld setSelectedType:0];
+        
+        self.selectedIndex = indexPath.row;
+        
+        if (self.selectedIndex == [WQDataShare sharedService].userObj.moneyType) {
+            [self.navBarView.rightBtn setEnabled:NO];
+        }else {
+            [self.navBarView.rightBtn setEnabled:YES];
+        }
+    }
 }
 
 @end

@@ -54,6 +54,8 @@
     
     //hotSaleVC通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showNewProductVC:) name:@"HotSaleVCShowNewProductVC" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(editShopProperty:) name:@"editShopProperty" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -64,6 +66,7 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HotSaleVCShowNewProductVC" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"editShopProperty" object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -88,7 +91,7 @@
     self.shopLogoImage = [[UIImageView alloc]initWithFrame:(CGRect){(self.view.width-60)/2,NavgationHeight,60,60}];
     self.shopLogoImage.contentMode = UIViewContentModeScaleAspectFill;
     self.shopLogoImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin;
-    self.shopLogoImage.image = [UIImage imageNamed:@"assets_placeholder_picture"];
+    [self.shopLogoImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,[WQDataShare sharedService].userObj.userHead]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     [Utility roundView:self.shopLogoImage];
     [self.shopView addSubview:self.shopLogoImage];
     
@@ -96,7 +99,7 @@
     self.shopNameLab = [[UILabel alloc]initWithFrame:(CGRect){0,self.shopLogoImage.bottom+2,self.view.width,20}];
     self.shopNameLab.backgroundColor = [UIColor clearColor];
     self.shopNameLab.font = [UIFont systemFontOfSize:17];
-    self.shopNameLab.text = @"龙舞精神";
+    self.shopNameLab.text = [NSString stringWithFormat:@"%@",[WQDataShare sharedService].userObj.userName];
     [self.shopNameLab sizeToFit];
     self.shopNameLab.frame = (CGRect){(self.view.width-self.shopNameLab.width)/2,self.shopLogoImage.bottom+2,self.shopNameLab.width,self.shopNameLab.height};
     self.shopNameLab.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin;
@@ -114,10 +117,12 @@
     
     //热卖
     WQHotSaleVC *hotVC = [[WQHotSaleVC alloc]init];
+    hotVC.navControl = self.navigationController;
     hotVC.title = NSLocalizedString(@"HotSaleVC", @"");
     
     //分类
     WQClassifyVC *classifyVC = [[WQClassifyVC alloc]init];
+    classifyVC.navControl = self.navigationController;
     classifyVC.title = NSLocalizedString(@"ProductClassifyVC", @"");
     
     //创建
@@ -132,5 +137,17 @@
 //热卖商品页面跳转创建商品页面
 -(void)showNewProductVC:(NSNotification *)notification {
     [self.pagesContainer setSelectedIndex:2 animated:YES];
+}
+
+-(void)editShopProperty:(NSNotification *)notification {
+    NSInteger number = [notification.object integerValue];
+    if (number==0) {
+        [self.shopLogoImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,[WQDataShare sharedService].userObj.userHead]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    }else if (number==1) {
+        self.shopNameLab.text = [NSString stringWithFormat:@"%@",[WQDataShare sharedService].userObj.userName];
+        [self.shopNameLab sizeToFit];
+        self.shopNameLab.frame = (CGRect){(self.view.width-self.shopNameLab.width)/2,self.shopLogoImage.bottom+2,self.shopNameLab.width,self.shopNameLab.height};
+        self.shopNameLab.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin;
+    }
 }
 @end

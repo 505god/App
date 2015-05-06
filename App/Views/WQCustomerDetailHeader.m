@@ -39,7 +39,7 @@
         
         self.starView = [[WQStarView alloc]initWithFrame:(CGRect){0,0,140,30}];
         self.starView.enable = NO;
-        self.starView.showNormal = NO;
+        self.starView.showNormal = YES;
         [self addSubview:self.starView];
         
         self.contentView.backgroundColor = COLOR(235, 235, 241, 1);
@@ -61,7 +61,7 @@
 -(void)setCustomerObj:(WQCustomerObj *)customerObj {
     _customerObj = customerObj;
     
-    [self.headerImage setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.headerImage sd_setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     self.nameLab.text = customerObj.customerName;
     

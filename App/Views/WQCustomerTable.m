@@ -96,11 +96,17 @@
     self.tableView.dataSource = delegate;
     self.searchBar.delegate = delegate;
     self.tableViewIndex.indexes = [self.delegate sectionIndexTitlesForWQCustomerTable:self];
-    self.tableViewIndex.frame = (CGRect){self.width-20,(self.height-NavgationHeight-self.tableViewIndex.indexes.count * 16)/2,20,self.tableViewIndex.indexes.count * 16};
-    self.tableViewIndex.autoresizingMask = UIViewAutoresizingNone;
-    self.tableViewIndex.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
-
-    self.tableViewIndex.tableViewIndexDelegate = self;
+    if (self.tableViewIndex.indexes.count>0) {
+        [self.tableViewIndex setHeight:YES];
+    }else {
+        [self.tableViewIndex setHeight:NO];
+        self.tableViewIndex.frame = (CGRect){self.width-20,(self.height-NavgationHeight-self.tableViewIndex.indexes.count * 16)/2,20,self.tableViewIndex.indexes.count * 16};
+        self.tableViewIndex.autoresizingMask = UIViewAutoresizingNone;
+        self.tableViewIndex.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
+        
+        self.tableViewIndex.tableViewIndexDelegate = self;
+    }
+    
 }
 
 - (void)reloadData

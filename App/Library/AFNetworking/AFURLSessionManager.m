@@ -470,8 +470,7 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 
 - (void)addDelegateForUploadTask:(NSURLSessionUploadTask *)uploadTask
                         progress:(NSProgress * __autoreleasing *)progress
-               completionHandler:(void (^)(NSURLResponse *response, id responseObject, NSError *error))completionHandler
-{
+               completionHandler:(void (^)(NSURLResponse *response, id responseObject, NSError *error))completionHandler {
     AFURLSessionManagerTaskDelegate *delegate = [[AFURLSessionManagerTaskDelegate alloc] init];
     delegate.manager = self;
     delegate.completionHandler = completionHandler;
@@ -659,9 +658,19 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 
 - (NSURLSessionUploadTask *)uploadTaskWithStreamedRequest:(NSURLRequest *)request
                                                  progress:(NSProgress * __autoreleasing *)progress
-                                        completionHandler:(void (^)(NSURLResponse *response, id responseObject, NSError *error))completionHandler
-{
+                                        completionHandler:(void (^)(NSURLResponse *response, id responseObject, NSError *error))completionHandler {
+    
+    //设置cookies
+    NSData *cookiesdata = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionCookies"];
+    if([cookiesdata length]) {
+        NSArray *cookies = [NSKeyedUnarchiver unarchiveObjectWithData:cookiesdata];
+        for (NSHTTPCookie *cookie in cookies) {
+            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+        }
+    }
+    
     __block NSURLSessionUploadTask *uploadTask = nil;
+    
     dispatch_sync(url_session_manager_creation_queue(), ^{
         uploadTask = [self.session uploadTaskWithStreamedRequest:request];
     });

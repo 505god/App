@@ -82,6 +82,12 @@
 #pragma clang diagnostic pop
 }
 
++ (void)clearCache {
+    AFImageCache *cache = (AFImageCache *)[UIImageView sharedImageCache];
+    [cache removeAllObjects];
+    return;
+}
+
 + (void)setSharedImageCache:(id <AFImageCache>)imageCache {
     objc_setAssociatedObject(self, @selector(sharedImageCache), imageCache, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }

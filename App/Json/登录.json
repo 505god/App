@@ -1,0 +1,11 @@
+{
+  "status": "1",
+  "msg": "sss",
+  "returnObj": {
+    "userId": 0,
+    "userName": "userId",
+    "userHead": "",
+    "userPhone": "",
+    "storeId": 0
+  }
+}

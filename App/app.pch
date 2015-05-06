@@ -22,7 +22,7 @@
 
 #import "UIView+LayerEffects.h"
 #import "UIView+Common.h"
-#import "UIImageView+AFNetworking.h"
+#import "UIImageView+WebCache.h"
 #import "Utility.h"
 #import "NSObject+Motis.h"
 #import "MBProgressHUD.h"
@@ -74,3 +74,5 @@
 #define Platform [[[UIDevice currentDevice] systemVersion] floatValue]
 
 #define NavgationHeight 44
+
+#define Host @"https://barryhippo.xicp.net:8443"

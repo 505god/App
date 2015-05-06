@@ -8,12 +8,7 @@
 
 #import "WQInitVC.h"
 #import "WQInitView.h"
-#import "WQLogVC.h"
-#import "WQMainVC.h"
-
-
-
-
+#import "WQLocalDB.h"
 @interface WQInitVC ()<WQInitViewDelegate>
 
 @end
@@ -34,10 +29,28 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    WQInitView *initView = [[WQInitView alloc]initWithBackgroundImage:nil];
+    __block WQInitView *initView = [[WQInitView alloc]initWithBackgroundImage:nil];
     initView.delegate = self;
     [self.view addSubview:initView];
-    [initView startAnimation];
+    
+    [WQAPIClient checkLogInWithBlock:^(NSInteger status, NSError *error) {
+        if (!error) {
+            if (status==0) {
+                [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                    [initView startAnimation];
+                    SafeRelease(initView);
+                }];
+            }else {
+                [initView startAnimation];
+                SafeRelease(initView);
+            }
+        }else {
+            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                [initView startAnimation];
+                SafeRelease(initView);
+            }];
+        }
+    }];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -74,14 +87,5 @@
     
     [appDel showRootVC];
 }
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

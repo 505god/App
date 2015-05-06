@@ -361,17 +361,15 @@ forHTTPHeaderField:(NSString *)field
     NSMutableURLRequest *mutableRequest = [[NSMutableURLRequest alloc] initWithURL:url];
     mutableRequest.HTTPMethod = method;
 
-#warning 设置cookies
     //设置cookies
-    NSArray *arcCookies = [NSKeyedUnarchiver unarchiveObjectWithData: [[NSUserDefaults standardUserDefaults] objectForKey: @"sessionCookies"]];
-    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *cookie in arcCookies){
-        [cookieStorage setCookie: cookie];
+    NSData *cookiesdata = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionCookies"];
+    if([cookiesdata length]) {
+        NSArray *cookies = [NSKeyedUnarchiver unarchiveObjectWithData:cookiesdata];
+        for (NSHTTPCookie *cookie in cookies) {
+            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+        }
     }
-    
-    NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:url];//id: NSHTTPCookie
-    NSDictionary *sheaders = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
-    [mutableRequest setAllHTTPHeaderFields:sheaders];
+    [mutableRequest setValue:@"test" forHTTPHeaderField:@"registractionid"];
     
     for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
         if ([self.mutableObservedChangedKeyPaths containsObject:keyPath]) {
@@ -528,6 +526,7 @@ forHTTPHeaderField:(NSString *)field
             }
             [mutableRequest setHTTPBody:[query dataUsingEncoding:self.stringEncoding]];
         }
+        [mutableRequest setTimeoutInterval:60];
     }
 
     return mutableRequest;

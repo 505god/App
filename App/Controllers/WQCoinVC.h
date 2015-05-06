@@ -11,19 +11,7 @@
 ///货币设置
 ///跟用户绑定
 
-@protocol WQCoinVCDelegate;
-
 @interface WQCoinVC : BaseViewController
 
-@property (nonatomic, assign) BOOL isPresentVC;
 
-@property (nonatomic, assign) id<WQCoinVCDelegate>delegate;
-
-@end
-
-@protocol WQCoinVCDelegate <NSObject>
-
-@optional
-
--(void)selectedCoin:(NSInteger)coinType;
 @end

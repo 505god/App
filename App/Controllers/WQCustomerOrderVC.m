@@ -11,9 +11,9 @@
 #import "MJRefresh.h"
 #import "WQCustomerOrderObj.h"
 #import "WQCustomerOrderProObj.h"
-
-#import "WQCustomerOrderCell.h"
 #import "WQOrderHeader.h"
+#import "WQCustomerOrderCell.h"
+
 
 @interface WQCustomerOrderVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource,WQSwipTableHeaderDelegate>
 
@@ -23,14 +23,11 @@
 
 @property (nonatomic, strong) NSMutableArray *arrSelSection;
 
-///刷新
-@property (nonatomic, assign) BOOL isRefreshing;
-///加载
-@property (nonatomic, assign) BOOL isLoadingMore;
+///当前页开始索引
+@property (nonatomic, assign) NSInteger start;
 ///分页基数---默认10
 @property (nonatomic, assign) NSInteger limit;
-///当前页开始索引
-@property (nonatomic, assign) NSInteger pageIndex;
+@property (nonatomic, assign) NSInteger lastOrderId;
 ///总页数
 @property (nonatomic, assign) NSInteger pageCount;
 ///成交额
@@ -39,29 +36,38 @@
 
 @implementation WQCustomerOrderVC
 
--(void)testData {
-    NSDictionary *aDic = [Utility returnDicByPath:@"CustomerOrderList"];
-    NSArray *array = [aDic objectForKey:@"orderList"];
-    
+#pragma mark - 获取订单列表
+
+-(void)getOrderList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *aDic = (NSDictionary *)obj;
-        WQCustomerOrderObj *product = [[WQCustomerOrderObj alloc]init];
-        [product mts_setValuesForKeysWithDictionary:aDic];
-        [weakSelf.dataArray addObject:product];
-        SafeRelease(product);
-        SafeRelease(aDic);
-    }];
     
-    //判断数据源
-    if (self.dataArray.count>0) {
-        [self.tableView reloadData];
-        [self setNoneText:nil animated:NO];
-        [self setToolImage:nil text:nil animated:NO];
-    }else {
-        [self setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
-        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"NewProductVC", @"") animated:YES];
-    }
+    self.interfaceTask = [WQAPIClient getCustomerOrderListWithParameters:@{@"count":[NSNumber numberWithInteger:self.limit],@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"userId":[NSNumber numberWithInteger:self.customerObj.customerId]} block:^(NSArray *array, NSInteger pageCount, CGFloat totalPrice, NSError *error) {
+        if (!error) {
+            if (weakSelf.pageCount<0) {
+                weakSelf.pageCount = pageCount;
+                weakSelf.orderPrice = totalPrice;
+            }
+            
+            [weakSelf.dataArray addObjectsFromArray:array];
+            if (weakSelf.dataArray.count>0) {
+                [weakSelf.tableView reloadData];
+                [weakSelf setNoneText:nil animated:NO];
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+            }
+            
+            if ((weakSelf.start/10+1)<self.pageCount) {
+                [weakSelf.tableView removeFooter];
+                [weakSelf addFooter];
+            }else {
+                [weakSelf.tableView removeFooter];
+            }
+        }else {
+            [weakSelf.tableView removeFooter];
+        }
+        [weakSelf.tableView headerEndRefreshing];
+        [weakSelf.tableView footerEndRefreshing];
+    }];
 }
 
 #pragma mark - lifestyle
@@ -75,9 +81,11 @@
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
     
+    
+    self.limit = 10;
+
     //集成刷新控件
     [self addHeader];
-    [self addFooter];
     
     [self initHeaderView];
 }
@@ -92,6 +100,9 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -133,14 +144,19 @@
     UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.tableView.width, 40)];
     customView.backgroundColor = COLOR(235, 235, 241, 1);
     
+    UIImageView *imageView = [[UIImageView alloc]initWithFrame:(CGRect){10,10,20,20}];
+    imageView.image = [UIImage imageNamed:@"customer"];
+    [customView addSubview:imageView];
+    
     UILabel *nameLab = [[UILabel alloc]initWithFrame:CGRectZero];
     nameLab.backgroundColor = [UIColor clearColor];
     nameLab.font = [UIFont systemFontOfSize:16];
     nameLab.text = [NSString stringWithFormat:@"%@",self.customerObj.customerName];
     [nameLab sizeToFit];
-    nameLab.frame = (CGRect){10,(40-nameLab.height)/2,nameLab.width,nameLab.height};
+    nameLab.frame = (CGRect){imageView.right+5,(40-nameLab.height)/2,nameLab.width,nameLab.height};
     [customView addSubview:nameLab];
     SafeRelease(nameLab);
+    SafeRelease(imageView);
     
     UILabel * headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     headerLabel.backgroundColor = [UIColor clearColor];
@@ -165,42 +181,34 @@
     customView=nil;
 }
 #pragma mark - private
-
+// 添加下拉刷新头部控件
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加下拉刷新头部控件
-    [self.tableView addHeaderWithCallback:^{
-        // 进入刷新状态就会回调这个Block
-        
-        [weakSelf testData];
-        
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
-            // 结束刷新
-            [weakSelf.tableView headerEndRefreshing];
-        });
-    } dateKey:@"WQCustomerOrderVC"];
-    // dateKey用于存储刷新时间，也可以不传值，可以保证不同界面拥有不同的刷新时间
     
+    [self.tableView addHeaderWithCallback:^{
+        weakSelf.dataArray = nil;
+        weakSelf.start = 0;
+        weakSelf.lastOrderId = 0;
+        weakSelf.pageCount = -1;
+        weakSelf.orderPrice = -1;
+        [weakSelf getOrderList];
+    } dateKey:@"WQCustomerOrderVC"];
     //自动刷新(一进入程序就下拉刷新)
     [self.tableView headerBeginRefreshing];
 }
-
+// 添加上拉刷新尾部控件
 - (void)addFooter {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加上拉刷新尾部控件
+    
     [self.tableView addFooterWithCallback:^{
-        // 进入刷新状态就会回调这个Block
         
-        [weakSelf testData];
+        weakSelf.start += weakSelf.limit;
+        if (weakSelf.dataArray.count>0) {
+            WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)[weakSelf.dataArray lastObject];
+            weakSelf.lastOrderId = orderObj.orderId;
+        }
         
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
-            //结束刷新
-            [weakSelf.tableView footerEndRefreshing];
-        });
+        [weakSelf getOrderList];
     }];
 }
 
@@ -230,7 +238,7 @@
     header.delegate = self;
     header.aSection = section;
     header.type=0;
-//    header.revealDirection = WQSwipTableHeaderRevealDirectionNone;
+    header.revealDirection = WQSwipTableHeaderRevealDirectionNone;
     BOOL isSelSection = NO;
     for (int i = 0; i < self.arrSelSection.count; i++) {
         if (section == [self.arrSelSection[i] integerValue]) {

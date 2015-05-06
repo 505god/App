@@ -11,7 +11,7 @@
 @interface WQEditNameVC ()<WQNavBarViewDelegate,UITextFieldDelegate>
 
 @property (nonatomic, strong) UIView *whiteView;
-@property (nonatomic, strong) UITextField *nameTxt;
+
 @end
 
 @implementation WQEditNameVC
@@ -37,11 +37,22 @@
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
     
-    [self.view addSubview:self.whiteView];
+    
+    self.nameTxt = [[UITextField alloc]initWithFrame:(CGRect){10,7,self.whiteView.width-20,30}];
+    self.nameTxt.delegate = self;
+    self.nameTxt.borderStyle = UITextBorderStyleNone;
+    self.nameTxt.returnKeyType = UIReturnKeyDone;
+    self.nameTxt.backgroundColor = [UIColor whiteColor];
+    [self.nameTxt setClearButtonMode:UITextFieldViewModeWhileEditing];
+    self.nameTxt.placeholder = NSLocalizedString(@"ShopNameLimit", @"");
+    self.nameTxt.text = [WQDataShare sharedService].userObj.userName;
+    [self.whiteView addSubview:self.nameTxt];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
     
     [self.nameTxt becomeFirstResponder];
     
@@ -50,10 +61,15 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
+    
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
 }
@@ -69,9 +85,7 @@
 
 //比较名称是否改变
 -(BOOL)validateChangeName {
-    BOOL res = NO;
-    
-    return res;
+    return ![self.nameTxt.text isEqualToString:[WQDataShare sharedService].userObj.userName];
 }
 
 #pragma mark - property
@@ -79,15 +93,7 @@
     if (!_whiteView) {
         _whiteView = [[UIView alloc]initWithFrame:(CGRect){0,self.navBarView.bottom+10,self.view.width,NavgationHeight}];
         _whiteView.backgroundColor = [UIColor whiteColor];
-        
-        _nameTxt = [[UITextField alloc]initWithFrame:(CGRect){10,7,_whiteView.width-20,30}];
-        _nameTxt.delegate = self;
-        _nameTxt.borderStyle = UITextBorderStyleNone;
-        _nameTxt.returnKeyType = UIReturnKeyDone;
-        _nameTxt.clearsOnBeginEditing = YES;
-        _nameTxt.backgroundColor = [UIColor whiteColor];
-        _nameTxt.placeholder = NSLocalizedString(@"ShopNameLimit", @"");
-        [_whiteView addSubview:_nameTxt];
+        [self.view addSubview:_whiteView];
     }
     return _whiteView;
 }
@@ -101,9 +107,12 @@
 }
 //右侧边栏的代理
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(editNameVCDidChange:)]) {
-        [self.delegate editNameVCDidChange:self];
-    }
+    
+    self.interfaceTask = [WQAPIClient editShopNameWithParameters:@{@"storeName":self.nameTxt.text} block:^(NSInteger finished, NSError *error) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(editNameVCDidChange:)]) {
+            [self.delegate editNameVCDidChange:self];
+        }
+    }];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -119,9 +128,8 @@
     NSInteger kMaxLength = 10;
     
     NSString *toBeString = text.text;
-#warning check
+
     NSString *lang = text.textInputMode.primaryLanguage;
-//    NSString *lang = [[UITextInputMode currentInputMode] primaryLanguage];
     if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
         UITextRange *selectedRange = [text markedTextRange];
         UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];

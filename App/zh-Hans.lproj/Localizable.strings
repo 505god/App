@@ -16,9 +16,11 @@
 
 "NewProductVC" = "创建商品";
 "ProductHotSale" = "店长推荐";
+"ProductOnSale" = "上架";
 "AddMarque" = "添加商品型号";
 "AddProperty" = "添加更多商品规格";
-
+"ProductDetails" = "商品详情";
+"ProductSaleType" = "优惠方式";
 "ProductPrice" = "价格:";
 "ProductStock" = "库存:";
 "ProductSize" = "尺码:";
@@ -46,6 +48,7 @@
 "customerPhoneCall" = "确定拨打客户电话?";
 "CustomerLevel" = "评级";
 "CustomerShield" = "屏蔽";
+"CustomerNew" = "邀请新的客户";
 
 "NameError" = "请输入商品描述";
 "PriceError" = "请输入商品价格";
@@ -102,6 +105,8 @@
 "DontSave" = "不保存";
 "DeleteCustomer" = "删除客户";
 
+"remindAlert" = "已提醒客户";
+
 "ClassDelete" = "该分类下包含子分类不能被删除";
 "ClassBDelete" = "该分类下包含商品不能被删除";
 "AddMoreLevelClass" = "添加更多子分类";
@@ -125,7 +130,7 @@
 "EUR" = "欧元";
 
 
-"InterfaceError" = "连接失败";
+"InterfaceError" = "未能连接到服务器";
 
 //订单
 "orderCode" = "订单号:%@";
@@ -133,7 +138,83 @@
 "orderSale" = "价格优惠:%.2f";
 "proDiscount" = "折优惠";
 
+"NoneOrder" = "暂无订单";
 
+"orderSearch" = "订单检索";
 "orderDeal" = "待处理";
 "orderPay" = "待付款";
 "orderFinish" = "已完成";
+
+"orderChangePrice" = "修改订单价格";
+"orderRemind" = "提醒客户付款";
+"orderSearchPlace" = "输入订单号或日期:2015.4.15";
+"orderSearchError" = "请输入正确的日期";
+"saleNone" = "没有优惠";
+"salePrice" = "价格优惠";
+"saleDisCount" = "折扣优惠";
+
+"salePriceName" = "填写优惠的价格";
+"saleDisCountName" = "填写优惠的折扣";
+"saleStartTime" = "起始时间";
+"saleEndTime" = "结束时间";
+"productLimit" = "产品数量限制";
+
+"salePriceLine" = "价格轴";
+
+"logInCode" = "右边图片的内容";
+"logInName" = "帐号";
+"logInNameError" = "请输入帐号";
+"logInPassword" = "密码";
+"logInPasswordError" = "请输入密码";
+"confirmPassword" = "确认密码";
+"confirmPasswordError" = "两次密码不一致";
+
+"shopSelected" = "选择店铺";
+"forgetPwd" = "忘记密码?";
+"findPwd" = "找回密码";
+"logIn" = "登录";
+"resign" = "注册";
+
+"labelnotice"="请确认你的国家或地区并输入手机号";
+"telfield"="请填写手机号码";
+"nextbtn"="下一步";
+"countrylable"="国家和地区";
+"countrychoose"="选择国家或地区";
+
+"notice"="提示";
+"errorphonenumber"="手机号码非法，请重新填写";
+"sure"="好";
+
+"willsendthecodeto"="我们将发送验证码短信到这个号码";
+"surephonenumber"="确认手机号码";
+"cancel"="取消";
+
+"codesenderrormsg"="验证码发送失败 请稍后重试";
+"codesenderrtitle"="发送失败";
+
+"maxcodemsg"="请求验证码超上限 请稍后重试";
+"maxcode"="超过上限";
+
+"codetoooftenmsg"="客户端请求发送短信验证过于频繁";
+
+"verifycode"="请输入验证码";
+"verifylabel"="我们已发送验证码到这个号码";
+"timelabel"="接受短信大约需要60秒";
+"repeatsms"="收不到短信验证码？";
+"submit"="提交";
+"sendingin"="正在发送中...";
+"timelablemsg"="接收验证码中...";
+"second"="秒";
+
+"verifycoderightmsg"="验证码正确";
+"verifycoderighttitle"="验证成功";
+"verifycodeerrormsg"="验证码无效 请重新获取验证码";
+"verifycodeerrortitle"="验证失败";
+
+"cannotgetsmsmsg"="我们将重新发送验证码短信到这个号码";
+
+"codedelaymsg"="验证码短信可能略有延迟,确定返回并重新开始";
+"wait"="等待";
+
+"verifycodeformaterror"="验证码格式错误,请重新填写";
+"doesnotsupportarea"="暂时不支持该地区";

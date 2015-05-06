@@ -42,33 +42,29 @@
     SafeRelease(_dataArray);
     SafeRelease(_delegate);
     SafeRelease(_selectedClassBObj);
+    SafeRelease(_selectedClassAObj);
     SafeRelease(_arrSelSection);
     SafeRelease(_selectedIdx);
 }
 
--(void)testData {
-    NSDictionary *aDic = [Utility returnDicByPath:@"ClassList"];
-    NSArray *array = [aDic objectForKey:@"classList"];
-    
-    __unsafe_unretained typeof(self) weakSelf = self;
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *aDic = (NSDictionary *)obj;
-        WQClassObj *class = [[WQClassObj alloc]init];
-        [class mts_setValuesForKeysWithDictionary:aDic];
-        [weakSelf.dataArray addObject:class];
-        SafeRelease(class);
-        SafeRelease(aDic);
-    }];
-    
-    //判断数据源
-    if (self.dataArray.count>0) {
-        [self.tableView reloadData];
-        [self setNoneText:nil animated:NO];
-    }else {
-        [self setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
-    }
-}
+#pragma mark - 获取分类列表
 
+-(void)getClassList {
+    __unsafe_unretained typeof(self) weakSelf = self;
+    self.interfaceTask = [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
+        [weakSelf.dataArray addObjectsFromArray:array];
+        
+        [WQDataShare sharedService].classArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
+        
+        if (weakSelf.dataArray.count>0) {
+            [weakSelf.tableView reloadData];
+            [weakSelf setNoneText:nil animated:NO];
+        }else {
+            [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        }
+        [weakSelf.tableView headerEndRefreshing];
+    }];
+}
 
 #pragma mark - lifestyle
 
@@ -77,7 +73,8 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"ClassifySetup", @"")];
-    [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Add", @"") forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addPropertyNormal"] forState:UIControlStateHighlighted];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
@@ -93,6 +90,14 @@
     if (self.isPresentVC) {
         [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
     }
+    
+    if ([WQDataShare sharedService].classArray.count>0) {
+        self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].classArray];
+        [self.tableView reloadData];
+    }else {
+        //自动刷新(一进入程序就下拉刷新)
+        [self.tableView headerBeginRefreshing];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -101,6 +106,8 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -121,7 +128,7 @@
 
 -(UITableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-20-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height} style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height} style:UITableViewStylePlain];
         _tableView.backgroundColor = [UIColor clearColor];
         _tableView.delegate = self;
         _tableView.dataSource = self;
@@ -138,26 +145,13 @@
     return _arrSelSection;
 }
 #pragma mark - private
-
+// 添加下拉刷新头部控件
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加下拉刷新头部控件
     [self.tableView addHeaderWithCallback:^{
-        // 进入刷新状态就会回调这个Block
-        
-        [weakSelf testData];
-        
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
-            // 结束刷新
-            [weakSelf.tableView headerEndRefreshing];
-        });
+        weakSelf.dataArray = nil;
+        [weakSelf getClassList];
     } dateKey:@"WQClassVC"];
-    // dateKey用于存储刷新时间，也可以不传值，可以保证不同界面拥有不同的刷新时间
-    
-    //自动刷新(一进入程序就下拉刷新)
-    [self.tableView headerBeginRefreshing];
 }
 
 -(void)setIsSelected:(BOOL)isSelected {
@@ -191,25 +185,27 @@
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
-//右侧边栏的代理
--(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {//添加一级分类
+//右侧边栏的代理 ---------//添加一级分类
+-(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    __unsafe_unretained typeof(self) weakSelf = self;
+    
     UITextField *textField;
-    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField block:^(BlockTextPromptAlertView *alert){
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        DLog(@"Text: %@", textField.text);
-        
-        WQClassObj *classObj = [[WQClassObj alloc]init];
-        classObj.className = textField.text;
-        [self.dataArray addObject:classObj];
-        
-        [self.tableView beginUpdates];
-        [self.tableView insertSections:[NSIndexSet indexSetWithIndex:self.dataArray.count-1] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
+        weakSelf.interfaceTask = [WQAPIClient addClassAWithParameters:@{@"classAName":textField.text} block:^(WQClassObj *classObject, NSError *error) {
+            [weakSelf.dataArray addObject:classObject];
+            
+            [[WQDataShare sharedService].classArray addObject:classObject];
+            [self setNoneText:nil animated:NO];
+            [weakSelf.tableView beginUpdates];
+            [weakSelf.tableView insertSections:[NSIndexSet indexSetWithIndex:self.dataArray.count-1] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.tableView endUpdates];
+        }];
     }];
     [alert show];
 }
@@ -264,6 +260,7 @@
     
     if (indexPath.row==classObj.levelClassList.count) {
         cell.revealDirection = RMSwipeTableViewCellRevealDirectionNone;
+        cell.imageView.image = [UIImage imageNamed:@"addProImg"];
         cell.textLabel.text = NSLocalizedString(@"AddMoreLevelClass", @"");
     }else {
         WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
@@ -273,8 +270,8 @@
         
         
         if (self.isPresentVC) {//弹出选择分类
-            if (self.selectedClassBObj) {
-                if (levelClassObj.levelClassId==self.selectedClassBObj.levelClassId) {
+            if (self.selectedClassBObj && self.selectedClassAObj) {
+                if (levelClassObj.levelClassId==self.selectedClassBObj.levelClassId && self.selectedClassAObj.classId==classObj.classId) {
                     [cell setSelectedType:2];
                     self.selectedIdx = indexPath;
                 }else {
@@ -290,7 +287,7 @@
     
     return cell;
 }
-
+//增加二级分类
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
@@ -299,30 +296,25 @@
     if (self.isPresentVC) {
         if (indexPath.row==classObj.levelClassList.count) {//添加更多子分类
             UITextField *textField;
-            BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField block:^(BlockTextPromptAlertView *alert){
+            BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
                 [alert.textField resignFirstResponder];
                 return YES;
             }];
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-                DLog(@"Text: %@", textField.text);
-                
-                WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
-                
-                WQClassLevelObj *levelClassObj = [[WQClassLevelObj alloc]init];
-                levelClassObj.levelClassName = textField.text;
-                
-                if (classObj.levelClassList) {
-                }else {
-                    classObj.levelClassList = [[NSMutableArray alloc]init];
-                }
-                [classObj.levelClassList addObject:levelClassObj];
-                classObj.levelClassCount ++;
-                
-                [self.tableView beginUpdates];
-                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self.tableView endUpdates];
+                [WQAPIClient addClassBWithParameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} block:^(WQClassLevelObj *classObject, NSError *error) {
+                    if (classObj.levelClassList) {
+                    }else {
+                        classObj.levelClassList = [[NSMutableArray alloc]init];
+                    }
+                    [classObj.levelClassList addObject:classObject];
+                    classObj.levelClassCount ++;
+                    [self.tableView beginUpdates];
+                    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.tableView endUpdates];
+                    
+                }];
             }];
             [alert show];
         }else {
@@ -332,8 +324,8 @@
 
                 self.selectedIdx = indexPath;
                 self.isSelected = YES;
-                WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
                 self.selectedClassBObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
+                self.selectedClassAObj = classObj;
             }else {
                 if (indexPath.row==self.selectedIdx.row && indexPath.section==self.selectedIdx.section) {
                     [cell setSelectedType:1];
@@ -341,6 +333,7 @@
                     self.selectedIdx = nil;
                     self.selectedClassBObj = nil;
                     self.isSelected = NO;
+                    self.selectedClassAObj = nil;
                 }else {
                     if (self.selectedIdx.section>=0 && self.selectedIdx.row>=0) {
                         WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIdx.row inSection:self.selectedIdx.section]];
@@ -350,17 +343,16 @@
 
                         self.selectedIdx = indexPath;
                         
-                        WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
                         self.selectedClassBObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
+                        self.selectedClassAObj = classObj;
                     }
                 }
             }
         }
     }else {
-        WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
         if (indexPath.row == classObj.levelClassList.count) {//添加更多子分类
             UITextField *textField;
-            BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField block:^(BlockTextPromptAlertView *alert){
+            BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
                 [alert.textField resignFirstResponder];
                 return YES;
             }];
@@ -369,27 +361,25 @@
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
                 DLog(@"Text: %@", textField.text);
                 
-                WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
-                
-                WQClassLevelObj *levelClassObj = [[WQClassLevelObj alloc]init];
-                levelClassObj.levelClassName = textField.text;
-                
-                if (classObj.levelClassList) {
-                }else {
-                    classObj.levelClassList = [[NSMutableArray alloc]init];
-                }
-                [classObj.levelClassList addObject:levelClassObj];
-                classObj.levelClassCount ++;
-                
-                [self.tableView beginUpdates];
-                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self.tableView endUpdates];
+                [WQAPIClient addClassBWithParameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} block:^(WQClassLevelObj *classObject, NSError *error) {
+                    if (classObj.levelClassList) {
+                    }else {
+                        classObj.levelClassList = [[NSMutableArray alloc]init];
+                    }
+                    [classObj.levelClassList addObject:classObject];
+                    classObj.levelClassCount ++;
+                    
+                    [self.tableView beginUpdates];
+                    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.tableView endUpdates];
+                    
+                }];
             }];
             [alert show];
         }
     }
 }
-
+//删除二级分类
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     if (point.x < 0 && (0-point.x) >= swipeTableViewCell.contentView.height) {
         
@@ -399,6 +389,7 @@
         if (levelClassObj.productCount>0) {
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassBDelete", @"")];
         }else {
+            swipeTableViewCell.shouldAnimateCellReset = YES;
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
@@ -411,13 +402,14 @@
                                      swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
                                  }
                                  completion:^(BOOL finished) {
-                                     [classObj.levelClassList removeObjectAtIndex:indexPath.row];
-                                     classObj.levelClassCount --;
-                                     [swipeTableViewCell setHidden:YES];
                                      
-                                     [self.tableView beginUpdates];
-                                     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-                                     [self.tableView endUpdates];
+                                     [WQAPIClient deleteClassBWithParameters:@{@"classBId":[NSNumber numberWithInteger:levelClassObj.levelClassId]} block:^(NSInteger finished, NSError *error) {
+                                         [classObj.levelClassList removeObjectAtIndex:indexPath.row];
+                                         classObj.levelClassCount --;
+                                         [swipeTableViewCell setHidden:YES];
+                                         
+                                         [self.tableView reloadData];
+                                     }];
                                  }
                  ];
             }];
@@ -425,16 +417,19 @@
         }
     }
 }
+
+//删除一级分类
 -(void)swipeTableViewHeaderWillResetState:(WQSwipTableHeader*)swipeTableViewHeader fromPoint:(CGPoint)point animation:(WQSwipTableHeaderAnimationType)animation velocity:(CGPoint)velocity {
     if (point.x < 0 && (0-point.x) >= swipeTableViewHeader.height) {
         
         WQClassHeader *header = (WQClassHeader *)swipeTableViewHeader;
-        DLog(@"section = %d",header.aSection);
+
         WQClassObj *classObj = (WQClassObj *)self.dataArray[header.aSection];
         
         if (classObj.levelClassList.count>0) {
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassDelete", @"")];
         }else {
+            header.shouldAnimateCellReset = YES;
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
@@ -446,26 +441,30 @@
                                  animations:^{
                                      header.frame = CGRectOffset(header.bounds, header.frame.size.width, 0);
                                  }completion:^(BOOL finished) {
-                                     [self.dataArray removeObjectAtIndex:header.aSection];
-                                     
-                                     if ([self.arrSelSection containsObject:[NSString stringWithFormat:@"%d",header.aSection]]) {
-                                         [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
-                                     }
-                                     
-                                     [header setHidden:YES];
-                                     
-                                     [self.tableView beginUpdates];
-                                     [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-                                     [self.tableView endUpdates];
+                                     [WQAPIClient deleteClassAWithParameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId]} block:^(NSInteger finished, NSError *error) {
+                                         [self.dataArray removeObjectAtIndex:header.aSection];
+                                         
+                                         if (self.dataArray.count==0) {
+                                             [self setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                                         }
+                                         
+                                         [[WQDataShare sharedService].classArray removeObjectAtIndex:header.aSection];
+                                         
+                                         if ([self.arrSelSection containsObject:[NSString stringWithFormat:@"%d",header.aSection]]) {
+                                             [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
+                                         }
+                                         [self.tableView reloadData];
+                                     }];
                                  }];
             }];
             [alert show];
         }
     }
 }
+//修改二级分类
 -(void)editDidLongPressedOption:(RMSwipeTableViewCell *)cell {//修改子分类
     UITextField *textField;
-    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditClass", @"") message:nil defaultText:[(WQRightCell *)cell levelClassObj].levelClassName textField:&textField block:^(BlockTextPromptAlertView *alert){
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditClass", @"") message:nil defaultText:[(WQRightCell *)cell levelClassObj].levelClassName textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
@@ -476,20 +475,23 @@
         
         WQClassObj *classObj = (WQClassObj *)self.dataArray[[[(WQRightCell *)cell indexPath] section]];
         WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[[[(WQRightCell *)cell indexPath] row]];
-        levelClassObj.levelClassName = textField.text;
         
-        [self.tableView beginUpdates];
-        [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
+        [WQAPIClient editClassBWithParameters:@{@"classBId":[NSNumber numberWithInteger:levelClassObj.levelClassId],@"classBName":textField.text} block:^(NSInteger finished, NSError *error) {
+            levelClassObj.levelClassName = textField.text;
+            
+            [self.tableView beginUpdates];
+            [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView endUpdates];
+        }];
     }];
     [alert show];
 }
 
 //确认选择
 -(void)toolControlPressed {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(classVC:selectedClass:)]) {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(classVC:classA:classB:)]) {
         WQClassObj *classObj = (WQClassObj *)self.dataArray[self.selectedIdx.section];
-        [self.delegate classVC:self selectedClass:(WQClassLevelObj *)classObj.levelClassList[self.selectedIdx.row]];
+        [self.delegate classVC:self classA:classObj classB:(WQClassLevelObj *)classObj.levelClassList[self.selectedIdx.row]];
     }
 }
 //去掉UItableview headerview黏性(sticky)
@@ -531,25 +533,27 @@
         [self.tableView endUpdates];
     }
 }
+//修改一级分类
 -(void)editDidLongPressedHeaderOption:(WQSwipTableHeader *)Header {
     WQClassHeader *header = (WQClassHeader *)Header;
     
     UITextField *textField;
-    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditClass", @"") message:nil defaultText:header.classObj.className textField:&textField block:^(BlockTextPromptAlertView *alert){
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditClass", @"") message:nil defaultText:header.classObj.className textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-         DLog(@"Text: %@", textField.text);
-        
         WQClassObj *classObj = (WQClassObj *)self.dataArray[header.aSection];
-        classObj.className = textField.text;
         
-        [self.tableView beginUpdates];
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
+        [WQAPIClient editClassAWithParameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId ],@"classAName":textField.text} block:^(NSInteger finished, NSError *error) {
+            classObj.className = textField.text;
+            
+            [self.tableView beginUpdates];
+            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView endUpdates];
+        }];
     }];
     [alert show];
 }

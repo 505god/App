@@ -22,7 +22,9 @@
 
 #import "WQCustomerDetailVC.h"
 
-@interface WQCustomerVC ()<WQCustomerTableDelegate,UISearchDisplayDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate>
+#import "WQNewCustomerVC.h"
+
+@interface WQCustomerVC ()<WQCustomerTableDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate>
 
 //通讯录列表
 @property (nonatomic, strong) WQCustomerTable *tableView;
@@ -44,35 +46,28 @@
     SafeRelease(_dataArray);
 }
 
--(void)testData {
-    NSDictionary *aDic = [Utility returnDicByPath:@"CustomerList"];
-    NSArray *array = [aDic objectForKey:@"customerList"];
-    
+#pragma mark - 获取客户列表
+-(void)getCustomerList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *aDic = (NSDictionary *)obj;
-        WQCustomerObj *customerObj = [[WQCustomerObj alloc]init];
-        [customerObj mts_setValuesForKeysWithDictionary:aDic];
-        [weakSelf.customerList addObject:customerObj];
-        SafeRelease(customerObj);
-        SafeRelease(aDic);
+    self.interfaceTask = [WQAPIClient getCustomerListWithBlock:^(NSArray *array, NSError *error) {
+        if (!error) {
+            [weakSelf.customerList addObjectsFromArray:array];
+            [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:weakSelf.customerList];
+            
+            if (weakSelf.customerList.count>0) {
+                [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
+                    weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
+                    [weakSelf.tableView setHeaderAnimated:YES];
+                    [weakSelf.tableView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }];
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneCustomer", @"") animated:YES];
+            }
+            [weakSelf.tableView.tableView headerEndRefreshing];
+        }
     }];
-    
-    [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:self.customerList];
-    
-    if (self.customerList.count>0) {
-        [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
-            weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
-            [weakSelf.tableView setHeaderAnimated:YES];
-            [weakSelf.tableView reloadData];
-            [weakSelf setNoneText:nil animated:NO];
-        }];
-    }else {
-        [weakSelf.tableView setHeaderAnimated:NO];
-        [weakSelf setNoneText:NSLocalizedString(@"NoneCustomer", @"") animated:YES];
-    }
 }
-
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
@@ -81,6 +76,7 @@
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CustomerVC", @"")];
     [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addPropertyNormal"] forState:UIControlStateHighlighted];
     [self.navBarView.leftBtn setHidden:YES];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
@@ -88,6 +84,8 @@
     
     //集成刷新控件
     [self addHeader];
+    
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -95,9 +93,24 @@
     
     if (self.isPresentVC) {
         [self.navBarView setTitleString:NSLocalizedString(@"SelectedProCustomers", @"")];
+        [self.navBarView.leftBtn setHidden:NO];
         [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
         
         self.toolControl.enabled = self.selectedList.count>0?YES:NO;
+    }
+    
+    //数据
+    if ([WQDataShare sharedService].customerArray.count>0) {
+        self.customerList = [NSMutableArray arrayWithArray:[WQDataShare sharedService].customerArray];
+        
+        [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
+            self.dataArray = [NSMutableArray arrayWithArray:array];
+            [self.tableView setHeaderAnimated:YES];
+            [self.tableView reloadData];
+        }];
+    }else {
+        //自动刷新(一进入程序就下拉刷新)
+        [self.tableView.tableView headerBeginRefreshing];
     }
 }
 
@@ -107,6 +120,9 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -122,23 +138,11 @@
 
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加下拉刷新头部控件
     [self.tableView.tableView addHeaderWithCallback:^{
-        // 进入刷新状态就会回调这个Block
-        
-        [weakSelf testData];
-        
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
-            // 结束刷新
-            [weakSelf.tableView.tableView headerEndRefreshing];
-        });
+        weakSelf.customerList = nil;
+        [weakSelf getCustomerList];
+
     } dateKey:@"WQCustomerVC"];
-    // dateKey用于存储刷新时间，也可以不传值，可以保证不同界面拥有不同的刷新时间
-    
-    //自动刷新(一进入程序就下拉刷新)
-    [self.tableView.tableView headerBeginRefreshing];
 }
 
 #pragma mark - 导航栏代理
@@ -162,15 +166,17 @@
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
-//右侧边栏的代理
+//右侧边栏的代理---添加客户
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
-    //添加客户
+    WQNewCustomerVC *customerVC = [[WQNewCustomerVC alloc]init];
+    [self.navigationController pushViewController:customerVC animated:YES];
+    SafeRelease(customerVC);
 }
 #pragma mark - property
 
 -(WQCustomerTable *)tableView {
     if (!_tableView) {
-        _tableView = [[WQCustomerTable alloc] initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-20-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height}];
+        _tableView = [[WQCustomerTable alloc] initWithFrame:self.isPresentVC?(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-self.navBarView.height*2}:(CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-10-self.navBarView.height}];
         _tableView.delegate = self;
         _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self.view addSubview:_tableView];
@@ -343,6 +349,10 @@
     }
     
     SafeRelease(mutableDic);SafeRelease(mutableArray);
+}
+
+-(void)scrollViewDidScrollToTop:(UIScrollView *)scrollView {
+    [self.tableView.searchBar resignFirstResponder];
 }
 #pragma mark - search代理
 

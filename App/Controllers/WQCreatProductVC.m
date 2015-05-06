@@ -30,12 +30,14 @@
 
 #import "WQCustomerVC.h"
 
+#import "WQProductSaleVC.h"
+
 ///一级
 static NSIndexPath *selectedProImageIndex = nil;
 ///二级  尺码
 static NSInteger selectedIndex = -1;
 
-@interface WQCreatProductVC ()<UITableViewDataSource, UITableViewDelegate,WQProAttributrFooterDelegate,WQProAttributeWithImgCellDelegate,WQColorVCDelegate,WQClassVCDelegate,WQSizeVCDelegate,JKImagePickerControllerDelegate,RMSwipeTableViewCellDelegate,WQProAttributeCellDelegate,WQCustomerVCDelegate>
+@interface WQCreatProductVC ()<UITableViewDataSource, UITableViewDelegate,WQProAttributrFooterDelegate,WQProAttributeWithImgCellDelegate,WQColorVCDelegate,WQClassVCDelegate,WQSizeVCDelegate,JKImagePickerControllerDelegate,RMSwipeTableViewCellDelegate,WQProAttributeCellDelegate,WQCustomerVCDelegate,WQProductSaleVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
@@ -49,12 +51,14 @@ static NSInteger selectedIndex = -1;
 @property (nonatomic, assign) CGFloat keyboardHeight;
 
 ///商品分类
+@property (nonatomic, strong) WQClassObj *selectedClassObj;
 @property (nonatomic, strong) WQClassLevelObj *selectedLevelClassObj;
 ///选择的推荐客户
 @property (nonatomic, strong) NSMutableArray *selectedCustomers;
 ///是否热卖
 @property (nonatomic, assign) BOOL isHotting;
-
+///是否上架
+@property (nonatomic, assign) BOOL isOnSale;
 ///传给后台数据
 @property (nonatomic, strong) NSMutableDictionary *postDictionary;
 @end
@@ -125,7 +129,8 @@ static NSInteger selectedIndex = -1;
  4=客户
  5=完成创建
  6=热卖
-
+ 7=优惠方式
+ 8=上架
  */
 //初始化数据
 -(void)setArrayData {
@@ -153,10 +158,21 @@ static NSInteger selectedIndex = -1;
     [self.originArray addObject:aDic4];
     [self.dataArray addObject:aDic4];
     
+    ///优惠方式
+    NSDictionary *aDic7 = @{@"titleSale":NSLocalizedString(@"ProductSaleType", @""),@"details":@"0",@"status":@"7",@"type":@"-1",@"start":@"",@"end":@"",@"limit":@""};
+    [self.originArray addObject:aDic7];
+    [self.dataArray addObject:aDic7];
+    
     //热卖
     NSDictionary *aDic14 = @{@"titleHot":NSLocalizedString(@"ProductHotSale", @""),@"isOn":@"0",@"status":@"6"};
     [self.originArray addObject:aDic14];
     [self.dataArray addObject:aDic14];
+    
+    //上架
+    self.isOnSale = YES;
+    NSDictionary *aDic15 = @{@"titleHot":NSLocalizedString(@"ProductOnSale", @""),@"isOn":@"1",@"status":@"8"};
+    [self.originArray addObject:aDic15];
+    [self.dataArray addObject:aDic15];
     
     ///完成创建
     NSDictionary *aDic5 = @{@"titleFinish":NSLocalizedString(@"AddProduct", @""),@"status":@"5"};
@@ -170,6 +186,8 @@ static NSInteger selectedIndex = -1;
     SafeRelease(aDic3);
     SafeRelease(aDic4);
     SafeRelease(aDic5);
+    SafeRelease(aDic7);
+    SafeRelease(aDic15)
 }
 
 #pragma mark - property
@@ -206,14 +224,14 @@ static NSInteger selectedIndex = -1;
     NSArray *array = [self returnArray];
     if (section==0) {
         return 0;
-    }else if (section==array.count-4) {
+    }else if (section==array.count-6) {
         return 40;
     }
     return 10;
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     NSArray *array = [self returnArray];
-    if (section == array.count-4) {
+    if (section == array.count-6) {
         WQProAttributrFooter *footer = (WQProAttributrFooter *)[tableView dequeueReusableHeaderFooterViewWithIdentifier:@"WQProAttributrFooter"];
         footer.footDelegate = self;
         return footer;
@@ -277,9 +295,9 @@ static NSInteger selectedIndex = -1;
             if (!cell) {
                 cell=[[WQProAttributeCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier ];
             }
-            if (status==3 || status==4 || status==5|| status==6) {
+            if (status==3 || status==4 || status==5|| status==6 || status==7|| status==8) {
                 cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-                if (status==5|| status==6) {
+                if (status==5|| status==6|| status==8) {
                     cell.accessoryType = UITableViewCellAccessoryNone;
                 }else {
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -306,9 +324,9 @@ static NSInteger selectedIndex = -1;
         
         NSInteger status = [[aDic objectForKey:@"status"]integerValue];
         
-        if (status==3 || status==4 || status==5 || status==6) {
+        if (status==3 || status==4 || status==5 || status==6 || status==7|| status==8) {
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-            if (status==5|| status==6) {
+            if (status==5|| status==6|| status==8) {
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }else {
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -328,6 +346,7 @@ static NSInteger selectedIndex = -1;
 }
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     if (point.x < 0 && (0-point.x) >= 60) {
+        swipeTableViewCell.shouldAnimateCellReset = YES;
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
@@ -345,7 +364,7 @@ static NSInteger selectedIndex = -1;
                                  [self.dataArray removeObjectAtIndex:indexPath.section];
                                  [swipeTableViewCell setHidden:YES];
                                  
-                                 if (self.dataArray.count==5) {
+                                 if (self.dataArray.count==6) {
                                      self.isContainProImg = NO;
                                  }
                                  [self.tableView reloadData];
@@ -354,6 +373,13 @@ static NSInteger selectedIndex = -1;
         }];
         [alert show];
     }
+}
+-(NSString*)dictionaryToJson:(NSDictionary *)dic{
+    NSError *parseError = nil;
+    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
+    
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -365,18 +391,37 @@ static NSInteger selectedIndex = -1;
             BOOL res = [self getPostStringWithImage];
             if (res) {
                 [self.postDictionary setObject:@"1" forKey:@"type"];
-                //TODO:
-            }
+            }else
+                return;
         }else {
             BOOL res = [self getPostStringWithoutImage];
             if (res) {
                 [self.postDictionary setObject:@"0" forKey:@"type"];
-                //TODO:
-            }
+                [self.postDictionary setObject:@"1" forKey:@"moneyType"];
+            }else
+                return;
         }
-    }else if (indexPath.section == array.count-2){//店长推荐
         
-    }else if (indexPath.section == array.count-3){//推荐客户
+        [self.postDictionary setObject:[NSNumber numberWithInteger:[WQDataShare sharedService].userObj.moneyType] forKey:@"moneyType"];
+        NSString *jsonString = [self dictionaryToJson:self.postDictionary];
+        self.interfaceTask = [WQAPIClient creatProductWithParameters:@{@"product":jsonString} block:^(NSInteger status, NSError *error) {
+            
+        }];
+        
+    }else if (indexPath.section == array.count-4){//优惠方式
+        __block WQProductSaleVC *saleVC = [[WQProductSaleVC alloc]init];
+        saleVC.delegate = self;
+        saleVC.selectedIndexPath = indexPath;
+        if (self.isContainProImg) {
+            saleVC.objectDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-4]];
+        }else {
+            saleVC.objectDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-4]];
+        }
+        
+        [self.view.window.rootViewController presentViewController:saleVC animated:YES completion:^{
+            SafeRelease(saleVC);
+        }];
+    }else if (indexPath.section == array.count-5){//推荐客户
         __block WQCustomerVC *customerVC = [[WQCustomerVC alloc]init];
         customerVC.isPresentVC = YES;
         customerVC.selectedList = self.selectedCustomers;
@@ -385,7 +430,7 @@ static NSInteger selectedIndex = -1;
         [self.view.window.rootViewController presentViewController:customerVC animated:YES completion:^{
             SafeRelease(customerVC);
         }];
-    }else if (indexPath.section == array.count-4){//选择分类
+    }else if (indexPath.section == array.count-6){//选择分类
         __block WQClassVC *classVC = [[WQClassVC alloc]init];
         classVC.delegate = self;
         classVC.isPresentVC = YES;
@@ -440,7 +485,7 @@ static NSInteger selectedIndex = -1;
         if (status==0) {///商品名称
             if ([Utility checkString:[aDic objectForKey:@"name"]]) {
                 isPost = YES;
-                [self.postDictionary setObject:[aDic objectForKey:@"name"] forKey:@"name"];
+                [self.postDictionary setObject:[aDic objectForKey:@"name"] forKey:@"productName"];
             }else {
                 isPost = NO;
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"NameError", @"")];
@@ -457,7 +502,7 @@ static NSInteger selectedIndex = -1;
             }else {
                 if ([self predicateText:priceString regex:@"^[0-9]+(.[0-9]{1,2})?$"]) {
                     isPost = YES;
-                    [self.postDictionary setObject:priceString forKey:@"price"];
+                    [self.postDictionary setObject:priceString forKey:@"productPrice"];
                 }else {
                     isPost = NO;
                     [WQPopView showWithImageName:@"PriceConfirmError" message:NSLocalizedString(@"PriceError", @"")];
@@ -475,7 +520,7 @@ static NSInteger selectedIndex = -1;
             }else {
                 if ([self predicateText:stockString regex:@"^[0-9]*$"]) {
                     isPost = YES;
-                    [self.postDictionary setObject:stockString forKey:@"stock"];
+                    [self.postDictionary setObject:stockString forKey:@"productStock"];
                 }else {
                     isPost = NO;
                     [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"StockConfirmError", @"")];
@@ -487,15 +532,24 @@ static NSInteger selectedIndex = -1;
     }
     
     if (isPost) {
-        if (self.selectedLevelClassObj) {
-            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"class"];
+        if (self.selectedLevelClassObj && self.selectedClassObj) {
+            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"proClassBId"];
+            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedClassObj.classId] forKey:@"proClassAId"];
         }
         
         if (self.selectedCustomers.count>0) {
             [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
         }
         
-        [self.postDictionary setObject:[NSNumber numberWithBool:self.isHotting] forKey:@"isHot"];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.isHotting] forKey:@"productIsHot"];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.isOnSale] forKey:@"productIsSale"];
+        
+        NSDictionary *dic = (NSDictionary *)self.originArray[self.originArray.count-4];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:([[dic objectForKey:@"type"] integerValue]+1)] forKey:@"proOnSaleType"];
+        [self.postDictionary setObject:[dic objectForKey:@"details"] forKey:@"onSalePrice"];
+        [self.postDictionary setObject:[dic objectForKey:@"start"] forKey:@"proSaleStartTime"];
+        [self.postDictionary setObject:[dic objectForKey:@"end"] forKey:@"proSaleEndTime"];
+        [self.postDictionary setObject:[dic objectForKey:@"limit"] forKey:@"onSaleStock"];
     }
     
     
@@ -507,13 +561,13 @@ static NSInteger selectedIndex = -1;
     BOOL isPost = NO;
     
     for (int i=0; i<self.dataArray.count; i++) {
-        NSDictionary *aDic = (NSDictionary *)self.originArray[i];
+        NSDictionary *aDic = (NSDictionary *)self.dataArray[i];
         
         NSInteger status = [[aDic objectForKey:@"status"]integerValue];
         if (status==0) {///商品名称
             if ([Utility checkString:[aDic objectForKey:@"name"]]) {
                 isPost = YES;
-                [self.postDictionary setObject:[aDic objectForKey:@"name"] forKey:@"name"];
+                [self.postDictionary setObject:[aDic objectForKey:@"name"] forKey:@"productName"];
             }else {
                 isPost = NO;
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"NameError", @"")];
@@ -523,8 +577,8 @@ static NSInteger selectedIndex = -1;
         }else if (status==2) {///商品
            
             NSMutableArray *imageArray = nil;
-            if (![[self.postDictionary objectForKey:@"imageArray"] isKindOfClass:[NSNull class]] && [self.postDictionary objectForKey:@"imageArray"]!= nil) {
-                imageArray = [NSMutableArray arrayWithArray:[self.postDictionary objectForKey:@"imageArray"]];
+            if (![[self.postDictionary objectForKey:@"proImgArray"] isKindOfClass:[NSNull class]] && [self.postDictionary objectForKey:@"proImgArray"]!= nil) {
+                imageArray = [NSMutableArray arrayWithArray:[self.postDictionary objectForKey:@"proImgArray"]];
             }else {
                 imageArray = [[NSMutableArray alloc]init];
             }
@@ -533,7 +587,7 @@ static NSInteger selectedIndex = -1;
             ///商品图片
             if ([[aDic objectForKey:@"image"]isKindOfClass:[UIImage class]] && [aDic objectForKey:@"image"]!=nil) {
                 UIImage *image = (UIImage *)[aDic objectForKey:@"image"];
-                [imageDic setObject:image forKey:@"image"];
+                [imageDic setObject:image forKey:@"productImg"];
                 isPost = YES;
             }else {
                 isPost = NO;
@@ -544,7 +598,7 @@ static NSInteger selectedIndex = -1;
             ///商品颜色
             if ([[aDic objectForKey:@"color"] isKindOfClass:[WQColorObj class]] && [aDic objectForKey:@"color"]!=nil) {
                 WQColorObj *color = (WQColorObj *)[aDic objectForKey:@"color"];
-                [imageDic setObject:[NSNumber numberWithInteger:color.colorId] forKey:@"image"];
+                [imageDic setObject:[NSNumber numberWithInteger:color.colorId] forKey:@"productColor"];
                 isPost = YES;
             }else {
                 isPost = NO;
@@ -562,8 +616,8 @@ static NSInteger selectedIndex = -1;
                 NSMutableDictionary *sizeDic = [[NSMutableDictionary alloc]init];
                 ///尺码
                 if ([[dic objectForKey:@"sizeDetail"]isKindOfClass:[WQSizeObj class]] && [dic objectForKey:@"sizeDetail"]!=nil) {
-                    WQSizeObj *size = (WQSizeObj *)[aDic objectForKey:@"sizeDetail"];
-                    [sizeDic setObject:[NSNumber numberWithInteger:size.sizeId] forKey:@"size"];
+                    WQSizeObj *size = (WQSizeObj *)[dic objectForKey:@"sizeDetail"];
+                    [sizeDic setObject:[NSNumber numberWithInteger:size.sizeId] forKey:@"productSize"];
                     isContinue = YES;
                 }else {
                     isContinue = NO;
@@ -579,7 +633,7 @@ static NSInteger selectedIndex = -1;
                 }else {
                     if ([self predicateText:priceString regex:@"^[0-9]+(.[0-9]{1,2})?$"]) {
                         isContinue = YES;
-                        [sizeDic setObject:priceString forKey:@"price"];
+                        [sizeDic setObject:priceString forKey:@"productPrice"];
                     }else {
                         isContinue = NO;
                         [WQPopView showWithImageName:@"PriceConfirmError" message:NSLocalizedString(@"PriceError", @"")];
@@ -587,7 +641,7 @@ static NSInteger selectedIndex = -1;
                     }
                 }
                 ///库存
-                NSString *stockString = [aDic objectForKey:@"stock"];
+                NSString *stockString = [dic objectForKey:@"stockDetail"];
                 if (stockString.length==0) {
                     isContinue = NO;
                     [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"StockError", @"")];
@@ -595,7 +649,7 @@ static NSInteger selectedIndex = -1;
                 }else {
                     if ([self predicateText:stockString regex:@"^[0-9]*$"]) {
                         isContinue = YES;
-                        [sizeDic setObject:stockString forKey:@"stock"];
+                        [sizeDic setObject:stockString forKey:@"productStock"];
                     }else {
                         isContinue = NO;
                         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"StockConfirmError", @"")];
@@ -606,13 +660,13 @@ static NSInteger selectedIndex = -1;
                 [sizeArray addObject:sizeDic];
                 SafeRelease(sizeDic);
             }
-            [imageDic setObject:sizeArray forKey:@"sizeArray"];
+            [imageDic setObject:sizeArray forKey:@"proSizeArray"];
             SafeRelease(sizeArray);
             
             [imageArray addObject:imageDic];
             SafeRelease(imageDic);
             
-            [self.postDictionary setObject:imageArray forKey:@"imageArray"];
+            [self.postDictionary setObject:imageArray forKey:@"proImgArray"];
             SafeRelease(imageArray);
             
             if (!isContinue) {
@@ -624,15 +678,24 @@ static NSInteger selectedIndex = -1;
     }
     
     if (isPost) {
-        if (self.selectedLevelClassObj) {
-            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"class"];
+        if (self.selectedLevelClassObj && self.selectedClassObj) {
+            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"proClassBId"];
+            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedClassObj.classId] forKey:@"proClassAId"];
         }
         
         if (self.selectedCustomers.count>0) {
             [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
         }
         
-        [self.postDictionary setObject:[NSNumber numberWithBool:self.isHotting] forKey:@"isHot"];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.isHotting] forKey:@"productIsHot"];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.isOnSale] forKey:@"productIsSale"];
+        
+        NSDictionary *dic = (NSDictionary *)self.dataArray[self.dataArray.count-4];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:([[dic objectForKey:@"type"] integerValue]+1)] forKey:@"proOnSaleType"];
+        [self.postDictionary setObject:[dic objectForKey:@"details"] forKey:@"onSalePrice"];
+        [self.postDictionary setObject:[dic objectForKey:@"start"] forKey:@"proSaleStartTime"];
+        [self.postDictionary setObject:[dic objectForKey:@"end"] forKey:@"proSaleEndTime"];
+        [self.postDictionary setObject:[dic objectForKey:@"limit"] forKey:@"onSaleStock"];
     }
     
     return isPost;
@@ -640,6 +703,8 @@ static NSInteger selectedIndex = -1;
 
 #pragma mark - 添加商品型号
 -(void)addMoreProType {
+    [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
+    
     self.isContainProImg = YES;
     
     ///尺码、价格、库存
@@ -648,7 +713,7 @@ static NSInteger selectedIndex = -1;
     
     NSDictionary *aDic2 = @{@"image":@"",@"color":@"",@"property":array,@"status":@"2"};
     
-    [self.dataArray insertObject:aDic2 atIndex:self.dataArray.count-4];
+    [self.dataArray insertObject:aDic2 atIndex:self.dataArray.count-6];
     
     [self.tableView reloadData];
 }
@@ -656,8 +721,6 @@ static NSInteger selectedIndex = -1;
 #pragma mark - WQProAttributeWithImgCellDelegate 有图片
 #pragma mark - 选择颜色
 -(void)selectedProductColor:(WQProductBtn *)colorBtn {
-    DLog(@"选择颜色");
-    
     selectedProImageIndex = colorBtn.idxPath;
     
     __block WQColorVC *colorVC = [[WQColorVC alloc]init];
@@ -807,7 +870,7 @@ static NSInteger selectedIndex = -1;
     if (mutableArray.count==0) {
         [self.dataArray removeObjectAtIndex:deleteBtn.idxPath.section];
         
-        if (self.dataArray.count==5) {
+        if (self.dataArray.count==7) {
             self.isContainProImg = NO;
         }
         [self.tableView reloadData];
@@ -822,9 +885,6 @@ static NSInteger selectedIndex = -1;
 }
 #pragma mark - 添加尺码、价格、库存
 -(void)addProductSize:(WQProductBtn *)addBtn {
-    DLog(@"添加尺码、价格、库存");
-    
-    DLog(@"section = %d",addBtn.idxPath.section);
     ///更改数据
     NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[addBtn.idxPath.section]];
     NSMutableArray *mutableArray = [NSMutableArray arrayWithArray:[mutableDic objectForKey:@"property"]];
@@ -839,28 +899,27 @@ static NSInteger selectedIndex = -1;
 }
 
 #pragma mark - 选择分类
--(void)classVC:(WQClassVC *)classVC selectedClass:(WQClassLevelObj *)classObj {
+-(void)classVC:(WQClassVC *)classVC classA:(WQClassObj *)classObj classB:(WQClassLevelObj *)levelClassObj {
     [classVC dismissViewControllerAnimated:YES completion:^{
-        self.selectedLevelClassObj = classObj;
+        self.selectedClassObj = classObj;
+        self.selectedLevelClassObj = levelClassObj;
         
         NSMutableDictionary *mutableDic = nil;
         if (self.isContainProImg) {
-            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-4]];
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-6]];
         }else {
-            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-4]];
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-6]];
         }
-        [mutableDic setObject:classObj.levelClassName forKey:@"details"];
-        [self.originArray replaceObjectAtIndex:(self.originArray.count-4) withObject:mutableDic];
-        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-4) withObject:mutableDic];
+        [mutableDic setObject:levelClassObj.levelClassName forKey:@"details"];
+        [self.originArray replaceObjectAtIndex:(self.originArray.count-6) withObject:mutableDic];
+        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-6) withObject:mutableDic];
         
         
         [self.tableView beginUpdates];
         [self.tableView reloadRowsAtIndexPaths:@[classVC.selectedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         [self.tableView endUpdates];
     }];
-    
 }
-
 #pragma mark - 选择客户
 - (void)customerVC:(WQCustomerVC *)customerVC didSelectCustomers:(NSArray *)customers {
     [customerVC dismissViewControllerAnimated:YES completion:^{
@@ -868,13 +927,13 @@ static NSInteger selectedIndex = -1;
         
         NSMutableDictionary *mutableDic = nil;
         if (self.isContainProImg) {
-            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-3]];
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[self.dataArray.count-5]];
         }else {
-            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-3]];
+            mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[self.originArray.count-5]];
         }
         [mutableDic setObject:[NSNumber numberWithInt:customers.count] forKey:@"details"];
-        [self.originArray replaceObjectAtIndex:(self.originArray.count-3) withObject:mutableDic];
-        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-3) withObject:mutableDic];
+        [self.originArray replaceObjectAtIndex:(self.originArray.count-5) withObject:mutableDic];
+        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-5) withObject:mutableDic];
         
         [self.tableView beginUpdates];
         [self.tableView reloadRowsAtIndexPaths:@[customerVC.selectedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -882,16 +941,37 @@ static NSInteger selectedIndex = -1;
         
     }];
 }
-
+#pragma mark - 选择优惠方式
+-(void)selectedSale:(WQProductSaleVC *)saleVC object:(NSDictionary *)dictionary {
+    [saleVC dismissViewControllerAnimated:YES completion:^{
+        [self.originArray replaceObjectAtIndex:(self.originArray.count-4) withObject:dictionary];
+        [self.dataArray replaceObjectAtIndex:(self.dataArray.count-4) withObject:dictionary];
+        
+        [self.tableView beginUpdates];
+        [self.tableView reloadRowsAtIndexPaths:@[saleVC.selectedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+    }];
+}
 #pragma mark - 热卖
 
 -(void)proAttributeCell:(WQProAttributeCell *)cell changeSwitch:(BOOL)isHot {
-    NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[cell.idxPath.section]];
+    if (self.isContainProImg) {
+        NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[cell.idxPath.section]];
+        
+        [mutableDic setObject:[NSNumber numberWithBool:isHot] forKey:@"isOn"];
+        [self.dataArray replaceObjectAtIndex:cell.idxPath.section withObject:mutableDic];
+    }else {
+        NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[cell.idxPath.section]];
+        
+        [mutableDic setObject:[NSNumber numberWithBool:isHot] forKey:@"isOn"];
+        [self.originArray replaceObjectAtIndex:cell.idxPath.section withObject:mutableDic];
+    }
     
-    [mutableDic setObject:[NSNumber numberWithBool:isHot] forKey:@"isOn"];
-    [self.dataArray replaceObjectAtIndex:cell.idxPath.section withObject:mutableDic];
-    
-    self.isHotting = isHot;
+    if (cell.switchBtn.tag==100) {
+        self.isHotting = isHot;
+    }else {
+        self.isOnSale = isHot;
+    }
 }
 
 #pragma mark - Keyboard notifications
@@ -958,31 +1038,39 @@ static NSInteger selectedIndex = -1;
         if (self.isContainProImg) {
             ///更改数据
             NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[text.idxPath.section]];
-            
-            NSMutableArray *array = [NSMutableArray arrayWithArray:[mutableDic objectForKey:@"property"]];
-            
-            NSInteger index = 0;
-            if (text.tag>=PriceTextFieldTag && text.tag<StockTextFieldTag) {//价格
-                index = text.tag-PriceTextFieldTag;
+            NSInteger status = [[mutableDic objectForKey:@"status"]integerValue];
+            if (status==0) {
+                [mutableDic setObject:text.text forKey:@"name"];
+                [self.dataArray replaceObjectAtIndex:text.idxPath.section withObject:mutableDic];
+                [self.originArray replaceObjectAtIndex:text.idxPath.section withObject:mutableDic];
+            }else {
+                NSMutableArray *array = [NSMutableArray arrayWithArray:[mutableDic objectForKey:@"property"]];
                 
-                NSMutableDictionary *aDic = [[NSMutableDictionary alloc]initWithDictionary:array[index]];
-                [aDic setObject:text.text forKey:@"priceDetail"];
-                [array replaceObjectAtIndex:index withObject:aDic];
-                
-            }else if (text.tag>=StockTextFieldTag){//库存
-                index = text.tag-StockTextFieldTag;
-                
-                NSMutableDictionary *aDic = [[NSMutableDictionary alloc]initWithDictionary:array[index]];
-                [aDic setObject:text.text forKey:@"stockDetail"];
-                [array replaceObjectAtIndex:index withObject:aDic];
+                NSInteger index = 0;
+                if (text.tag>=PriceTextFieldTag && text.tag<StockTextFieldTag) {//价格
+                    index = text.tag-PriceTextFieldTag;
+                    
+                    NSMutableDictionary *aDic = [[NSMutableDictionary alloc]initWithDictionary:array[index]];
+                    [aDic setObject:text.text forKey:@"priceDetail"];
+                    [array replaceObjectAtIndex:index withObject:aDic];
+                    
+                }else if (text.tag>=StockTextFieldTag){//库存
+                    index = text.tag-StockTextFieldTag;
+                    
+                    NSMutableDictionary *aDic = [[NSMutableDictionary alloc]initWithDictionary:array[index]];
+                    [aDic setObject:text.text forKey:@"stockDetail"];
+                    [array replaceObjectAtIndex:index withObject:aDic];
+                }
+                [mutableDic setObject:array forKey:@"property"];
+                [self.dataArray replaceObjectAtIndex:text.idxPath.section withObject:mutableDic];
             }
-            [mutableDic setObject:array forKey:@"property"];
-            [self.dataArray replaceObjectAtIndex:text.idxPath.section withObject:mutableDic];
+            
         }else {
             NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.originArray[text.idxPath.section]];
             NSInteger status = [[mutableDic objectForKey:@"status"]integerValue];
             if (status==0) {
                 [mutableDic setObject:text.text forKey:@"name"];
+                [self.dataArray replaceObjectAtIndex:text.idxPath.section withObject:mutableDic];
             }else if (status==1){
                 if (text.tag==100) {//textField
                     [mutableDic setObject:text.text forKey:@"price"];

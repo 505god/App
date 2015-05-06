@@ -14,7 +14,7 @@
 #import "WQSwitch.h"
 
 @class WQCreatProductVC;
-
+@class WQProductDetailVC;
 @protocol WQProAttributeCellDelegate;
 
 @interface WQProAttributeCell : UITableViewCell
@@ -26,6 +26,7 @@
 @property (nonatomic, strong) NSDictionary *dataDic;
 
 @property (nonatomic, strong) WQCreatProductVC *productVC;
+@property (nonatomic, strong) WQProductDetailVC *detailVC;
 
 @property (nonatomic, strong) WQProductText *textField;
 @property (nonatomic, strong) WQProductText *textField2;

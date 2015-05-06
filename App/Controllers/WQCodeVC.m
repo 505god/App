@@ -9,157 +9,201 @@
 #import "WQCodeVC.h"
 
 #import <SMS_SDK/SMS_SDK.h>
+
+#import "BlockAlertView.h"
 #import "WQInfoVC.h"
 
-@interface WQCodeVC ()<UITextFieldDelegate>
-
-@property (nonatomic, weak) IBOutlet UITextField *codeText;
-@property (nonatomic, weak) IBOutlet UIButton *getCodeBtn;
-@property (nonatomic, assign) NSInteger timeCount;
+@interface WQCodeVC ()<UITextFieldDelegate,WQNavBarViewDelegate>{
+    NSString* _phone;
+    NSString* _areaCode;
+    
+    NSTimer* _timer1;
+    NSTimer* _timer2;
+}
 
 @end
 
+static int count = 0;
+
 @implementation WQCodeVC
 
+-(void)dealloc {
+    SafeRelease(_telLabel);
+    SafeRelease(_verifyCodeField.delegate);
+    SafeRelease(_verifyCodeField);
+    SafeRelease(_timeLabel);
+    SafeRelease(_repeatSMSBtn);
+    SafeRelease(_submitBtn);
+}
+
+
+-(void)setPhone:(NSString*)phone AndAreaCode:(NSString*)areaCode
+{
+    _phone=phone;
+    _areaCode=areaCode;
+}
+
+-(void)submit {
+    [self.view endEditing:YES];
+    
+    if(self.verifyCodeField.text.length!=4) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"verifycodeformaterror", @"")];
+    }else{
+        [SMS_SDK commitVerifyCode:self.verifyCodeField.text result:^(enum SMS_ResponseState state) {
+            if (1==state) {
+                //TODO:填写资料
+                WQInfoVC *infoVC = [[WQInfoVC alloc]init];
+                infoVC.phoneNumber = _phone;
+                [self.navigationController pushViewController:infoVC animated:YES];
+                SafeRelease(infoVC);
+            }else if(0==state) {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"verifycodeerrormsg", @"")];
+            }
+        }];
+    }
+}
+
+
+-(void)CannotGetSMS {
+     NSString* str=[NSString stringWithFormat:@"%@:%@",NSLocalizedString(@"cannotgetsmsmsg", nil) ,_phone];
+    BlockAlertView *alert = [BlockAlertView alertWithTitle:NSLocalizedString(@"surephonenumber", nil) message:str];
+    
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        
+        [SMS_SDK getVerifyCodeByPhoneNumber:_phone AndZone:_areaCode result:^(enum SMS_GetVerifyCodeResponseState state){
+             if (1==state){
+                 [self setTimer];
+                 _timeLabel.text=[NSString stringWithFormat:@"%@%i%@",NSLocalizedString(@"timelablemsg", nil),60-count,NSLocalizedString(@"second", nil)];
+                 [_repeatSMSBtn setHeight:YES];
+             }else if(0==state) {
+                 [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"codesenderrormsg", @"")];
+             }else if (SMS_ResponseStateMaxVerifyCode==state) {
+                 [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"maxcodemsg", @"")];
+             }else if(SMS_ResponseStateGetVerifyCodeTooOften==state) {
+                 [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"codetoooftenmsg", @"")];
+             }
+             
+         }];
+        
+    }];
+    [alert show];
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.view endEditing:YES];
+}
+-(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
+    [self.navigationController popViewControllerAnimated:YES];
+}
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"填写验证码";
+    //导航栏
+    [self.navBarView setTitleString:NSLocalizedString(@"verifycode", @"")];
+    [self.navBarView.rightBtn setHidden:YES];
+    self.navBarView.isShowShadow = YES;
+    self.navBarView.navDelegate = self;
+    [self.view addSubview:self.navBarView];
+
+    UILabel* label=[[UILabel alloc] init];
+    label.frame=CGRectMake(15, self.navBarView.bottom+10, self.view.frame.size.width - 30, 21);
+    label.text=[NSString stringWithFormat:NSLocalizedString(@"verifylabel", nil)];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont systemFontOfSize:16];
+    [self.view addSubview:label];
     
-    //获取验证码
-    [self getPhoneCode];
-    self.getCodeBtn.enabled = NO;
+    self.telLabel=[[UILabel alloc] init];
+    self.telLabel.frame=CGRectMake(15, label.bottom+10, self.view.frame.size.width - 30, 21);
+    self.telLabel.textAlignment = NSTextAlignmentCenter;
+    self.telLabel.font = [UIFont systemFontOfSize:16];
+    [self.view addSubview:self.telLabel];
+    self.telLabel.text= [NSString stringWithFormat:@"+%@ %@",_areaCode,_phone];
+    
+    self.verifyCodeField=[[UITextField alloc] init];
+    self.verifyCodeField.frame=CGRectMake(15, self.telLabel.bottom+10, self.view.frame.size.width - 30, NavgationHeight);
+    self.verifyCodeField.borderStyle=UITextBorderStyleRoundedRect;
+    self.verifyCodeField.textAlignment=NSTextAlignmentCenter;
+    self.verifyCodeField.placeholder=NSLocalizedString(@"verifycode", nil);
+    self.verifyCodeField.font=[UIFont systemFontOfSize:16];
+    self.verifyCodeField.keyboardType=UIKeyboardTypePhonePad;
+    self.verifyCodeField.clearButtonMode=UITextFieldViewModeWhileEditing;
+    [self.view addSubview:self.verifyCodeField];
+    
+    self.timeLabel=[[UILabel alloc] init];
+    self.timeLabel.frame=CGRectMake(15, self.verifyCodeField.bottom+10, self.view.frame.size.width - 30, 40);
+    self.timeLabel.numberOfLines = 0;
+    self.timeLabel.textAlignment = NSTextAlignmentCenter;
+    self.timeLabel.font = [UIFont systemFontOfSize:15];
+    self.timeLabel.text=NSLocalizedString(@"timelabel", nil);
+    [self.view addSubview:self.timeLabel];
+    
+    self.repeatSMSBtn=[UIButton buttonWithType:UIButtonTypeSystem];
+    self.repeatSMSBtn.frame=CGRectMake(15, self.verifyCodeField.bottom+10, self.view.frame.size.width - 30, 40);
+    [self.repeatSMSBtn setTitle:NSLocalizedString(@"repeatsms", nil) forState:UIControlStateNormal];
+    [self.repeatSMSBtn addTarget:self action:@selector(CannotGetSMS) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.repeatSMSBtn];
+    
+    
+    self.submitBtn=[UIButton buttonWithType:UIButtonTypeSystem];
+    [self.submitBtn setTitle:NSLocalizedString(@"submit", nil) forState:UIControlStateNormal];
+    self.submitBtn.backgroundColor = COLOR(251, 0, 41, 1);
+    self.submitBtn.frame=CGRectMake(15, self.repeatSMSBtn.bottom+10, self.view.frame.size.width - 30, 40);
+    [self.submitBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.submitBtn  setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
+    self.submitBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [self.submitBtn addTarget:self action:@selector(submit) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.submitBtn];
+    
+    [self setTimer];
+    
+    SafeRelease(label);
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+-(void)setTimer {
+    self.timeLabel.hidden = NO;
+    self.repeatSMSBtn.hidden = YES;
     
-    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"下一步" style:UIBarButtonItemStyleDone target:self action:@selector(rightNavBarTap)];
+    [_timer2 invalidate];
+    [_timer1 invalidate];
     
-    self.navigationItem.rightBarButtonItem.enabled = [self checkCodeNumber];
+    count = 0;
     
-    [self.codeText becomeFirstResponder];
+    NSTimer* timer=[NSTimer scheduledTimerWithTimeInterval:60
+                                                    target:self
+                                                  selector:@selector(showRepeatButton)
+                                                  userInfo:nil
+                                                   repeats:YES];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldTextChange:) name:UITextFieldTextDidChangeNotification object:nil];
+    NSTimer* timer2=[NSTimer scheduledTimerWithTimeInterval:1
+                                                     target:self
+                                                   selector:@selector(updateTime)
+                                                   userInfo:nil
+                                                    repeats:YES];
+    _timer1=timer;
+    _timer2=timer2;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    [self.view endEditing:YES];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
-}
-
--(void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
--(void)rightNavBarTap {
-    [self.view endEditing:YES];
-    
-    //匹配验证码
-    __weak typeof(self) wself = self;
-    [SMS_SDK commitVerifyCode:self.codeText.text result:^(enum SMS_ResponseState state) {
-        if (state == SMS_ResponseStateSuccess) {
-            [NSObject cancelPreviousPerformRequestsWithTarget:wself
-                                                     selector:@selector(scrollTimer)
-                                                       object:nil];
-            
-            [wself.getCodeBtn setTitle:@"验证码正确" forState:UIControlStateNormal];
-            
-            WQInfoVC *infoVC = LOADVC(@"WQInfoVC");
-            infoVC.type = self.type;
-            infoVC.phoneNumber = self.phoneNumber;
-            
-            [self.navigationController pushViewController:infoVC animated:YES];
-             
-            SafeRelease(infoVC);
-            
-        }else {
-//            [KVNProgress showErrorWithStatus:@"验证码不正确!"];
-            
-            [NSObject cancelPreviousPerformRequestsWithTarget:wself
-                                                     selector:@selector(scrollTimer)
-                                                       object:nil];
-            [wself.getCodeBtn setTitle:@"重新获取验证码" forState:UIControlStateNormal];
-            [wself.codeText becomeFirstResponder];
-            self.getCodeBtn.enabled = YES;
-        }
-    }];
-}
-
--(BOOL)checkCodeNumber {
-    if ([Utility checkString:self.codeText.text]) {
-        NSString *phoneRegex = @"[0-9]{4}";
-        NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", phoneRegex];
-        if (![phoneTest evaluateWithObject:self.codeText.text]){
-            return NO;
-        }
-    }else {
-        return NO;
-    }
-    
-    return YES;
-}
-#pragma mark - 获取验证码
-
--(void)getPhoneCode
+-(void)updateTime
 {
-    __weak typeof(self) wself = self;
-    [SMS_SDK getVerifyCodeByPhoneNumber:self.phoneNumber AndZone:@"86" result:^(enum SMS_GetVerifyCodeResponseState state) {
-        if (state == SMS_ResponseStateGetVerifyCodeSuccess) {
-//            [KVNProgress showSuccessWithStatus:@"验证码已发送!"];
-            
-            wself.timeCount = 60;
-            [wself.getCodeBtn setBackgroundImage:[UIImage imageNamed:@"BindingBtnAct"] forState:UIControlStateNormal];
-            [wself.getCodeBtn setTitle:[NSString stringWithFormat:@"%ds 后重新获取验证码",wself.timeCount] forState:UIControlStateNormal];
-            [wself performSelector:@selector(scrollTimer) withObject:nil afterDelay:1];
-        }else {
-//            [KVNProgress showErrorWithStatus:@"验证码获取失败!"];
-            self.getCodeBtn.enabled = YES;
-        }
-    }];
-}
-
--(void)scrollTimer{
-    
-    [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                             selector:@selector(scrollTimer)
-                                               object:nil];
-    
-    self.timeCount --;
-    if (self.timeCount<0) {
-        [self.getCodeBtn setTitle:@"重新获取验证码" forState:UIControlStateNormal];
-        self.getCodeBtn.enabled = YES;
-    }else {
-        [self.getCodeBtn setTitle:[NSString stringWithFormat:@"%ds 后重新获取验证码",self.timeCount] forState:UIControlStateNormal];
-        
-        [self performSelector:@selector(scrollTimer) withObject:nil afterDelay:1];
+    count++;
+    if (count>=60)
+    {
+        [_timer2 invalidate];
+        return;
     }
-}
-#pragma mark - UITextFieldDelegate
-
-- (void)textFieldTextChange:(NSNotification *)notification {
-    self.navigationItem.rightBarButtonItem.enabled=[self checkCodeNumber];
+    self.timeLabel.text=[NSString stringWithFormat:@"%@%i%@",NSLocalizedString(@"timelablemsg", nil),60-count,NSLocalizedString(@"second", nil)];
 }
 
-#pragma mark - 事件
-
--(IBAction)getCodeBtnPressed:(id)sender {
-    [self getPhoneCode];
+-(void)showRepeatButton{
+    self.timeLabel.hidden=YES;
+    self.repeatSMSBtn.hidden=NO;
+    
+    [_timer1 invalidate];
+    return;
 }
-
 
 @end

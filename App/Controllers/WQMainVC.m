@@ -46,7 +46,6 @@
     SafeRelease(_rightVC);
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showSidebarView" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"creatProductNotification" object:nil];
 }
 
 #pragma mark - lifestyle
@@ -65,6 +64,7 @@
     self.navBarView.navDelegate = self;
     [self.navBarView.leftBtn setHidden:YES];
     [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"mainNavRight"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"mainNavRightNormal"] forState:UIControlStateHighlighted];
     self.navBarView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.navBarView];
     
@@ -95,9 +95,6 @@
     
     //监测scrollview滑动到边缘
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showSidebarView:) name:@"showSidebarView" object:nil];
-    
-    //创建商品时候隐藏导航栏和侧边栏
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(creatProductNotification:) name:@"creatProductNotification" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -108,7 +105,6 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showSidebarView" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"creatProductNotification" object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -146,7 +142,9 @@
 -(void)setChildenControllerArray:(NSArray *)childenControllerArray{
     if (_childenControllerArray != childenControllerArray && childenControllerArray&& childenControllerArray.count > 0) {
         for (UIViewController *controller in childenControllerArray) {
+            [controller willMoveToParentViewController:self];
             [self addChildViewController:controller];
+            [controller didMoveToParentViewController:self];
         }
     }
     _childenControllerArray = childenControllerArray;
@@ -177,7 +175,7 @@
     if (!childController) {
         return;
     }
-    [childController willMoveToParentViewController:childController];
+    [childController willMoveToParentViewController:self];
     childController.view.frame = (CGRect){LeftWidth,0,self.view.width-LeftWidth,self.view.height};
     [self.view addSubview:childController.view];
     [childController didMoveToParentViewController:self];
@@ -452,16 +450,4 @@
     }
 }
 
--(void)creatProductNotification:(NSNotification *)notification {
-    NSInteger type = [notification.object integerValue];
-    if (type==0) {//隐藏
-        [self.panGestureRec setEnabled:NO];
-        [self.navBarView setHidden:YES];
-        [self.leftBarView setHidden:YES];
-    }else if (type==1) {//出现
-        [self.panGestureRec setEnabled:YES];
-        [self.navBarView setHidden:NO];
-        [self.leftBarView setHidden:NO];
-    }
-}
 @end

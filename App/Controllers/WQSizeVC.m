@@ -36,27 +36,23 @@
     SafeRelease(_delegate);
 }
 
--(void)testData {
-    NSDictionary *aDic = [Utility returnDicByPath:@"SizeList"];
-    NSArray *array = [aDic objectForKey:@"sizeList"];
-    
+#pragma mark - 颜色列表
+-(void)getSizeList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *aDic = (NSDictionary *)obj;
-        WQSizeObj *class = [[WQSizeObj alloc]init];
-        [class mts_setValuesForKeysWithDictionary:aDic];
-        [weakSelf.dataArray addObject:class];
-        SafeRelease(class);
-        SafeRelease(aDic);
-    }];
     
-    //判断数据源
-    if (self.dataArray.count>0) {
-        [self.tableView reloadData];
-        [self setNoneText:nil animated:NO];
-    }else {
-        [self setNoneText:NSLocalizedString(@"NoneSize", @"") animated:YES];
-    }
+    [WQAPIClient getSizeListWithBlock:^(NSArray *array, NSError *error) {
+        [weakSelf.dataArray addObjectsFromArray:array];
+        
+        [WQDataShare sharedService].sizeArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
+        
+        if (weakSelf.dataArray.count>0) {
+            [weakSelf.tableView reloadData];
+            [weakSelf setNoneText:nil animated:NO];
+        }else {
+            [weakSelf setNoneText:NSLocalizedString(@"NoneSize", @"") animated:YES];
+        }
+        [weakSelf.tableView headerEndRefreshing];
+    }];
 }
 
 #pragma mark - lifestyle
@@ -65,7 +61,8 @@
     [super viewDidLoad];
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"SizeSetup", @"")];
-    [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Add", @"") forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addPropertyNormal"] forState:UIControlStateHighlighted];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
@@ -81,6 +78,14 @@
     if (self.isPresentVC) {
         [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
     }
+    
+    if ([WQDataShare sharedService].sizeArray.count>0) {
+        self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].sizeArray];
+        [self.tableView reloadData];
+    }else {
+        //自动刷新(一进入程序就下拉刷新)
+        [self.tableView headerBeginRefreshing];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -89,6 +94,9 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -119,26 +127,14 @@
     return _tableView;
 }
 #pragma mark - private
-
+// 添加下拉刷新头部控件
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加下拉刷新头部控件
-    [self.tableView addHeaderWithCallback:^{
-        // 进入刷新状态就会回调这个Block
-        
-        [weakSelf testData];
-        
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.tableView reloadData];
-            // 结束刷新
-            [weakSelf.tableView headerEndRefreshing];
-        });
-    } dateKey:@"WQColorVC"];
-    // dateKey用于存储刷新时间，也可以不传值，可以保证不同界面拥有不同的刷新时间
     
-    //自动刷新(一进入程序就下拉刷新)
-    [self.tableView headerBeginRefreshing];
+    [self.tableView addHeaderWithCallback:^{
+        weakSelf.dataArray = nil;
+        [weakSelf getSizeList];
+    } dateKey:@"WQColorVC"];
 }
 
 -(void)setSelectedIndex:(NSInteger)selectedIndex {
@@ -172,24 +168,23 @@
 //右侧边栏的代理
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
     UITextField *textField;
-    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatSize", @"") message:nil textField:&textField block:^(BlockTextPromptAlertView *alert){
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatSize", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        DLog(@"Text: %@", textField.text);
-        
-        WQSizeObj *colorObj = [[WQSizeObj alloc]init];
-        colorObj.sizeName = textField.text;
-        [self.dataArray addObject:colorObj];
-        
-        NSIndexPath *idx = [NSIndexPath indexPathForRow:self.dataArray.count-1 inSection:0];
-        
-        [self.tableView beginUpdates];
-        [self.tableView insertRowsAtIndexPaths:@[idx] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
+        [WQAPIClient addSizeWithParameters:@{@"sizeName":textField.text} block:^(WQSizeObj *sizeObject, NSError *error) {
+            [self.dataArray addObject:sizeObject];
+            [[WQDataShare sharedService].sizeArray addObject:sizeObject];
+            [self setNoneText:nil animated:NO];
+            NSIndexPath *idx = [NSIndexPath indexPathForRow:self.dataArray.count-1 inSection:0];
+            
+            [self.tableView beginUpdates];
+            [self.tableView insertRowsAtIndexPaths:@[idx] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView endUpdates];
+        }];
     }];
     [alert show];
 }
@@ -258,6 +253,7 @@
         }
     }
 }
+//删除尺码
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     if (point.x < 0 && (0-point.x) >= swipeTableViewCell.contentView.height) {
         
@@ -267,11 +263,11 @@
         if (sizeObj.productCount>0) {
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"SizeDelete", @"")];
         }else {
+            swipeTableViewCell.shouldAnimateCellReset = YES;
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-                swipeTableViewCell.shouldAnimateCellReset = NO;
                 [UIView animateWithDuration:0.25
                                       delay:0
                                     options:UIViewAnimationOptionCurveLinear
@@ -279,13 +275,18 @@
                                      swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
                                  }
                                  completion:^(BOOL finished) {
-                                     
-                                     [self.dataArray removeObjectAtIndex:indexPath.row];
-                                     [swipeTableViewCell setHidden:YES];
-                                     
-                                     [self.tableView beginUpdates];
-                                     [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                                     [self.tableView endUpdates];
+                                     [WQAPIClient deleteSizeWithParameters:@{@"sizeId":[NSNumber numberWithInteger:sizeObj.sizeId]} block:^(NSInteger finished, NSError *error) {
+                                         [self.dataArray removeObjectAtIndex:indexPath.row];
+                                         [[WQDataShare sharedService].sizeArray removeObjectAtIndex:indexPath.row];
+                                         
+                                         if (self.dataArray.count==0) {
+                                             [self setNoneText:NSLocalizedString(@"NoneSize", @"") animated:YES];
+                                         }
+                                         
+                                         [swipeTableViewCell setHidden:YES];
+                                         
+                                         [self.tableView reloadData];
+                                     }];
                                  }
                  ];
             }];
@@ -293,23 +294,25 @@
         }
     }
 }
+//修改尺码
 -(void)editDidLongPressedOption:(RMSwipeTableViewCell *)cell {
     UITextField *textField;
-    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditSize", @"") message:nil defaultText:[(WQRightCell *)cell sizeObj].sizeName textField:&textField block:^(BlockTextPromptAlertView *alert){
+    BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditSize", @"") message:nil defaultText:[(WQRightCell *)cell sizeObj].sizeName textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        DLog(@"Text: %@", textField.text);
-        
         WQSizeObj *sizeObj = (WQSizeObj *)self.dataArray[[[(WQRightCell *)cell indexPath] row]];
-        sizeObj.sizeName = textField.text;
         
-        [self.tableView beginUpdates];
-        [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
+        [WQAPIClient editSizeWithParameters:@{@"sizeId":[NSNumber numberWithInteger:sizeObj.sizeId],@"sizeName":textField.text} block:^(NSInteger finished, NSError *error) {
+            sizeObj.sizeName = textField.text;
+            
+            [self.tableView beginUpdates];
+            [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView endUpdates];
+        }];
     }];
     [alert show];
 }

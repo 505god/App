@@ -10,7 +10,7 @@
 
 @interface WQCustomerOrderObj : NSObject
 
-@property (nonatomic, assign) NSInteger orderId;
+@property (nonatomic, strong) NSString *orderId;
 @property (nonatomic, strong) NSString *orderTime;
 ///订单价格
 @property (nonatomic, assign) CGFloat orderPrice;

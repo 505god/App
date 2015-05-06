@@ -1,0 +1,28 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "pricelineList": [
+                          {
+                          "time": "2014/03/14",
+                          "price": "993",
+                          "orderCount": "56"
+                          },
+                          {
+                          "time": "2014/03/13",
+                          "price": "993",
+                          "orderCount": "56"
+                          },
+                          {
+                          "time": "2014/03/12",
+                          "price": "993",
+                          "orderCount": "56"
+                          },
+                          {
+                          "time": "2014/03/11",
+                          "price": "993",
+                          "orderCount": "56"
+                          }
+                          ]
+    }
+}

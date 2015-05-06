@@ -15,4 +15,6 @@
  */
 @interface WQClassifyVC : BaseViewController
 
+@property (nonatomic, strong) UINavigationController *navControl;
+
 @end

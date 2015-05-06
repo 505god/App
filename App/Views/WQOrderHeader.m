@@ -20,6 +20,15 @@
 @property (nonatomic, strong) UIImageView *arrawImage;
 
 @property (nonatomic, strong) UIImageView *lineView;
+
+@property (nonatomic, strong) UIImageView *editGreyImageView;
+@property (nonatomic, strong) UIImageView *editRedImageView;
+
+@property (nonatomic, strong) UIImageView *deleteGreyImageView;
+@property (nonatomic, strong) UIImageView *deleteRedImageView;
+
+//@property (nonatomic, strong) UIImageView *remindGreyImageView;
+//@property (nonatomic, strong) UIImageView *remindRedImageView;
 @end
 
 @implementation WQOrderHeader
@@ -57,7 +66,7 @@
         [self.contextMenuView addSubview:self.customerLab];
         
         self.customerImg = [[UIImageView alloc]initWithFrame:CGRectZero];
-        self.customerImg.image = [UIImage imageNamed:@"addProperty"];
+        self.customerImg.image = [UIImage imageNamed:@"customer"];
         self.customerImg.backgroundColor = [UIColor clearColor];
         [self.contextMenuView addSubview:self.customerImg];
         
@@ -104,12 +113,21 @@
     _aSection = aSection;
 }
 
+/*
+ type:
+ 0=客户
+ 1=待处理
+ 2=待付款
+ 3=已完成
+ */
 -(void)setType:(NSInteger)type {
     _type = type;
     
     if (type ==0) {
+        self.customerImg.hidden = YES;
         self.customerLab.hidden = YES;
     }else {
+        self.customerImg.hidden = NO;
         self.customerLab.hidden = NO;
     }
 }
@@ -144,7 +162,8 @@
     
     self.priceLab.frame = (CGRect){10,self.codeLab.bottom+5,self.priceLab.width,self.priceLab.height};
     
-    self.customerLab.frame = (CGRect){10,self.priceLab.bottom+5,self.customerLab.width,self.customerLab.height};
+    self.customerImg.frame = (CGRect){10,self.priceLab.bottom+5,self.customerLab.height,self.customerLab.height};
+    self.customerLab.frame = (CGRect){self.customerImg.right+5,self.priceLab.bottom+5,self.customerLab.width,self.customerLab.height};
     
     self.timeLab.frame = (CGRect){self.width-self.timeLab.width-10,self.codeLab.top,self.timeLab.width,self.timeLab.height};
     
@@ -157,7 +176,7 @@
 
 -(UIImageView*)deleteGreyImageView {
     if (!_deleteGreyImageView) {
-        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.frame), 0, self.height, self.height)];
+        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.frame), (self.height-40)/2, 40, 40)];
         [_deleteGreyImageView setImage:[UIImage imageNamed:@"DeleteGrey"]];
         [_deleteGreyImageView setContentMode:UIViewContentModeCenter];
         [self.backView addSubview:_deleteGreyImageView];
@@ -177,8 +196,8 @@
 
 -(UIImageView*)editGreyImageView {
     if (!_editGreyImageView) {
-        _editGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.height, self.height)];
-        [_editGreyImageView setImage:[UIImage imageNamed:@"CheckmarkGrey"]];
+        _editGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, (self.height-40)/2, 40, 40)];
+        [_editGreyImageView setImage:[UIImage imageNamed:self.type==1?@"orderEditGrey":@"orderRemindGrey"]];
         [_editGreyImageView setContentMode:UIViewContentModeCenter];
         [self.backView addSubview:_editGreyImageView];
     }
@@ -188,14 +207,12 @@
 -(UIImageView*)editRedImageView {
     if (!_editRedImageView) {
         _editRedImageView = [[UIImageView alloc] initWithFrame:self.editGreyImageView.bounds];
-        [_editRedImageView setImage:[UIImage imageNamed:@"CheckmarkGreen"]];
+        [_editRedImageView setImage:[UIImage imageNamed:self.type==1?@"orderEditRed":@"orderRemindRed"]];
         [_editRedImageView setContentMode:UIViewContentModeCenter];
         [self.editGreyImageView addSubview:_editRedImageView];
     }
     return _editRedImageView;
 }
-
-
 -(void)cleanupBackView {
     [super cleanupBackView];
     [_deleteGreyImageView removeFromSuperview];
@@ -213,20 +230,21 @@
 
 -(void)animateContentViewForPoint:(CGPoint)point velocity:(CGPoint)velocity {
     [super animateContentViewForPoint:point velocity:velocity];
+    
+    CGFloat width = 50;
+    
     if (point.x > 0) {
         [self.editGreyImageView setFrame:CGRectMake(MIN(CGRectGetMinX(self.contextMenuView.frame) - self.editGreyImageView.width, 0), CGRectGetMinY(self.editGreyImageView.frame), self.editGreyImageView.width,self.editGreyImageView.height)];
         
-        if (point.x >= self.contextMenuView.height) {
+        if (point.x >= width) {
             [self.editRedImageView setAlpha:1];
         }else {
             [self.editRedImageView setAlpha:0];
         }
     }else if (point.x < 0) {
         [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.frame) - self.deleteGreyImageView.width, CGRectGetMaxX(self.contextMenuView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
-        
-        DLog(@"%f",MAX(CGRectGetMaxX(self.frame) - self.deleteGreyImageView.width, CGRectGetMaxX(self.contextMenuView.frame)));
-        
-        if (-point.x >= self.contextMenuView.height) {
+
+        if (-point.x >= width) {
             [self.deleteRedImageView setAlpha:1];
         } else {
             [self.deleteRedImageView setAlpha:0];

@@ -1,0 +1,41 @@
+{
+    "status": "1",
+    "msg": "sss",
+    "returnObj": {
+        "productId": 0,
+        "type": 1,
+        "productName": "篮球鞋",
+        "productPrice": "288",
+        "productStock": 873734,
+        "proClassAId": 0,
+        "proClassAName": "",
+        "proClassBId": 1,
+        "proClassBName": "",
+        "proIsHot": 1,
+        "proIsOnSale": 1,
+        "proOnSaleType": 0,
+        "proSalePrice": "",
+        "proSaleStartTime": "",
+        "proSaleEndTime": "",
+        "onSaleStock": 0,
+        "customers": [
+                      "0",
+                      "1"
+                      ],
+        "proImgArray": [
+                        {
+                        "proImg": "http://",
+                        "proColorId": 0,
+                        "proColorName": "看见电视",
+                        "proSizeArray": [
+                                         {
+                                         "proSizeId": 0,
+                                         "proSizeName": "黑",
+                                         "productPrice": "2",
+                                         "productStock": 0
+                                         }
+                                         ]
+                        }
+                        ]
+    }
+}

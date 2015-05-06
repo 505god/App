@@ -7,43 +7,39 @@
 //
 
 #import "WQInfoVC.h"
-#import "WQTapImg.h"
+#import "WQInputText.h"
+#import "UIView+XD.h"
 
-#import "JKImagePickerController.h"
-#import <AssetsLibrary/AssetsLibrary.h>
+@interface WQInfoVC ()<UITextFieldDelegate,WQNavBarViewDelegate>
 
-@interface WQInfoVC ()<JKImagePickerControllerDelegate,UITextFieldDelegate,WQTapImgDelegate>
+@property (nonatomic, strong) UITextField *userText;
+@property (nonatomic, strong) UILabel *userTextName;
 
-@property (nonatomic, weak) IBOutlet WQTapImg *headerImg;
+@property (nonatomic, strong) UITextField *passwordText;
+@property (nonatomic, strong) UILabel *passwordTextName;
 
-@property (nonatomic, weak) IBOutlet UILabel *promptLab;
-@property (nonatomic, weak) IBOutlet UITextField *passwordText1;
-@property (nonatomic, weak) IBOutlet UITextField *passwordText2;
-
-@property (nonatomic, weak) IBOutlet UITextField *companyText;
-@property (nonatomic, weak) IBOutlet UIButton *signBtn;
+@property (nonatomic, assign) BOOL chang;
 
 @end
 
 @implementation WQInfoVC
 
+-(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
+    [self.navigationController popViewControllerAnimated:YES];
+}
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"填写信息";
+    //导航栏
+    [self.navBarView setTitleString:NSLocalizedString(@"logInPassword", @"")];
+    [self.navBarView.rightBtn setHidden:YES];
+    self.navBarView.isShowShadow = YES;
+    self.navBarView.navDelegate = self;
+    [self.view addSubview:self.navBarView];
     
-    if (self.type==0) {//注册
-        self.headerImg.image = [UIImage imageNamed:@"randomheader_7"];
-        self.headerImg.delegate = self;
-        
-    }else if (self.type==1){//找回密码
-        //TODO:显示用户头像
-        self.promptLab.hidden = YES;
-        self.companyText.userInteractionEnabled = NO;
-        self.companyText.text = self.phoneNumber;
-    }
+    [self setupInputRectangle];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -69,106 +65,123 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - touchesBegan
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [self.view endEditing:YES];
-}
+#pragma mark - 添加输入框
 
--(IBAction)signBtnPressed:(id)sender {
-    if ([Utility checkString:self.companyText.text]) {
-        if ([Utility checkString:self.passwordText1.text]) {
-            if (![self.passwordText1.text isEqualToString:self.passwordText2.text]) {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:@"两次密码不一致"];
-            }else {
-//                [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"努力加载中...",KVNProgressViewParameterBackgroundType:@(KVNProgressBackgroundTypeSolid),KVNProgressViewParameterFullScreen: @(NO)}];
-                
-                if (self.type==0) {
-                    
-                }else if (self.type==1) {
-                    
-                }
-            }
-        }else {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请设置密码"];
-        }
-    }else {
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请输入用户姓名"];
+- (void)setupInputRectangle {
+    CGFloat centerX = [UIScreen mainScreen].bounds.size.width * 0.5;
+    WQInputText *inputText = [[WQInputText alloc] init];
+    CGFloat userY = 100;
+    
+    //帐号
+    self.userText = [inputText setupWithIcon:@"login_pwd" textY:userY centerX:centerX point:nil];
+    self.userText.delegate = self;
+    [self.userText setReturnKeyType:UIReturnKeyNext];
+    [self.view addSubview:self.userText];
+    
+    self.userTextName = [self setupTextName:NSLocalizedString(@"logInPassword", @"") frame:self.userText.frame];
+    [self.view addSubview:self.userTextName];
+    
+    //密码
+    CGFloat passwordY = self.userText.bottom + 30;
+    self.passwordText = [inputText setupWithIcon:@"login_pwd" textY:passwordY centerX:centerX point:nil];
+    [self.passwordText setReturnKeyType:UIReturnKeyDone];
+    [self.passwordText setSecureTextEntry:YES];
+    self.passwordText.delegate = self;
+    [self.view addSubview:self.passwordText];
+    
+    self.passwordTextName = [self setupTextName:NSLocalizedString(@"confirmPassword", @"") frame:self.passwordText.frame];
+    [self.view addSubview:self.passwordTextName];
+    
+    //登录
+    UIButton *loginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    loginBtn.width = self.userText.width;
+    loginBtn.height = 40;
+    loginBtn.x = self.passwordText.left;
+    loginBtn.y = self.passwordText.bottom + 50;
+    [loginBtn setTitle:NSLocalizedString(@"submit", @"") forState:UIControlStateNormal];
+    loginBtn.backgroundColor = COLOR(251, 0, 41, 1);
+    loginBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [loginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [loginBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
+    [loginBtn addTarget:self action:@selector(submit) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:loginBtn];
+    
+    SafeRelease(loginBtn);SafeRelease(inputText);
+}
+-(void)submit {
+    NSString *msg = @"";
+    
+    if (self.userText.text.length==0) {
+        msg = NSLocalizedString(@"logInPasswordError", @"");
+    }else if (![self.userText.text isEqualToString:self.passwordText.text]){
+        msg = NSLocalizedString(@"confirmPasswordError", @"");
     }
+    
+    if (msg.length>0) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:msg];
+    }else {
+        
+    }
+}
+- (UILabel *)setupTextName:(NSString *)textName frame:(CGRect)frame
+{
+    UILabel *textNameLabel = [[UILabel alloc] init];
+    textNameLabel.text = textName;
+    textNameLabel.font = [UIFont systemFontOfSize:16];
+    textNameLabel.textColor = [UIColor whiteColor];
+    frame.origin.x += 20;
+    textNameLabel.frame = frame;
+    return textNameLabel;
 }
 #pragma mark - UITextFieldDelegate
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-    if (textField == self.companyText){
-        return [self.passwordText1 becomeFirstResponder];
-    }else if (textField == self.passwordText1){
-        return [self.passwordText2 becomeFirstResponder];
-    }else if (textField == self.passwordText2){
-        return [self.view endEditing:YES];
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    if (textField == self.userText) {
+        [self diminishTextName:self.userTextName];
+        [self restoreTextName:self.passwordTextName textField:self.passwordText];
+    } else if (textField == self.passwordText) {
+        [self diminishTextName:self.passwordTextName];
+        [self restoreTextName:self.userTextName textField:self.userText];
     }
     return YES;
 }
-
-#pragma mark - RpImageViewTapDelegate
-- (void)tappedWithObject:(id) sender {
-    JKImagePickerController *imagePickerController = [[JKImagePickerController alloc] init];
-    imagePickerController.delegate = self;
-    imagePickerController.allowsMultipleSelection = YES;
-    imagePickerController.minimumNumberOfSelection = 1;
-    imagePickerController.maximumNumberOfSelection = 1;
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:imagePickerController];
-    [self presentViewController:navigationController animated:YES completion:NULL];
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if (textField == self.userText) {
+        return [self.passwordText becomeFirstResponder];
+    } else {
+        [self restoreTextName:self.passwordTextName textField:self.passwordText];
+        return [self.passwordText resignFirstResponder];
+    }
 }
-#pragma mark - JKImagePickerControllerDelegate
-- (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAssets:(NSArray *)assets isSource:(BOOL)source
-{
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    __weak typeof(self) weakSelf = self;
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        JKAssets *asset = (JKAssets *)assets[0];
-        __block UIImage *image = nil;
-        ALAssetsLibrary   *lib = [[ALAssetsLibrary alloc] init];
-        [lib assetForURL:asset.assetPropertyURL resultBlock:^(ALAsset *asset) {
-            if (asset) {
-                UIImage *tempImg = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]];
-                image = [weakSelf dealImage:tempImg];
-            }
-        } failureBlock:^(NSError *error) {
-            
-        }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [imagePicker dismissViewControllerAnimated:YES completion:^{
-                weakSelf.headerImg.image = image;
-                [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-            }];
-        });
-    });
-}
-
-- (void)imagePickerControllerDidCancel:(JKImagePickerController *)imagePicker
-{
-    [imagePicker dismissViewControllerAnimated:YES completion:^{
-        
+- (void)diminishTextName:(UILabel *)label {
+    [UIView animateWithDuration:0.5 animations:^{
+        label.transform = CGAffineTransformMakeTranslation(-20, -16);
+        label.font = [UIFont systemFontOfSize:12];
     }];
 }
-
-
--(UIImage *)dealImage:(UIImage *)image {
-    CGFloat compression = 0.9f;
-    CGFloat maxCompression = 0.1f;
-    int maxFileSize = 200*1024;
-    
-    NSData *imageData = UIImageJPEGRepresentation(image, compression);
-    
-    while ([imageData length] > maxFileSize && compression > maxCompression)
-    {
-        compression -= 0.1;
-        imageData = UIImageJPEGRepresentation(image, compression);
+- (void)restoreTextName:(UILabel *)label textField:(UITextField *)textFieled {
+    [self textFieldTextChange:textFieled];
+    if (self.chang) {
+        [UIView animateWithDuration:0.5 animations:^{
+            label.transform = CGAffineTransformIdentity;
+            label.font = [UIFont systemFontOfSize:16];
+        }];
     }
-    
-    return [UIImage imageWithData:imageData];
 }
+- (void)textFieldTextChange:(UITextField *)textField {
+    if (textField.text.length != 0) {
+        self.chang = NO;
+    } else {
+        self.chang = YES;
+    }
+}
+
+#pragma mark - touchesBegan
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    [self.view endEditing:YES];
+    [self restoreTextName:self.userTextName textField:self.userText];
+    [self restoreTextName:self.passwordTextName textField:self.passwordText];
+}
+
 
 @end

@@ -10,7 +10,7 @@
 #import "WQCellSelectedBackground.h"
 
 #import "WQCreatProductVC.h"
-
+#import "WQProductDetailVC.h"
 #define TextTag 100
 #define NextTextTag 1000
 
@@ -166,6 +166,13 @@
     self.textField2.delegate = productVC;
 }
 
+-(void)setDetailVC:(WQProductDetailVC *)detailVC {
+    _detailVC = detailVC;
+    
+    self.textField.delegate = detailVC;
+    self.textField2.delegate = detailVC;
+}
+
 -(void)setIdxPath:(NSIndexPath *)idxPath {
     _idxPath = idxPath;
     
@@ -182,7 +189,8 @@
  3=分类
  4=客户
  5=完成创建
- 
+ 6=热卖
+ 7=优惠方式
  */
 -(void)setDataDic:(NSDictionary *)dataDic {
     _dataDic = dataDic;
@@ -193,7 +201,8 @@
     self.detailLab.hidden = YES;
     self.textLabel.hidden = YES;
     [self.switchBtn setHidden:YES];
-    
+    self.textField.hidden = NO;
+    self.lineView.hidden = NO;
     NSInteger status = [[dataDic objectForKey:@"status"]integerValue];
     if (status == 0) {///名称
         self.titleLab.text = [dataDic objectForKey:@"titleName"];
@@ -212,9 +221,9 @@
         self.textField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
         
         self.titleLab2.text = [dataDic objectForKey:@"titleStock"];
-        self.textField2.text = [dataDic objectForKey:@"stock"];
-        self.textField.returnKeyType = UIReturnKeyDone;
-        self.textField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+        self.textField2.text = [NSString stringWithFormat:@"%@",[dataDic objectForKey:@"stock"]];
+        self.textField2.returnKeyType = UIReturnKeyDone;
+        self.textField2.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
     }else if (status ==3) {///商品分类
         self.textField.hidden = YES;
         self.lineView.hidden = YES;
@@ -241,7 +250,28 @@
         [self.switchBtn setHidden:NO];
         self.textField.hidden = YES;
         self.lineView.hidden = YES;
+        self.switchBtn.tag = 100;
+        self.titleLab.text = [dataDic objectForKey:@"titleHot"];
+        self.switchBtn.on = [[dataDic objectForKey:@"isOn"] boolValue];
+    }else if (status ==7) {///优惠方式
+        self.textField.hidden = YES;
+        self.lineView.hidden = YES;
+        self.detailLab.hidden = NO;
         
+        self.titleLab.text = [dataDic objectForKey:@"titleSale"];
+        
+        if ([[dataDic objectForKey:@"type"]integerValue]==0) {
+            self.detailLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderSale", @""),[[dataDic objectForKey:@"details"] floatValue]];
+        }else if([[dataDic objectForKey:@"type"]integerValue]==1){
+            self.detailLab.text = [NSString stringWithFormat:@"%d%@",(NSInteger)([[dataDic objectForKey:@"details"]floatValue]*10),NSLocalizedString(@"proDiscount", @"")];
+        }else {
+            self.detailLab.text = NSLocalizedString(@"saleNone", @"");
+        }
+    }else if (status ==8) {//上架
+        [self.switchBtn setHidden:NO];
+        self.textField.hidden = YES;
+        self.lineView.hidden = YES;
+        self.switchBtn.tag = 1000;
         self.titleLab.text = [dataDic objectForKey:@"titleHot"];
         self.switchBtn.on = [[dataDic objectForKey:@"isOn"] boolValue];
     }
@@ -249,6 +279,12 @@
 
 -(void)prepareForReuse {
     [super prepareForReuse];
+    self.titleLab.text = nil;
+    self.titleLab2.text = nil;
+    self.detailLab.text = nil;
+    self.textField.text = nil;
+    self.textField2.text = nil;
+    self.textField.returnKeyType = UIReturnKeyNext;
 }
 
 -(void)switchChanged:(WQSwitch *)sender {

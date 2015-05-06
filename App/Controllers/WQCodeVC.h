@@ -10,9 +10,14 @@
 
 @interface WQCodeVC : BaseViewController
 
-//手机号码
-@property (nonatomic, strong) NSString *phoneNumber;
-//0:注册  1:忘记密码
-@property (nonatomic, assign) NSInteger type;
+@property(nonatomic,strong)  UILabel* telLabel;
+@property(nonatomic,strong)  UITextField* verifyCodeField;
+@property(nonatomic,strong)  UILabel* timeLabel;
+@property(nonatomic,strong)  UIButton* repeatSMSBtn;
+@property(nonatomic,strong)  UIButton* submitBtn;
 
+
+-(void)setPhone:(NSString*)phone AndAreaCode:(NSString*)areaCode;
+-(void)submit;
+-(void)CannotGetSMS;
 @end

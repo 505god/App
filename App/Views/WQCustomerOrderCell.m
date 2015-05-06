@@ -90,7 +90,7 @@
 -(void)setOrderProductObj:(WQCustomerOrderProObj *)orderProductObj {
     _orderProductObj = orderProductObj;
     
-    [self.imageView setImageWithURL:[NSURL URLWithString:orderProductObj.proImg] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:orderProductObj.proImg] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     self.textLabel.text = [NSString stringWithFormat:@"%@",orderProductObj.proName];
     

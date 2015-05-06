@@ -91,8 +91,8 @@
 - (UIButton *)checkButton{
     if (!_checkButton) {
         _checkButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        UIImage  *img = [UIImage imageNamed:@"photo_check_default"];
-        UIImage  *imgH = [UIImage imageNamed:@"photo_check_selected"];
+        UIImage  *img = [UIImage imageNamed:@"selectedNormal"];
+        UIImage  *imgH = [UIImage imageNamed:@"selectedAct"];
         _checkButton.frame = CGRectMake(0, 0, img.size.width, img.size.height);
         [_checkButton setBackgroundImage:img forState:UIControlStateNormal];
         [_checkButton setBackgroundImage:imgH forState:UIControlStateSelected];

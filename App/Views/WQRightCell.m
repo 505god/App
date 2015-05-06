@@ -70,7 +70,7 @@
 
 -(UIImageView*)deleteGreyImageView {
     if (!_deleteGreyImageView) {
-        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contentView.frame), 0, self.contentView.height, self.contentView.height)];
+        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contentView.frame), (self.height-40)/2, 40, 40)];
         [_deleteGreyImageView setImage:[UIImage imageNamed:@"DeleteGrey"]];
         [_deleteGreyImageView setContentMode:UIViewContentModeCenter];
         [self.backView addSubview:_deleteGreyImageView];
@@ -92,6 +92,10 @@
     [super layoutSubviews];
     
     self.contentView.frame = (CGRect){0,0,self.width,self.height};
+    
+    [self.textLabel sizeToFit];
+    self.imageView.frame = (CGRect){20,(self.height-20)/2,20,20};
+    self.textLabel.frame = (CGRect){self.imageView.right+10,(self.height-self.textLabel.height)/2,self.textLabel.width,self.textLabel.height};
     
     if (self.isLevel) {
         self.titleLab.frame = (CGRect){20,(self.contentView.height-20)/2,self.contentView.width-40,20};
@@ -155,6 +159,7 @@
     [super prepareForReuse];
     self.textLabel.text = @"";
     self.titleLab.text = @"";
+    self.imageView.image = nil;
     [self cleanupBackView];
 }
 -(void)cleanupBackView {

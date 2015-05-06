@@ -7,9 +7,13 @@
 //
 
 #import "BaseViewController.h"
+#import "SectionsViewController.h"
 
-@interface WQPhoneVC : BaseViewController
+@interface WQPhoneVC : BaseViewController<SecondViewControllerDelegate,UITextFieldDelegate>
 
-//0:注册  1:忘记密码
-@property (nonatomic, assign) NSInteger type;
+@property(nonatomic,strong) UITableView* tableView;
+@property(nonatomic,strong) UITextField* areaCodeField;
+@property(nonatomic,strong) UITextField* telField;
+
+-(void)nextStep;
 @end

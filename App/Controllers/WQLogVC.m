@@ -12,38 +12,82 @@
 
 #import "WQPhoneVC.h"
 
-@interface WQLogVC ()<UITextFieldDelegate>
+#import "WQTapImg.h"
+#import "SDImageCache.h"
 
-//指令
-@property (nonatomic, strong) UITextField *companyText;
-@property (nonatomic, strong) UILabel *companyTextName;
+#import "UIImageView+AFNetworking.h"
+#import "WQLocalDB.h"
+
+
+@interface WQLogVC ()<UITextFieldDelegate,WQTapImgDelegate>
+
 //用户名、帐号
 @property (nonatomic, strong) UITextField *userText;
-@property (nonatomic, strong) UILabel *userTextName;
 //密码
 @property (nonatomic, strong) UITextField *passwordText;
-@property (nonatomic, strong) UILabel *passwordTextName;
 
+@property (nonatomic, strong) UIButton *forgetBtn;
+@property (nonatomic, strong) UIButton *loginBtn;
 
-@property (nonatomic, assign) BOOL chang;
+///错误次数
+@property (nonatomic, assign) NSInteger wrongNumber;
+@property (nonatomic, strong) WQTapImg *codeImageView;
+
+//验证码
+@property (nonatomic, strong) UITextField *codeText;
 @end
 
 @implementation WQLogVC
 
+#pragma mark - 获取登录错误次数
+-(void)getWrongNumber {
+    
+    __unsafe_unretained typeof(self) weakSelf = self;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        weakSelf.interfaceTask = [WQAPIClient getWrongNumberWithBlock:^(NSInteger wrongNumber, NSError *error) {
+            weakSelf.wrongNumber = wrongNumber;
+        }];
+    });
+}
+
+///验证码
+-(void)getWrongCode {
+    __unsafe_unretained typeof(self) weakSelf = self;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        self.interfaceTask = [WQAPIClient getWrongCodeWithBlock:^(NSString *wrongCode, NSError *error) {
+            
+            NSString *imageURLString = [NSString stringWithFormat:@"%@%@",Host,wrongCode];
+
+            [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
+                [[SDImageCache sharedImageCache]removeImageForKey:imageURLString withCompletion:^{
+                    [weakSelf.codeImageView sd_setImageWithURL:[NSURL URLWithString:imageURLString] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"] options:SDWebImageRefreshCached];
+                }];
+            }];
+            
+        }];
+    });
+}
 
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    
+    [self addObserver:self forKeyPath:@"wrongNumber" options:0 context:nil];
+    
+    [self getWrongNumber];
+    
+    
     [self setupInputRectangle];
+    
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    self.title = @"登录";
-    [self.navigationItem setHidesBackButton:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -52,7 +96,10 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
     
+    [self removeObserver:self forKeyPath:@"wrongNumber"];
     [self.view endEditing:YES];
 }
 
@@ -70,184 +117,148 @@
 - (void)setupInputRectangle {
     CGFloat centerX = [UIScreen mainScreen].bounds.size.width * 0.5;
     WQInputText *inputText = [[WQInputText alloc] init];
-    CGFloat companyY = 20;
-    
-    //指令、公司
-    self.companyText = [inputText setupWithIcon:@"login_name" textY:companyY centerX:centerX point:nil];
-    self.companyText.delegate = self;
-    [self.companyText setReturnKeyType:UIReturnKeyNext];
-    [self.view addSubview:self.companyText];
-    
-    self.companyTextName = [self setupTextName:@"指令" frame:self.companyText.frame];
-    [self.view addSubview:self.companyTextName];
+    CGFloat userY = 100;
     
     //帐号
-    CGFloat userY = CGRectGetMaxY(self.companyText.frame) + 30;
-    self.userText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:nil];
+    self.userText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:NSLocalizedString(@"logInName", @"")];
     self.userText.delegate = self;
     [self.userText setReturnKeyType:UIReturnKeyNext];
     [self.view addSubview:self.userText];
     
-    self.userTextName = [self setupTextName:@"手机" frame:self.userText.frame];
-    [self.view addSubview:self.userTextName];
-    
     //密码
-    CGFloat passwordY = CGRectGetMaxY(self.userText.frame) + 30;
-    self.passwordText = [inputText setupWithIcon:@"login_pwd" textY:passwordY centerX:centerX point:nil];
+    CGFloat passwordY = self.userText.bottom + 30;
+    self.passwordText = [inputText setupWithIcon:@"login_pwd" textY:passwordY centerX:centerX point:NSLocalizedString(@"logInPassword", @"")];
     [self.passwordText setReturnKeyType:UIReturnKeyDone];
     [self.passwordText setSecureTextEntry:YES];
     self.passwordText.delegate = self;
     [self.view addSubview:self.passwordText];
     
-    self.passwordTextName = [self setupTextName:@"密码" frame:self.passwordText.frame];
-    [self.view addSubview:self.passwordTextName];
+    //验证码
+    CGFloat codeY = self.passwordText.bottom + 40;
+    self.codeText = [inputText setupWithIcon:@"login_pwd" textY:codeY centerX:centerX point:NSLocalizedString(@"logInCode", @"")];
+    self.codeText.delegate = self;
+    [self.codeText setReturnKeyType:UIReturnKeyDone];
+    [self.view addSubview:self.codeText];
+    [self.codeText setHidden:YES];
+    
+    self.codeImageView = [[WQTapImg alloc]initWithFrame:(CGRect){self.passwordText.right-120,self.codeText.bottom-50,120,40}];
+    self.codeImageView.delegate = self;
+    self.codeImageView.image = [UIImage imageNamed:@"assets_placeholder_picture"];
+    self.codeImageView.contentMode = UIViewContentModeScaleAspectFill;
+    [self.view addSubview:self.codeImageView];
+    [self.codeImageView setHidden:YES];
     
     //忘记密码
-    UIButton *forgetBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    forgetBtn.width = 64;
-    forgetBtn.height = 20;
-    forgetBtn.x = CGRectGetMaxX(self.passwordText.frame)-64;
-    forgetBtn.y = CGRectGetMaxY(self.passwordText.frame) + 10;
-    [forgetBtn setTitle:@"忘记密码?" forState:UIControlStateNormal];
-    forgetBtn.titleLabel.font = [UIFont systemFontOfSize:14];
-    [forgetBtn setTitleColor:COLOR(242, 242, 242, 1) forState:UIControlStateNormal];
-    [forgetBtn setTitleColor:COLOR(6, 102, 186, 1) forState:UIControlStateHighlighted];
-    [forgetBtn addTarget:self action:@selector(forgetBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:forgetBtn];
+    self.forgetBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.forgetBtn.width = 64;
+    self.forgetBtn.height = 20;
+    self.forgetBtn.x = self.passwordText.right-64;
+    self.forgetBtn.y = self.passwordText.bottom + 10;
+    [self.forgetBtn setTitle:NSLocalizedString(@"forgetPwd", @"") forState:UIControlStateNormal];
+    self.forgetBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+    [self.forgetBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.forgetBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
+    [self.forgetBtn addTarget:self action:@selector(forgetBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.forgetBtn];
     
     //登录
-    UIButton *loginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    loginBtn.width = 120;
-    loginBtn.height = 40;
-    loginBtn.x = CGRectGetMinX(self.passwordText.frame);
-    loginBtn.y = CGRectGetMaxY(self.passwordText.frame) + 50;
-    [loginBtn setTitle:@"登录" forState:UIControlStateNormal];
-    loginBtn.backgroundColor = COLOR(37, 153, 210, 1);
-    loginBtn.titleLabel.font = [UIFont systemFontOfSize:20];
-    [loginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [loginBtn setTitleColor:COLOR(6, 102, 186, 1) forState:UIControlStateHighlighted];
-    [loginBtn addTarget:self action:@selector(loginBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:loginBtn];
+    self.loginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.loginBtn.width = self.userText.width;
+    self.loginBtn.height = 40;
+    self.loginBtn.x = self.passwordText.left;
+    self.loginBtn.y = self.passwordText.bottom + 50;
+    [self.loginBtn setTitle:NSLocalizedString(@"logIn", @"") forState:UIControlStateNormal];
+    self.loginBtn.backgroundColor = COLOR(251, 0, 41, 1);
+    self.loginBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [self.loginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.loginBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
+    [self.loginBtn addTarget:self action:@selector(loginBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.loginBtn];
     
-    //注册
-    UIButton *resigBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    resigBtn.width = 120;
-    resigBtn.height = 40;
-    resigBtn.x = CGRectGetMaxX(self.passwordText.frame)-120;
-    resigBtn.y = CGRectGetMaxY(self.passwordText.frame) + 50;
-    [resigBtn setTitle:@"注册" forState:UIControlStateNormal];
-    resigBtn.layer.borderColor = [UIColor whiteColor].CGColor;
-    resigBtn.layer.borderWidth = 1;
-    resigBtn.titleLabel.font = [UIFont systemFontOfSize:20];
-    [resigBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [resigBtn setTitleColor:COLOR(6, 102, 186, 1) forState:UIControlStateHighlighted];
-    [resigBtn addTarget:self action:@selector(resigBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:resigBtn];
+    SafeRelease(inputText);
 }
 
-- (UILabel *)setupTextName:(NSString *)textName frame:(CGRect)frame
-{
-    UILabel *textNameLabel = [[UILabel alloc] init];
-    textNameLabel.text = textName;
-    textNameLabel.font = [UIFont systemFontOfSize:16];
-    textNameLabel.textColor = [UIColor whiteColor];
-    frame.origin.x += 20;
-    textNameLabel.frame = frame;
-    textNameLabel.alpha = 0.8;
-    return textNameLabel;
-}
 
 - (void)loginBtnClick {
     [self.view endEditing:YES];
     if ([Utility checkString:self.userText.text]) {
-        NSString *phoneRegex = @"1([3-5]|[7-8]){1}[0-9]{9}";
-        NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", phoneRegex];
-        if (![phoneTest evaluateWithObject:self.userText.text]){
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请输入正确手机号码"];
-        }else {
-            if ([Utility checkString:self.passwordText.text]) {
-                DLog(@"登录中...");
-            }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请输入密码"];
+        if ([Utility checkString:self.passwordText.text]) {
+            
+            if (self.codeText.hidden== NO && ![Utility checkString:self.codeText.text]) {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"verifycode", @"")];
+                return;
             }
+            [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            
+            self.interfaceTask = [WQAPIClient logInWithParameters:@{@"userPhone":self.userText.text,@"userPassword":self.passwordText.text,@"validateCode":self.codeText.text} block:^(WQUserObj *user, NSError *error) {
+                [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+                if (!error) {
+                    if (user==nil) {
+                        self.wrongNumber ++;
+                    }else {
+                        [WQDataShare sharedService].userObj = user;
+                        
+                        [[WQLocalDB sharedWQLocalDB] saveUserDataToLocal:user completeBlock:^(BOOL finished) {
+                            if (finished) {
+                                [self.appDel showRootVC];
+                            }
+                        }];    
+                    }
+                }else {
+                    
+                }
+            }];
+        }else {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"logInPasswordError", @"")];
         }
     }else {
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:@"请输入手机号码"];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"logInNameError", @"")];
     }
-}
--(void)pushResignVCWithType:(NSInteger)type {
-    [self.view endEditing:YES];
-    
-    WQPhoneVC *phoneVC = LOADVC(@"WQPhoneVC");
-    phoneVC.type = type;
-    [self.navigationController pushViewController:phoneVC animated:YES];
-     
-    SafeRelease(phoneVC);
-}
--(void)resigBtnClick {
-    [self pushResignVCWithType:0];
 }
 
 -(void)forgetBtnClick {
-    [self pushResignVCWithType:1];
+    [self.view endEditing:YES];
+    
+    WQPhoneVC *phoneVC = [[WQPhoneVC alloc]init];
+    [self.navigationController pushViewController:phoneVC animated:YES];
+    
+    SafeRelease(phoneVC);
 }
 
 #pragma mark - UITextFieldDelegate
-
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
-    if (textField == self.companyText) {
-        [self diminishTextName:self.companyTextName];
-        [self restoreTextName:self.userTextName textField:self.userText];
-        [self restoreTextName:self.passwordTextName textField:self.passwordText];
-    }else if (textField == self.userText) {
-        [self diminishTextName:self.userTextName];
-        [self restoreTextName:self.passwordTextName textField:self.passwordText];
-        [self restoreTextName:self.companyTextName textField:self.companyText];
-    } else if (textField == self.passwordText) {
-        [self diminishTextName:self.passwordTextName];
-        [self restoreTextName:self.userTextName textField:self.userText];
-        [self restoreTextName:self.companyTextName textField:self.companyText];
-    }
-    return YES;
-}
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if (textField == self.companyText) {
-        return [self.userText becomeFirstResponder];
-    } else if (textField == self.userText) {
+    if (textField == self.userText) {
         return [self.passwordText becomeFirstResponder];
     } else {
-        [self restoreTextName:self.passwordTextName textField:self.passwordText];
         return [self.passwordText resignFirstResponder];
-    }
-}
-- (void)diminishTextName:(UILabel *)label {
-    [UIView animateWithDuration:0.5 animations:^{
-        label.transform = CGAffineTransformMakeTranslation(-20, -16);
-        label.font = [UIFont systemFontOfSize:12];
-    }];
-}
-- (void)restoreTextName:(UILabel *)label textField:(UITextField *)textFieled {
-    [self textFieldTextChange:textFieled];
-    if (self.chang) {
-        [UIView animateWithDuration:0.5 animations:^{
-            label.transform = CGAffineTransformIdentity;
-            label.font = [UIFont systemFontOfSize:16];
-        }];
-    }
-}
-- (void)textFieldTextChange:(UITextField *)textField {
-    if (textField.text.length != 0) {
-        self.chang = NO;
-    } else {
-        self.chang = YES;
     }
 }
 
 #pragma mark - touchesBegan
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [self.view endEditing:YES];
-    [self restoreTextName:self.companyTextName textField:self.companyText];
-    [self restoreTextName:self.userTextName textField:self.userText];
-    [self restoreTextName:self.passwordTextName textField:self.passwordText];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+    if ([keyPath isEqualToString:@"wrongNumber"]) {
+        if (self.wrongNumber>=3) {//错误3次
+            self.forgetBtn.frame = (CGRect){self.forgetBtn.left,self.codeText.bottom+10,self.forgetBtn.width,self.forgetBtn.height};
+            
+            self.loginBtn.frame = (CGRect){self.loginBtn.left,self.forgetBtn.bottom+20,self.loginBtn.width,self.loginBtn.height};
+            
+            [self.codeText setHidden:NO];
+            [self.codeImageView setHidden:NO];
+            
+            [self getWrongCode];
+        }
+    }
+}
+
+- (void)tappedWithObject:(id) sender {
+    self.codeImageView.image = [UIImage imageNamed:@"assets_placeholder_picture"];
+    [self getWrongCode];
 }
 @end

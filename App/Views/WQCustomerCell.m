@@ -109,7 +109,7 @@
     
     self.phoneLab.text = customerObj.customerPhone;
     
-    [self.headerImg setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.headerImg sd_setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
 }
 
 

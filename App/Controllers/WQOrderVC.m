@@ -13,6 +13,8 @@
 #import "WQOrderPayVC.h"
 #import "WQOrderFinishVC.h"
 
+#import "WQOrderSearchVC.h"
+
 @interface WQOrderVC ()<WQNavBarViewDelegate>
 
 //待处理、待付款、已完成容器
@@ -23,7 +25,7 @@
 @implementation WQOrderVC
 
 -(void)dealloc {
-    
+    SafeRelease(_pagesContainer);
 }
 
 #pragma mark - lifestyle
@@ -33,7 +35,8 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"OrderVC", @"")];
-    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"searchNormal"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"searchHight"] forState:UIControlStateHighlighted];;
     [self.navBarView.leftBtn setHidden:YES];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
@@ -89,4 +92,12 @@
     SafeRelease(dealVC);SafeRelease(payVC);SafeRelease(finishVC);
 }
 
+#pragma mark - 导航栏代理
+
+//右侧边栏的代理
+-(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    WQOrderSearchVC *orderSearchVC = [[WQOrderSearchVC alloc]init];
+    [self.navigationController pushViewController:orderSearchVC animated:YES];
+    SafeRelease(orderSearchVC);
+}
 @end

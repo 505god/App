@@ -16,6 +16,7 @@
 
 @property (nonatomic, assign) id<WQEditNameVCDelegate>delegate;
 
+@property (nonatomic, strong) UITextField *nameTxt;
 @end
 
 @protocol WQEditNameVCDelegate <NSObject>

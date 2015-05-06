@@ -27,7 +27,7 @@
     
     textField.placeholder = point;
     textField.font = [UIFont systemFontOfSize:16];
-    textField.textColor = [UIColor whiteColor];
+    textField.textColor = [UIColor blackColor];
     textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     textField.clearButtonMode = UITextFieldViewModeAlways;
     UIImage *bigIcon = [UIImage imageNamed:icon];

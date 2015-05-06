@@ -10,12 +10,18 @@
 
 #import "WQMainVC.h"
 
+@class WQXMPPManager;
+@class WQMessageVC;
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
 @property (nonatomic, strong) UINavigationController *navControl;
 
+@property (nonatomic, strong) WQXMPPManager *xmppManager;
+//消息VC
+@property (strong, nonatomic) WQMessageVC *chatVC;
 //首页
 @property (nonatomic, strong) WQMainVC *mainVC;
 

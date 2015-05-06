@@ -18,6 +18,8 @@
 
 #import "BlockAlertView.h"
 
+#import "WQProductVC.h"
+
 @interface WQClassifyVC ()<UITableViewDataSource, UITableViewDelegate,RMSwipeTableViewCellDelegate,WQSwipTableHeaderDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
@@ -37,37 +39,14 @@
     SafeRelease(_dataArray);
     SafeRelease(_arrSelSection);
 }
--(void)testData {
-    NSDictionary *aDic = [Utility returnDicByPath:@"ClassList"];
-    NSArray *array = [aDic objectForKey:@"classList"];
-    
-    __unsafe_unretained typeof(self) weakSelf = self;
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *aDic = (NSDictionary *)obj;
-        WQClassObj *product = [[WQClassObj alloc]init];
-        [product mts_setValuesForKeysWithDictionary:aDic];
-        [weakSelf.dataArray addObject:product];
-        SafeRelease(product);
-        SafeRelease(aDic);
-    }];
-    
-    //判断数据源
-    if (self.dataArray.count>0) {
-        [self.tableView reloadData];
-        [self setNoneText:nil animated:NO];
-    }else {
-        [self setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
-    }
-}
-#pragma mark - 获取分类数据
+
+#pragma mark - 获取分类列表
 
 -(void)getClassList {
     __unsafe_unretained typeof(self) weakSelf = self;
     self.interfaceTask = [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
-        weakSelf.dataArray = nil;
-        weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
+        [weakSelf.dataArray addObjectsFromArray:array];
         
-        //判断数据源
         if (weakSelf.dataArray.count>0) {
             [weakSelf.tableView reloadData];
             [weakSelf setNoneText:nil animated:NO];
@@ -82,6 +61,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //集成刷新控件
+    [self addHeader];
     
     self.isFirstShow = YES;
 }
@@ -90,12 +71,15 @@
     [super viewWillAppear:animated];
     
     if (self.isFirstShow) {
-        //集成刷新控件
-        [self addHeader];
         self.isFirstShow = NO;
         
-        //自动刷新(一进入程序就下拉刷新)
-        [self.tableView headerBeginRefreshing];
+        if ([WQDataShare sharedService].classArray.count>0) {
+            self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].classArray];
+            [self.tableView reloadData];
+        }else {
+            //自动刷新(一进入程序就下拉刷新)
+            [self.tableView headerBeginRefreshing];
+        }
     }
 }
 
@@ -106,7 +90,6 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    [self.tableView headerEndRefreshing];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -121,11 +104,12 @@
 }
 
 #pragma mark - private
-
+// 添加下拉刷新头部控件
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加下拉刷新头部控件
+    
     [self.tableView addHeaderWithCallback:^{
+        weakSelf.dataArray = nil;
         [weakSelf getClassList];
     } dateKey:@"WQClassifyVC"];
 }
@@ -207,13 +191,22 @@
     WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
     
     [cell setLevelClassObj:levelClassObj];
-    cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
+    cell.revealDirection = RMSwipeTableViewCellRevealDirectionNone;
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.delegate = self;
     return cell;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
+    
+    WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
+    
+    WQProductVC *productVC = [[WQProductVC alloc]init];
+    productVC.levelClassObj = levelClassObj;
+    [self.navControl pushViewController:productVC animated:YES];
+    SafeRelease(productVC);
 }
 //去掉UItableview headerview黏性(sticky)
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
@@ -226,6 +219,7 @@
         }
     }
 }
+/*
 #pragma mark - Swipe Table View Cell Delegate
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     
@@ -238,6 +232,7 @@
         if (levelClassObj.productCount>0) {
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassBDelete", @"")];
         }else {
+            swipeTableViewCell.shouldAnimateCellReset = YES;
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
@@ -263,7 +258,7 @@
         }
     }
 }
-
+*/
 
 #pragma mark - section事件
 //展开分类

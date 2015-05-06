@@ -66,7 +66,7 @@
 -(void)setProductObj:(WQProductObj *)productObj {
     _productObj = productObj;
     
-    [self.proImage setImageWithURL:[NSURL URLWithString:productObj.productImage] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.proImage sd_setImageWithURL:[NSURL URLWithString:productObj.productImage] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     self.priceLab.text = productObj.productPrice;
     

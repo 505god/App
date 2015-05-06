@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "WQUserObj.h"
+
 typedef void(^CompleteBlock)(NSArray *array);
 
 @interface WQDataShare : NSObject {
@@ -19,7 +21,9 @@ typedef void(^CompleteBlock)(NSArray *array);
 //区分6、7statusBar高度
 @property (nonatomic, assign) NSInteger statusHeight;
 
-//TODO:分类、颜色、尺码 放到单列里面
+@property (nonatomic, strong) WQUserObj *userObj;
+///xmpp注册
+@property (nonatomic, assign) BOOL idRegister;//1＝注册，0=未注册
 //分类
 @property (nonatomic, strong) NSMutableArray *classArray;
 //颜色

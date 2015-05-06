@@ -22,6 +22,7 @@
 
 @class WQCreatProductVC;
 @class WQProductBtn;
+@class WQProductDetailVC;
 
 @protocol WQProAttributeWithImgCellDelegate;
 
@@ -37,7 +38,9 @@
 
 @property (nonatomic, strong) NSDictionary *dictionary;
 @property (nonatomic, strong) NSIndexPath *indexPath;
+
 @property (nonatomic, strong) WQCreatProductVC *productVC;
+@property (nonatomic, strong) WQProductDetailVC *detailVC;
 
 @property (nonatomic, strong) UIImageView *deleteGreyImageView;
 @property (nonatomic, strong) UIImageView *deleteRedImageView;

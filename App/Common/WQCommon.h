@@ -17,31 +17,6 @@ typedef enum{
     WQOrderTypeFinish=6,     //已完成
 }WQOrderType;
 
-//聊天-------信息类型
-typedef enum{
-    WQMessageTypeText = 0,    //文字
-    WQMessageTypeImage = 1,   //图片
-    WQMessageTypeVoice =2,    //语音
-    WQMessageTypeMap =3,    //地图
-    WQMessageTypeOrder =4,    //订单
-}WQMessageType;
-
-//聊天-------信息来源类型
-typedef enum{
-    WQMessageCellTypeMe = 0,      //我
-    WQMessageCellTypeOther = 1,   //其他人
-}WQMessageCellType;
-
-
-//聊天-------键盘输入源
-typedef enum{
-    WQKeyboardTypeSystem = 0, //默认
-    WQKeyboardTypeFace = 1,   //表情
-    WQKeyboardTypePhoto = 2,  //图片
-    WQKeyboardTypeVoice = 3,  //语音
-    WQKeyboardTypeNone = 4,   //没有
-}WQKeyboardType;
-
 //语言-------系统当前语言
 typedef enum{
     WQLanguageChinese = 0,   //汉语
@@ -56,3 +31,15 @@ typedef enum{
     WQCoinEUR = 2,          //欧元
 }WQCoinType;
 
+
+typedef NS_ENUM(NSInteger, MessageType) {
+    WQMessageTypeText     = 0 , // 文字
+    WQMessageTypePicture  = 1 , // 图片
+    WQMessageTypeVoice    = 2   // 语音
+};
+
+
+typedef NS_ENUM(NSInteger, MessageFrom) {
+    WQMessageFromMe    = 0,   // 自己发的
+    WQMessageFromOther = 1    // 别人发得
+};

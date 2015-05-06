@@ -80,10 +80,8 @@
     }
 }
 -(void)setStarNumber:(NSInteger)starNumber{
-    if(_starNumber!=starNumber){
-        _starNumber = starNumber;
-        self.topView.frame = CGRectMake(0, 0, self.starWidth*(starNumber+1), self.bounds.size.height);
-    }
+    _starNumber = starNumber;
+    self.topView.frame = CGRectMake(0, 0, self.starWidth*(starNumber+1), self.bounds.size.height);
 }
 
 -(void)setShowNormal:(BOOL)showNormal {

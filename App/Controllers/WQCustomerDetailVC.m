@@ -42,7 +42,9 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CustomerInfoDetail", @"")];
-    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"customerMore"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"customerMoreNormal"] forState:UIControlStateHighlighted];
+    
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
@@ -95,7 +97,8 @@
         NSDictionary *dic = @{NSLocalizedString(@"customerArea", @""):self.customerObj.customerArea};
         [self.dataArray addObject:dic];
     }
-    NSDictionary *dic = @{NSLocalizedString(@"customerCode", @""):self.customerObj.customerCode};
+//    NSDictionary *dic = @{NSLocalizedString(@"customerCode", @""):self.customerObj.customerCode};
+     NSDictionary *dic = @{NSLocalizedString(@"customerCode", @""):@"test"};
     [self.dataArray addObject:dic];
     
     NSDictionary *dic2 = @{NSLocalizedString(@"customerOrder", @""):@""};

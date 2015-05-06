@@ -15,4 +15,6 @@
  */
 @interface WQHotSaleVC : BaseViewController
 
+@property (nonatomic, strong) UINavigationController *navControl;
+
 @end

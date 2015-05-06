@@ -8,15 +8,7 @@
 
 #import "BaseViewController.h"
 
-#import "PNChartDelegate.h"
-#import "PNChart.h"
+@interface WQSaleVC : BaseViewController
 
-@interface WQSaleVC : BaseViewController<PNChartDelegate>
-
-@property (nonatomic) PNLineChart * lineChart;
-@property (nonatomic) PNBarChart * barChart;
-@property (nonatomic) PNCircleChart * circleChart;
-@property (nonatomic) PNPieChart *pieChart;
-@property (nonatomic) PNScatterChart *scatterChart;
 
 @end

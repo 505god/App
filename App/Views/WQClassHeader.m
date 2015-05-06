@@ -69,7 +69,7 @@
 
 -(UIImageView*)deleteGreyImageView {
     if (!_deleteGreyImageView) {
-        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contextMenuView.frame), 0, self.height, self.height)];
+        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.contextMenuView.frame), (self.height-40)/2, 40, 40)];
         [_deleteGreyImageView setImage:[UIImage imageNamed:@"DeleteGrey"]];
         [_deleteGreyImageView setContentMode:UIViewContentModeCenter];
         [self.backView addSubview:_deleteGreyImageView];

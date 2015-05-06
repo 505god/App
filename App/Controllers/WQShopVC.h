@@ -12,5 +12,4 @@
 
 @interface WQShopVC : BaseViewController
 
-
 @end

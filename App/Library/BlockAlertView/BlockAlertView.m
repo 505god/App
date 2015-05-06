@@ -85,8 +85,9 @@ static UIFont *buttonFont = nil;
             labelView.textAlignment = NSTextAlignmentCenter;
             labelView.text = message;
             
-            [labelView sizeToFit];
-            labelView.frame = (CGRect){kAlertViewBorder, _height, frame.size.width-kAlertViewBorder*2, labelView.height};
+            CGSize size = [message boundingRectWithSize:CGSizeMake(frame.size.width-kAlertViewBorder*2, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:messageFont,NSFontAttributeName, nil] context:nil].size;
+    
+            labelView.frame = (CGRect){kAlertViewBorder, _height, frame.size.width-kAlertViewBorder*2, size.height};
             
             [_view addSubview:labelView];
             

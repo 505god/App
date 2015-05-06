@@ -12,6 +12,8 @@
 
 #import "MJRefresh.h"
 
+#import "WQProductDetailVC.h"
+
 @interface WQHotSaleVC ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -20,55 +22,65 @@
 
 ///当前页开始索引
 @property (nonatomic, assign) NSInteger start;
+@property (nonatomic, assign) NSInteger lastProductId;
+///分页基数---默认10
+@property (nonatomic, assign) NSInteger limit;
 ///总页数
 @property (nonatomic, assign) NSInteger pageCount;
-///刷新
-@property (nonatomic, assign) BOOL isRefreshing;
-///加载
-@property (nonatomic, assign) BOOL isLoadingMore;
-
 @end
 
 @implementation WQHotSaleVC
 
--(void)testData {
-    NSDictionary *aDic = [Utility returnDicByPath:@"ProductList"];
-    NSArray *array = [aDic objectForKey:@"productList"];
-    
-    __unsafe_unretained typeof(self) weakSelf = self;
-    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *aDic = (NSDictionary *)obj;
-        WQProductObj *product = [[WQProductObj alloc]init];
-        [product mts_setValuesForKeysWithDictionary:aDic];
-        [weakSelf.dataArray addObject:product];
-        SafeRelease(product);
-        SafeRelease(aDic);
-    }];
-    
-    //判断数据源
-    if (self.dataArray.count>0) {
-        [self.collectionView reloadData];
-        [self setNoneText:nil animated:NO];
-        [self setToolImage:nil text:nil animated:NO];
-    }else {
-        [self setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
-        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"NewProductVC", @"") animated:YES];
-    }
-}
 -(void)dealloc {
     SafeRelease(_collectionView.delegate);
     SafeRelease(_collectionView.dataSource);
     SafeRelease(_collectionView);
     SafeRelease(_dataArray);
 }
+
+#pragma mark - 获取产品列表
+
+-(void)getProductList {
+    __unsafe_unretained typeof(self) weakSelf = self;
+    self.interfaceTask = [WQAPIClient getHotSaleListWithParameters:@{@"lastProductId":[NSNumber numberWithInteger:self.lastProductId],@"count":[NSNumber numberWithInteger:self.limit]} block:^(NSArray *array, NSInteger pageCount, NSError *error) {
+        if (!error) {
+            if (weakSelf.pageCount<0) {
+                weakSelf.pageCount = pageCount;
+            }
+            
+            [weakSelf.dataArray addObjectsFromArray:array];
+            if (weakSelf.dataArray.count>0) {
+                [weakSelf.collectionView reloadData];
+                [weakSelf setNoneText:nil animated:NO];
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+            }
+            
+            if ((weakSelf.start/10+1)<self.pageCount) {
+                [weakSelf.collectionView removeFooter];
+                [weakSelf addFooter];
+            }else {
+                [weakSelf.collectionView removeFooter];
+            }
+        }else {
+            [weakSelf.collectionView removeFooter];
+        }
+        [weakSelf.collectionView headerEndRefreshing];
+        [weakSelf.collectionView footerEndRefreshing];
+    }];
+}
+
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.limit = 10;
+    
     //集成刷新控件
     [self addHeader];
-    [self addFooter];
+    
+    [self.collectionView headerBeginRefreshing];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -81,6 +93,9 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -96,39 +111,26 @@
 
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加下拉刷新头部控件
     [self.collectionView addHeaderWithCallback:^{
-        // 进入刷新状态就会回调这个Block
+        weakSelf.dataArray = nil;
+        weakSelf.start = 0;
+        weakSelf.lastProductId = 0;
+        weakSelf.pageCount = -1;
         
-        [weakSelf testData];
-        
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.collectionView reloadData];
-            // 结束刷新
-            [weakSelf.collectionView headerEndRefreshing];
-        });
+        [weakSelf getProductList];
     } dateKey:@"WQHotSaleVC"];
-    // dateKey用于存储刷新时间，也可以不传值，可以保证不同界面拥有不同的刷新时间
-    
-     //自动刷新(一进入程序就下拉刷新)
-    [self.collectionView headerBeginRefreshing];
 }
 
 - (void)addFooter {
     __unsafe_unretained typeof(self) weakSelf = self;
-    // 添加上拉刷新尾部控件
     [self.collectionView addFooterWithCallback:^{
-        // 进入刷新状态就会回调这个Block
+        weakSelf.start += weakSelf.limit;
+        if (weakSelf.dataArray.count>0) {
+            WQProductObj *proObj = (WQProductObj *)[weakSelf.dataArray lastObject];
+            weakSelf.lastProductId = proObj.productId;
+        }
         
-        [weakSelf testData];
-        
-        // 模拟延迟加载数据，因此2秒后才调用（真实开发中，可以移除这段gcd代码）
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.collectionView reloadData];
-             //结束刷新
-            [weakSelf.collectionView footerEndRefreshing];
-        });
+        [weakSelf getProductList];
     }];
 }
 
@@ -178,17 +180,23 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    __block UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseIn|UIViewAnimationOptionAllowUserInteraction animations:^{
-        cell.transform = CGAffineTransformMakeScale(1.03, 1.03);
-    } completion:^(BOOL finished) {
-        //
-        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseOut|UIViewAnimationOptionAllowUserInteraction animations:^{
-            cell.transform = CGAffineTransformIdentity;
-        } completion:^(BOOL finished) {
-            
-        }];
-    }];
+    WQProductDetailVC *detailVC = [[WQProductDetailVC alloc]init];
+    
+    WQProductObj *proObj = (WQProductObj *)self.dataArray[indexPath.item];
+    detailVC.productObj = proObj;
+    [self.navControl pushViewController:detailVC animated:YES];
+    SafeRelease(detailVC);
+    
+//    __block UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+//    [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseIn|UIViewAnimationOptionAllowUserInteraction animations:^{
+//        cell.transform = CGAffineTransformMakeScale(1.03, 1.03);
+//    } completion:^(BOOL finished) {
+//        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseOut|UIViewAnimationOptionAllowUserInteraction animations:^{
+//            cell.transform = CGAffineTransformIdentity;
+//        } completion:^(BOOL finished) {
+//            
+//        }];
+//    }];
 }
 
 #pragma mark - toolBar事件

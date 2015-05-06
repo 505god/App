@@ -19,7 +19,7 @@ static CGFloat animationDuration = 1.0;
         if (backgroundImage) {
             self.backgroundColor = [UIColor colorWithPatternImage:backgroundImage];
         }else {
-            self.backgroundColor = COLOR(64, 153, 255, 1);
+            self.backgroundColor = [UIColor clearColor];
         }
         
         self.logoImg = [[UIImageView alloc]init];
