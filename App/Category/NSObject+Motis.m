@@ -225,8 +225,7 @@
     if (originalValue == value && validated)
         validated = [self mts_validateAutomaticallyValue:&value forKey:mappedKey];
     
-    if (validated)
-    {
+    if (validated) {
         [self setValue:value forKey:mappedKey];
     }
     else

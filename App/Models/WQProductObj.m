@@ -11,14 +11,28 @@
 @implementation WQProductObj
 
 + (NSDictionary*)mts_mapping {
-    return  @{@"productId": mts_key(productId),
-              @"productName": mts_key(productName),
-              @"productPrice": mts_key(productPrice),
-              @"productSaleCount": mts_key(productSaleCount),
-              @"productImage": mts_key(productImage),
-              @"productViewCount": mts_key(productViewCount),
-              @"productIsHot": mts_key(productIsHot),
-              @"productIsSale": mts_key(productIsSale)
+    return  @{
+              @"productId": mts_key(proId),
+              @"productImg": mts_key(proImage),
+              @"productName": mts_key(proName),
+              @"productPrice": mts_key(proPrice),
+              @"productStock": mts_key(proStock),
+              @"moneyType": mts_key(moneyType),
+              @"productSaleCount": mts_key(proSaleCount),
+              @"productViewCount": mts_key(proViewCount),
+              @"productIsHot": mts_key(proIsHot),
+              @"productIsSale": mts_key(proIsSale),
+              @"proImgArray": mts_key(proImgArray),
+              @"type": mts_key(type),
+              @"proOnSaleType": mts_key(proOnSaleType),
+              @"onSalePrice": mts_key(onSalePrice),
+              @"onSaleStock": mts_key(onSaleStock),
+              @"proSaleEndTime": mts_key(proSaleEndTime),
+              @"proSaleStartTime": mts_key(proSaleStartTime),
+              @"proClassAName": mts_key(proClassAName),
+              @"proClassAId": mts_key(proClassAId),
+              @"proClassBId": mts_key(proClassBId),
+              @"proClassBName": mts_key(proClassBName),
               };
 }
 

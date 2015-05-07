@@ -24,6 +24,9 @@ typedef void(^CompleteBlock)(NSArray *array);
 @property (nonatomic, strong) WQUserObj *userObj;
 ///xmpp注册
 @property (nonatomic, assign) BOOL idRegister;//1＝注册，0=未注册
+///当前聊天对象的JID
+@property (nonatomic, strong) NSString *otherJID;
+
 //分类
 @property (nonatomic, strong) NSMutableArray *classArray;
 //颜色

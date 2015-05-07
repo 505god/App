@@ -26,6 +26,7 @@
 @property (nonatomic, strong) UIToolbar *accessoryView;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) UIDatePicker *datePicker;
+@property (nonatomic, assign) BOOL isShowDatePicker;
 
 @property (nonatomic, assign) CGFloat keyboardHeight;
 @end
@@ -165,40 +166,38 @@
 }
 
 - (void)hiddenDatePick{
-    if (indexTemp==1) {
+    if (indexTemp.row==1) {
         self.startTime = self.datePicker.date;
-        cellTemp.detailTextLabel.text = [self.dateFormatter stringFromDate:self.startTime];
         [self.objectDic setObject:[self.dateFormatter stringFromDate:self.startTime] forKey:@"start"];
-    }else if (indexTemp==2){
+    }else if (indexTemp.row==2){
         self.endTime = self.datePicker.date;
-        cellTemp.detailTextLabel.text = [self.dateFormatter stringFromDate:self.endTime];
         [self.objectDic setObject:[self.dateFormatter stringFromDate:self.endTime] forKey:@"end"];
     }
+    
+    [self.tableView reloadData];
     
     [UIView animateWithDuration:0.25f animations:^{
         self.accessoryView.frame = (CGRect){0,self.view.height,self.view.width,NavgationHeight};
         self.datePicker.frame = (CGRect){0,self.accessoryView.bottom,self.view.width,216};
         self.tableView.frame = (CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-self.navBarView.height-10};
     }completion:^(BOOL finished) {
-        [self.tableView deselectRowAtIndexPath:cellTemp.indexPath animated:YES];
-        cellTemp = nil;
-        indexTemp = -1;
         [self.datePicker removeFromSuperview];
         [self.accessoryView removeFromSuperview];
         self.datePicker  = nil;
         self.accessoryView = nil;
+        self.isShowDatePicker = NO;
     }];
 }
 - (void)dateChanged:(id)sender  {
-    if (indexTemp==1) {
-        self.startTime = ((UIDatePicker *)sender).date;
-        cellTemp.detailTextLabel.text = [self.dateFormatter stringFromDate:self.startTime];
-        [self.objectDic setObject:[self.dateFormatter stringFromDate:self.startTime] forKey:@"start"];
-    }else if (indexTemp==2){
-        self.endTime = ((UIDatePicker *)sender).date;
-        cellTemp.detailTextLabel.text = [self.dateFormatter stringFromDate:self.endTime];
-        [self.objectDic setObject:[self.dateFormatter stringFromDate:self.endTime] forKey:@"end"];
-    }
+//    if (indexTemp.row==1) {
+//        self.startTime = ((UIDatePicker *)sender).date;
+//        [self.objectDic setObject:[self.dateFormatter stringFromDate:self.startTime] forKey:@"start"];
+//    }else if (indexTemp.row==2){
+//        self.endTime = ((UIDatePicker *)sender).date;
+//        [self.objectDic setObject:[self.dateFormatter stringFromDate:self.endTime] forKey:@"end"];
+//    }
+//    
+//    [self.tableView reloadData];
 }
 #pragma mark - tableView
 
@@ -295,15 +294,13 @@
     }
     return cell;
 }
-static WQProductSaleTypeCell *cellTemp;
-static NSInteger indexTemp;
+static NSIndexPath *indexTemp;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
     
-    cellTemp = (WQProductSaleTypeCell *)[tableView cellForRowAtIndexPath:indexPath];
+    indexTemp = indexPath;
     if (indexPath.row==0) {
     }else if (indexPath.row==1){
-        indexTemp = 1;
         [self.datePicker setMinimumDate:[NSDate date]];
         [self.datePicker setDate:[NSDate date]];
         if (self.endTime) {
@@ -311,9 +308,10 @@ static NSInteger indexTemp;
         }
         [self showDatePicker];
     }else if (indexPath.row==2) {
-        indexTemp = 2;
         if (self.startTime) {
             [self.datePicker setMinimumDate:self.startTime];
+            
+            [self.datePicker setMaximumDate:nil];
         }
         [self showDatePicker];
     }
@@ -324,7 +322,8 @@ static NSInteger indexTemp;
         self.datePicker.frame = (CGRect){0,self.accessoryView.bottom,self.view.width,216};
         self.tableView.frame = (CGRect){0,self.navBarView.bottom+10,self.view.width,self.view.height-self.navBarView.height-10-NavgationHeight-216};
     }completion:^(BOOL finished) {
-        [self scrollToIndex:cellTemp.indexPath animated:YES];
+        [self scrollToIndex:indexTemp animated:YES];
+        self.isShowDatePicker = YES;
     }];
 }
 - (void)scrollToIndex:(NSIndexPath *)indexPath animated:(BOOL)animated {
@@ -360,7 +359,10 @@ static NSInteger indexTemp;
         
         [self scrollToIndex:text.idxPath animated:YES];
         
-        [self hiddenDatePick];
+        if (self.isShowDatePicker) {
+            [self hiddenDatePick];
+        }
+        
     }
 }
 

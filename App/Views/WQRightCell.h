@@ -37,4 +37,6 @@
 
 ///选择时 0=隐藏  1=normal  2=highted
 @property (nonatomic, assign) NSInteger selectedType;
+
+@property (nonatomic, assign) BOOL isCanSelected;
 @end

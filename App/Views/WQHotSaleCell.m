@@ -36,6 +36,8 @@
         self.proImage = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.proImage.backgroundColor = [UIColor clearColor];
         self.proImage.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.proImage.layer.masksToBounds = YES;
+        self.proImage.layer.cornerRadius = 6;
         self.proImage.contentMode = UIViewContentModeScaleAspectFill;
         [self.contentView addSubview:self.proImage];
         
@@ -63,19 +65,33 @@
     return self;
 }
 
+-(NSString *)returnMoneyWithType:(NSInteger)type {
+    if (type==0) {
+        return @"￥";
+    }else if (type==1) {
+        return @"＄";
+    }else if (type==2) {
+        return @"€";
+    }
+    return @"＄";
+}
+
 -(void)setProductObj:(WQProductObj *)productObj {
     _productObj = productObj;
     
-    [self.proImage sd_setImageWithURL:[NSURL URLWithString:productObj.productImage] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.proImage sd_setImageWithURL:[NSURL URLWithString:productObj.proImage] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
-    self.priceLab.text = productObj.productPrice;
+    //￥ ＄ €
+    self.priceLab.text = [NSString stringWithFormat:@"%@ %@",productObj.proPrice,[self returnMoneyWithType:productObj.moneyType]];
     
-    self.nameLab.text = productObj.productName;
+    self.nameLab.text = productObj.proName;
     
-    self.saleLab.text = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"HasSale", @""),productObj.productSaleCount];
+    
+    
+    self.saleLab.text = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"HasSale", @""),productObj.proSaleCount];
     
     //未上架
-    if (productObj.productIsSale==0) {
+    if (productObj.proIsSale==0) {
         self.proImage.layer.borderWidth = 1;
         self.proImage.layer.borderColor = [UIColor darkGrayColor].CGColor;
     }else {
@@ -88,7 +104,6 @@
     
     //(60,60)
     self.proImage.frame = (CGRect){(self.contentView.width-60)/2,10,60,60};
-    [Utility roundView:self.proImage];
     
     self.priceLab.frame = (CGRect){0,self.proImage.bottom+2,self.contentView.width,18};
     

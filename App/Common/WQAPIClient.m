@@ -912,7 +912,7 @@
             
             if ([[jsonData objectForKey:@"status"]integerValue]==1) {
                 NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
-                NSArray *postsFromResponse = [aDic objectForKey:@"productList"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"resultList"];
                 
                 NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
                 
@@ -1018,11 +1018,17 @@
                     block([[jsonData objectForKey:@"status"]integerValue], nil);
                 }
             }else {
+                if (block) {
+                    block(0, nil);
+                }
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (block) {
+            block(0, nil);
+        }
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }

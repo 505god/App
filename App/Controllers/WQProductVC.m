@@ -139,7 +139,7 @@
         weakSelf.start += weakSelf.limit;
         if (weakSelf.dataArray.count>0) {
             WQProductObj *proObj = (WQProductObj *)[weakSelf.dataArray lastObject];
-            weakSelf.lastProductId = proObj.productId;
+            weakSelf.lastProductId = proObj.proId;
         }
         
         [weakSelf getProductList];

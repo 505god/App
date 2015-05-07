@@ -43,7 +43,6 @@
     messageObj.messageContent = [rs stringForColumn:@"messageContent"];
     messageObj.messageDate = [rs stringForColumn:@"messageDate"];
     messageObj.messageType = [[rs stringForColumn:@"messageType"]integerValue];
-    
     return messageObj;
 }
 @end

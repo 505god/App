@@ -23,6 +23,7 @@
 
 #import "WQXMPPManager.h"
 #import "WQMessageVC.h"
+#import "JSONKit.h"
 
 @interface AppDelegate ()<ChatDelegate>
 
@@ -169,7 +170,12 @@
 
 #pragma mark - chatDelegate
 -(void)getNewMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
+    NSDictionary *aDic = [message.body objectFromJSONString];
+    WQMessageObj *messageObj = [WQMessageObj messageFromDictionary:aDic];
     
+    [[WQLocalDB sharedWQLocalDB] saveMessageToLocal:messageObj completeBlock:^(BOOL finished) {
+        
+    }];
 }
 
 -(void)didSendMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {

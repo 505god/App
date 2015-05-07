@@ -407,6 +407,7 @@
 		5D8D1E851AD75446007B2500 /* CreatProductImage.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D8D1E841AD75446007B2500 /* CreatProductImage.json */; };
 		5D8D1E871AD754B1007B2500 /* CreatProductDefault.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D8D1E861AD754B1007B2500 /* CreatProductDefault.json */; };
 		5D8D1E901AD771FC007B2500 /* WQProductBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D8D1E8F1AD771FC007B2500 /* WQProductBtn.m */; };
+		5D91E3FE1AFA137500286CAC /* WQChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D91E3FD1AFA137500286CAC /* WQChatManager.m */; };
 		5D984E0B1AF8917D00A61C00 /* NSDate+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D984E081AF8917D00A61C00 /* NSDate+Utils.m */; };
 		5D984E0C1AF8917D00A61C00 /* NSString+JSMessagesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D984E0A1AF8917D00A61C00 /* NSString+JSMessagesView.m */; };
 		5D984E0F1AF891A900A61C00 /* WQMessageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D984E0E1AF891A900A61C00 /* WQMessageVC.m */; };
@@ -445,6 +446,7 @@
 		5DA9A0621A8C789500E59380 /* SizeList.json in Resources */ = {isa = PBXBuildFile; fileRef = 5DA9A0611A8C789500E59380 /* SizeList.json */; };
 		5DA9A0651A8C7BC100E59380 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */; };
 		5DA9A0701A8C9F9500E59380 /* WQSizeVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DA9A06E1A8C9F9500E59380 /* WQSizeVC.m */; };
+		5DB0E1011AFAFD030084C509 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DB0E1001AFAFD030084C509 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		5DC02C4D1ACE344D005BD8A7 /* WQMainRightCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DC02C4C1ACE344D005BD8A7 /* WQMainRightCell.m */; };
 		5DC02C4F1ACE3583005BD8A7 /* line@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DC02C4E1ACE3583005BD8A7 /* line@2x.png */; };
 		5DCAB01A1AA48A8100760516 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5DCAB01C1AA48A8100760516 /* Localizable.strings */; };
@@ -1253,6 +1255,8 @@
 		5D8D1E861AD754B1007B2500 /* CreatProductDefault.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CreatProductDefault.json; sourceTree = "<group>"; };
 		5D8D1E8E1AD771FC007B2500 /* WQProductBtn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQProductBtn.h; sourceTree = "<group>"; };
 		5D8D1E8F1AD771FC007B2500 /* WQProductBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQProductBtn.m; sourceTree = "<group>"; };
+		5D91E3FC1AFA137500286CAC /* WQChatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQChatManager.h; sourceTree = "<group>"; };
+		5D91E3FD1AFA137500286CAC /* WQChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQChatManager.m; sourceTree = "<group>"; };
 		5D984E071AF8917D00A61C00 /* NSDate+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Utils.h"; sourceTree = "<group>"; };
 		5D984E081AF8917D00A61C00 /* NSDate+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Utils.m"; sourceTree = "<group>"; };
 		5D984E091AF8917D00A61C00 /* NSString+JSMessagesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+JSMessagesView.h"; sourceTree = "<group>"; };
@@ -1324,6 +1328,8 @@
 		5DA9A0641A8C7BC100E59380 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		5DA9A06D1A8C9F9500E59380 /* WQSizeVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQSizeVC.h; sourceTree = "<group>"; };
 		5DA9A06E1A8C9F9500E59380 /* WQSizeVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQSizeVC.m; sourceTree = "<group>"; };
+		5DB0E0FF1AFAFD030084C509 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
+		5DB0E1001AFAFD030084C509 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 		5DC02C4B1ACE344D005BD8A7 /* WQMainRightCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQMainRightCell.h; sourceTree = "<group>"; };
 		5DC02C4C1ACE344D005BD8A7 /* WQMainRightCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQMainRightCell.m; sourceTree = "<group>"; };
 		5DC02C4E1ACE3583005BD8A7 /* line@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "line@2x.png"; path = "../Views/line@2x.png"; sourceTree = "<group>"; };
@@ -1576,6 +1582,8 @@
 				5D7707E71AF4B1D700A5DB42 /* WQMessageContentButton.m */,
 				5D7707E91AF4B22C00A5DB42 /* WQMessageCell.h */,
 				5D7707EA1AF4B22C00A5DB42 /* WQMessageCell.m */,
+				5D91E3FC1AFA137500286CAC /* WQChatManager.h */,
+				5D91E3FD1AFA137500286CAC /* WQChatManager.m */,
 			);
 			name = "聊天";
 			sourceTree = "<group>";
@@ -1987,6 +1995,8 @@
 		5D7324271A7EFC5600949D93 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				5DB0E0FF1AFAFD030084C509 /* JSONKit.h */,
+				5DB0E1001AFAFD030084C509 /* JSONKit.m */,
 				5D3CB9341AF127EE00C52784 /* Voice */,
 				5D5C093C1AEC9BD100E17610 /* SDWebImage */,
 				5D7407EF1AE737F700F53E80 /* FMDB */,
@@ -3511,6 +3521,7 @@
 				5D7325CE1A7F008F00949D93 /* XMPPRoomHybridStorage.m in Sources */,
 				5D3CB9AB1AF1283600C52784 /* ltp.c in Sources */,
 				5D7325F71A7F008F00949D93 /* XMPPMessageArchiving.xcdatamodeld in Sources */,
+				5DB0E1011AFAFD030084C509 /* JSONKit.m in Sources */,
 				5D3CB9E81AF129AD00C52784 /* Decapsulator.m in Sources */,
 				5D7325D71A7F008F00949D93 /* XMPPvCard.xcdatamodeld in Sources */,
 				5D7326101A7F008F00949D93 /* XMPPMessage+XEP_0308.m in Sources */,
@@ -3730,6 +3741,7 @@
 				5D81879A1A8217DF00DF3BFA /* ChineseInclude.m in Sources */,
 				5D81876D1A81D02700DF3BFA /* WQCustomerCell.m in Sources */,
 				5D3CB9E91AF129AD00C52784 /* Encapsulator.m in Sources */,
+				5D91E3FE1AFA137500286CAC /* WQChatManager.m in Sources */,
 				5D3CB9B61AF1283600C52784 /* speex_callbacks.c in Sources */,
 				5D7325BD1A7F008F00949D93 /* XMPPUserCoreDataStorageObject.m in Sources */,
 				5D7326211A7F008F00949D93 /* DDDispatchQueueLogFormatter.m in Sources */,

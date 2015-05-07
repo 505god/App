@@ -12,6 +12,7 @@
 @interface WQRightCell ()
 @property (nonatomic, strong) UIImageView *accessView;
 
+@property (nonatomic, strong) UIView *coverView;
 @end
 
 @implementation WQRightCell
@@ -48,6 +49,12 @@
         [self.accessView setHidden:YES];
         [self.accessView setImage:[UIImage imageNamed:@"selectedNormal"]];
         [self.contentView addSubview:self.accessView];
+        
+        self.coverView = [[UIView alloc]initWithFrame:CGRectZero];
+        self.coverView.backgroundColor = [UIColor whiteColor];
+        self.coverView.alpha = 0.8;
+        [self.coverView setHidden:YES];
+        [self.contentView addSubview:self.coverView];
         
         WQCellSelectedBackground *selectedBackgroundView = [[WQCellSelectedBackground alloc] initWithFrame:CGRectZero];
         [self setSelectedBackgroundView:selectedBackgroundView];
@@ -93,6 +100,8 @@
     
     self.contentView.frame = (CGRect){0,0,self.width,self.height};
     
+    self.coverView.frame = (CGRect){0,0,self.width,self.height-1};
+    
     [self.textLabel sizeToFit];
     self.imageView.frame = (CGRect){20,(self.height-20)/2,20,20};
     self.textLabel.frame = (CGRect){self.imageView.right+10,(self.height-self.textLabel.height)/2,self.textLabel.width,self.textLabel.height};
@@ -104,7 +113,6 @@
     }
     
     self.accessView.frame = (CGRect){self.titleLab.right-20,(self.contentView.height-20)/2,20,20};
-    
     
     self.lineView.frame = (CGRect){self.titleLab.left,self.height-1,self.titleLab.width,2};
 }
@@ -153,6 +161,12 @@
             [self.accessView setImage:[UIImage imageNamed:@"selectedAct"]];
         }
     }
+}
+
+-(void)setIsCanSelected:(BOOL)isCanSelected {
+    _isCanSelected = isCanSelected;
+    
+    self.coverView.hidden = isCanSelected;
 }
 
 -(void)prepareForReuse {

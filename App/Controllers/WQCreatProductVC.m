@@ -134,7 +134,7 @@ static NSInteger selectedIndex = -1;
  */
 //初始化数据
 -(void)setArrayData {
-    self.isContainProImg = NO;
+    self.isContainProImg = YES;
     self.postDictionary = nil;
     self.originArray = [[NSMutableArray alloc]init];
     self.dataArray = [[NSMutableArray alloc]init];
@@ -178,6 +178,14 @@ static NSInteger selectedIndex = -1;
     NSDictionary *aDic5 = @{@"titleFinish":NSLocalizedString(@"AddProduct", @""),@"status":@"5"};
     [self.originArray addObject:aDic5];
     [self.dataArray addObject:aDic5];
+    
+    ///尺码、价格、库存
+    NSDictionary *aDic23 = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"priceDetail":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
+    NSArray *array = @[aDic23];
+    
+    NSDictionary *aDic21 = @{@"image":@"",@"color":@"",@"property":array,@"status":@"2"};
+    [self.dataArray insertObject:aDic21 atIndex:self.dataArray.count-6];
+    
     
     [self.tableView reloadData];
     
@@ -364,7 +372,7 @@ static NSInteger selectedIndex = -1;
                                  [self.dataArray removeObjectAtIndex:indexPath.section];
                                  [swipeTableViewCell setHidden:YES];
                                  
-                                 if (self.dataArray.count==6) {
+                                 if (self.dataArray.count==7) {
                                      self.isContainProImg = NO;
                                  }
                                  [self.tableView reloadData];
@@ -390,24 +398,23 @@ static NSInteger selectedIndex = -1;
         if (self.isContainProImg) {
             BOOL res = [self getPostStringWithImage];
             if (res) {
+                [MBProgressHUD showHUDAddedTo:self.appDel.window.rootViewController.view animated:YES];
                 [self.postDictionary setObject:@"1" forKey:@"type"];
+                
+                [self upLoadImageArray:[self.postDictionary objectForKey:@"proImgArray"]];
             }else
                 return;
         }else {
             BOOL res = [self getPostStringWithoutImage];
             if (res) {
+                [MBProgressHUD showHUDAddedTo:self.appDel.window.rootViewController.view animated:YES];
                 [self.postDictionary setObject:@"0" forKey:@"type"];
-                [self.postDictionary setObject:@"1" forKey:@"moneyType"];
+                
+                [self saveProduct];
+                
             }else
                 return;
         }
-        
-        [self.postDictionary setObject:[NSNumber numberWithInteger:[WQDataShare sharedService].userObj.moneyType] forKey:@"moneyType"];
-        NSString *jsonString = [self dictionaryToJson:self.postDictionary];
-        self.interfaceTask = [WQAPIClient creatProductWithParameters:@{@"product":jsonString} block:^(NSInteger status, NSError *error) {
-            
-        }];
-        
     }else if (indexPath.section == array.count-4){//优惠方式
         __block WQProductSaleVC *saleVC = [[WQProductSaleVC alloc]init];
         saleVC.delegate = self;
@@ -531,15 +538,17 @@ static NSInteger selectedIndex = -1;
         }
     }
     
+    if (self.selectedLevelClassObj && self.selectedClassObj && isPost) {
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"proClassBId"];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedClassObj.classId] forKey:@"proClassAId"];
+    }else {
+        isPost = NO;
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassSelectedError", @"")];
+        self.postDictionary = nil;
+    }
+    
     if (isPost) {
-        if (self.selectedLevelClassObj && self.selectedClassObj) {
-            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"proClassBId"];
-            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedClassObj.classId] forKey:@"proClassAId"];
-        }
-        
-        if (self.selectedCustomers.count>0) {
-            [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
-        }
+        [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
         
         [self.postDictionary setObject:[NSNumber numberWithInteger:self.isHotting] forKey:@"productIsHot"];
         [self.postDictionary setObject:[NSNumber numberWithInteger:self.isOnSale] forKey:@"productIsSale"];
@@ -677,15 +686,17 @@ static NSInteger selectedIndex = -1;
         }
     }
     
+    if (self.selectedLevelClassObj && self.selectedClassObj && isPost) {
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"proClassBId"];
+        [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedClassObj.classId] forKey:@"proClassAId"];
+    }else {
+        isPost = NO;
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassSelectedError", @"")];
+        self.postDictionary = nil;
+    }
+    
     if (isPost) {
-        if (self.selectedLevelClassObj && self.selectedClassObj) {
-            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedLevelClassObj.levelClassId] forKey:@"proClassBId"];
-            [self.postDictionary setObject:[NSNumber numberWithInteger:self.selectedClassObj.classId] forKey:@"proClassAId"];
-        }
-        
-        if (self.selectedCustomers.count>0) {
-            [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
-        }
+        [self.postDictionary setObject:self.selectedCustomers forKey:@"customer"];
         
         [self.postDictionary setObject:[NSNumber numberWithInteger:self.isHotting] forKey:@"productIsHot"];
         [self.postDictionary setObject:[NSNumber numberWithInteger:self.isOnSale] forKey:@"productIsSale"];
@@ -774,7 +785,7 @@ static NSInteger selectedIndex = -1;
 /// JKImagePickerControllerDelegate
 
 - (void)imagePickerController:(JKImagePickerController *)imagePicker didSelectAssets:(NSArray *)assets{
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    [MBProgressHUD showHUDAddedTo:self.appDel.window.rootViewController.view animated:YES];
     
     __weak typeof(self) weakSelf = self;
     JKAssets *asset = (JKAssets *)assets[0];
@@ -782,14 +793,13 @@ static NSInteger selectedIndex = -1;
     ALAssetsLibrary   *lib = [[ALAssetsLibrary alloc] init];
     [lib assetForURL:asset.assetPropertyURL resultBlock:^(ALAsset *asset) {
         if (asset) {
-            UIImage *tempImg = [UIImage imageWithCGImage:asset.thumbnail];//157x157
-            
+            UIImage *tempImg = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]];
             image = [Utility dealImageData:tempImg];//图片处理
             SafeRelease(tempImg);
         }
     } failureBlock:^(NSError *error) {
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"PhotoSelectedError", @"")];
-        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+        [MBProgressHUD hideAllHUDsForView:self.appDel.window.rootViewController.view animated:YES];
     }];
     
     [imagePicker dismissViewControllerAnimated:YES completion:^{
@@ -801,7 +811,7 @@ static NSInteger selectedIndex = -1;
         [mutableDic setObject:image forKey:@"image"];
         [self.dataArray replaceObjectAtIndex:selectedProImageIndex.section withObject:mutableDic];
         selectedProImageIndex = nil;
-        [MBProgressHUD hideAllHUDsForView:weakSelf.view animated:YES];
+        [MBProgressHUD hideAllHUDsForView:weakSelf.appDel.window.rootViewController.view animated:YES];
     }];
 }
 - (void)imagePickerControllerDidCancel:(JKImagePickerController *)imagePicker {
@@ -813,18 +823,30 @@ static NSInteger selectedIndex = -1;
 #pragma mark - 选择尺码
 -(void)selectedProductSize:(WQProductBtn *)sizeBtn {
     DLog(@"选择尺码");
-    
     selectedProImageIndex = sizeBtn.idxPath;
     selectedIndex = sizeBtn.tag - SizeTextFieldTag;
+
+    NSMutableArray *tempArray = [NSMutableArray array];
     
+    NSDictionary *object = (NSDictionary *)self.dataArray[selectedProImageIndex.section];
+    NSArray *array = (NSArray *)[object objectForKey:@"property"];
+    
+    [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if (idx != selectedIndex) {
+            NSDictionary *dic = (NSDictionary *)obj;
+            if ([[dic objectForKey:@"sizeDetail"]isKindOfClass:[WQSizeObj class]] && [dic objectForKey:@"sizeDetail"]!=nil) {
+                WQSizeObj *size = (WQSizeObj *)[dic objectForKey:@"sizeDetail"];
+                [tempArray addObject:[NSString stringWithFormat:@"%d",size.sizeId]];
+            }
+        }
+    }];
+
     __block WQSizeVC *sizeVC = [[WQSizeVC alloc]init];
     sizeVC.isPresentVC = YES;
     sizeVC.delegate = self;
     sizeVC.selectedIndexPath = sizeBtn.idxPath;
+    sizeVC.hasSelectedSize = tempArray;
     
-    ///选择的颜色
-    NSDictionary *object = (NSDictionary *)self.dataArray[selectedProImageIndex.section];
-    NSArray *array = (NSArray *)[object objectForKey:@"property"];
     NSDictionary *aDic = (NSDictionary *)array[selectedIndex];
     if ([[aDic objectForKey:@"sizeDetail"]isKindOfClass:[WQSizeObj class]] && [aDic objectForKey:@"sizeDetail"]!=nil) {
         sizeVC.selectedSizeObj = (WQSizeObj *)[object objectForKey:@"sizeDetail"];
@@ -1106,5 +1128,86 @@ static NSInteger selectedIndex = -1;
 
 -(void)containerWillBeginDragging:(NSNotification *)notification {
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
+}
+
+
+#pragma mark - 上传图像
+static NSInteger upLoadImgCount = 0;
+-(void)upLoadImageArray:(NSArray *)imgArray {
+    if (upLoadImgCount == imgArray.count) {
+        [self saveProduct];
+    }else {
+        NSDictionary *dictionary = (NSDictionary *)imgArray[upLoadImgCount];
+        
+        if ([[dictionary objectForKey:@"productImg"]isKindOfClass:[UIImage class]] && [dictionary objectForKey:@"productImg"]!=nil) {
+            UIImage *image = (UIImage *)[dictionary objectForKey:@"productImg"];
+            
+            [self postProductImg:image index:upLoadImgCount];
+        }else {
+            upLoadImgCount ++;
+            return  [self upLoadImageArray:[self.postDictionary objectForKey:@"proImgArray"]];
+        }
+    }
+}
+-(void)postProductImg:(UIImage *)image index:(NSInteger)index {
+    
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/img/uploadProImg" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile.jpeg" mimeType:@"image/jpeg"];
+    } error:nil];
+    
+    [request setValue:@"test" forHTTPHeaderField:@"registractionid"];
+    
+    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    manager.securityPolicy.allowInvalidCertificates = YES;
+    
+    NSProgress *progress = nil;
+    
+    self.uploadTask = [manager uploadTaskWithStreamedRequest:request progress:&progress completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
+        if (!error) {
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+
+                    NSDictionary *obj = [jsonData objectForKey:@"returnObj"];
+                    NSString *imagePath = [obj objectForKey:@"img"];
+                    
+                    NSMutableArray *mutableArray = [NSMutableArray arrayWithArray:[self.postDictionary objectForKey:@"proImgArray"]];
+                    NSMutableDictionary *mutableDic = mutableArray[index];
+                    [mutableDic setObject:imagePath forKey:@"productImg"];
+                    [mutableArray replaceObjectAtIndex:index withObject:mutableDic];
+                    [self.postDictionary setObject:mutableArray forKey:@"proImgArray"];
+                    
+                    
+                    upLoadImgCount ++;
+                    
+                    return  [self upLoadImageArray:[self.postDictionary objectForKey:@"proImgArray"]];
+                }else {
+                    upLoadImgCount = 0;
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+        }else {
+            upLoadImgCount = 0;
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+        }
+    }];
+    [self.uploadTask resume];
+}
+//最终创建商品
+-(void)saveProduct {
+    [self.postDictionary setObject:[NSNumber numberWithInteger:[WQDataShare sharedService].userObj.moneyType] forKey:@"moneyType"];
+    
+    NSString *jsonString = [self dictionaryToJson:self.postDictionary];
+    self.interfaceTask = [WQAPIClient creatProductWithParameters:@{@"product":jsonString} block:^(NSInteger status, NSError *error) {
+        [MBProgressHUD hideAllHUDsForView:self.appDel.window.rootViewController.view animated:YES];
+        if (!error && status==1) {
+            self.postDictionary = nil;
+            [self setArrayData];
+            [self.tableView setContentOffset:CGPointMake(0, 0) animated:YES];
+        }else {
+            upLoadImgCount = 0;
+        }
+    }];
 }
 @end

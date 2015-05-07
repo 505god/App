@@ -27,10 +27,8 @@
 @property (nonatomic, strong) NSString *messageVoicePath;
 ///消息来源
 @property (nonatomic, assign) MessageFrom fromType;
-
-@property (nonatomic, assign) BOOL showDateLabel;
-///本地数据库里面的id
-@property (nonatomic, strong) NSString *localDBId;
+///显示时间
+@property (nonatomic, assign) NSInteger showDateLabel;
 
 +(WQMessageObj *)messageFromDictionary:(NSDictionary *)aDic;
 

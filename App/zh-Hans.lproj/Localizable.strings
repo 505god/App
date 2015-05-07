@@ -36,7 +36,7 @@
 "CustomerInfoDetail" = "详细资料";
 "CustomerInfoDetailEdit" = "资料设置";
 "ProNumber" = "数量:%ld";
-
+"ClassSelectedError" = "请选择商品分类";
 "ProTotalPrice" = "成交额:%@";
 
 "CustomerPhone" = "手机";

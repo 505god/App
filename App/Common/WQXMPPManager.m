@@ -52,7 +52,7 @@ static WQXMPPManager *sharedManager;
 #pragma mark - xmpp链接
 - (BOOL)myConnect{
     //设置用户
-    XMPPJID *myjid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d@ubuntu",[WQDataShare sharedService].userObj.userId]];
+    XMPPJID *myjid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d@barryhippo.xicp.net",[WQDataShare sharedService].userObj.userId]];
     NSError *error ;
     [self.xmppStream setMyJID:myjid];
     if (![self.xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
@@ -95,7 +95,7 @@ static WQXMPPManager *sharedManager;
 
 #pragma mark - 获取离线消息
 -(void)getOffLineMessage {
-    NSString *jid = [NSString stringWithFormat:@"%d@ubuntu",[WQDataShare sharedService].userObj.userId];
+    NSString *jid = [NSString stringWithFormat:@"%d@barryhippo.xicp.net",[WQDataShare sharedService].userObj.userId];
     XMPPIQ *iq = [[XMPPIQ alloc] initWithXMLString:[NSString stringWithFormat:@"<presence from='%@'><priority>1</priority></presence>",jid]error:nil];
     [self.xmppStream sendElement:iq];
 }
@@ -134,7 +134,7 @@ static WQXMPPManager *sharedManager;
         }
     }else {
         if ([self.xmppStream isConnected] && [self.xmppStream supportsInBandRegistration]) {
-            XMPPJID *myJID = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d@ubuntu",[WQDataShare sharedService].userObj.userId]];
+            XMPPJID *myJID = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d@barryhippo.xicp.net",[WQDataShare sharedService].userObj.userId]];
             [self.xmppStream setMyJID:myJID];
             
             NSError *error ;
@@ -290,5 +290,6 @@ static WQXMPPManager *sharedManager;
     DLog(@"shouldAttemptAutoReconnect:%u",reachabilityFlags);
     return YES;
 }
+
 
 @end

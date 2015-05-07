@@ -207,7 +207,6 @@
     [super layoutSubviews];
     
     self.proImgView.frame = (CGRect){10,5,50,50};
-    [Utility roundView:self.proImgView];
     
     self.colorBtn.frame = (CGRect){self.proImgView.right+20,15,120,30};
     self.arrawImage.frame = (CGRect){self.contentView.width-32,20,20,20};
@@ -342,6 +341,8 @@
     if (!_proImgView) {
         _proImgView= [[WQTapImg alloc]initWithFrame:CGRectZero];
         _proImgView.delegate = self;
+        _proImgView.layer.cornerRadius = 6;
+        _proImgView.layer.masksToBounds = YES;
         _proImgView.contentMode = UIViewContentModeScaleAspectFill;
         _proImgView.image = [UIImage imageNamed:@"assets_placeholder_picture"];
     }

@@ -21,6 +21,9 @@
 @property (nonatomic, strong) WQSizeObj *selectedSizeObj;
 
 @property (nonatomic, strong) NSIndexPath *selectedIndexPath;
+
+///已选择的尺码
+@property (nonatomic, strong) NSMutableArray *hasSelectedSize;
 @end
 
 @protocol WQSizeVCDelegate <NSObject>

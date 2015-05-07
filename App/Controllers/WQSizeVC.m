@@ -221,6 +221,15 @@
         }else {
             [cell setSelectedType:1];
         }
+        
+        if ([self.hasSelectedSize containsObject:[NSString stringWithFormat:@"%d",size.sizeId]]) {
+            [cell setIsCanSelected:NO];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+        }else {
+            [cell setIsCanSelected:YES];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleDefault];
+        }
+        
     }
     
     [cell setSizeObj:size];
@@ -231,24 +240,30 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if (self.isPresentVC) {
-        WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
         
-        if (indexPath.row == self.selectedIndex) {
-            [cell setSelectedType:1];
-            self.selectedIndex = -1;
-            self.selectedSizeObj = nil;
+        WQSizeObj *sizeObj = (WQSizeObj *)self.dataArray[indexPath.row];
+        if ([self.hasSelectedSize containsObject:[NSString stringWithFormat:@"%d",sizeObj.sizeId]]) {
+            
         }else {
-            if (self.selectedIndex>=0) {
-                WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
-                [cellOld setSelectedType:1];
-                
-                [cell setSelectedType:2];
-                self.selectedIndex = indexPath.row;
-                self.selectedSizeObj = (WQSizeObj *)self.dataArray[indexPath.row];
+            WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
+            
+            if (indexPath.row == self.selectedIndex) {
+                [cell setSelectedType:1];
+                self.selectedIndex = -1;
+                self.selectedSizeObj = nil;
             }else {
-                [cell setSelectedType:2];
-                self.selectedIndex = indexPath.row;
-                self.selectedSizeObj = (WQSizeObj *)self.dataArray[indexPath.row];
+                if (self.selectedIndex>=0) {
+                    WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
+                    [cellOld setSelectedType:1];
+                    
+                    [cell setSelectedType:2];
+                    self.selectedIndex = indexPath.row;
+                    self.selectedSizeObj = sizeObj;
+                }else {
+                    [cell setSelectedType:2];
+                    self.selectedIndex = indexPath.row;
+                    self.selectedSizeObj = sizeObj;
+                }
             }
         }
     }
