@@ -9,20 +9,17 @@
 #import "WQOrderDealVC.h"
 #import "MJRefresh.h"
 #import "WQCustomerOrderObj.h"
-#import "WQCustomerOrderProObj.h"
-#import "WQOrderHeader.h"
 #import "WQCustomerOrderCell.h"
 
 #import "BlockAlertView.h"
 #import "BlockTextPromptAlertView.h"
 
 
-@interface WQOrderDealVC ()<UITableViewDelegate,UITableViewDataSource,WQSwipTableHeaderDelegate>
+@interface WQOrderDealVC ()<UITableViewDelegate,UITableViewDataSource,RMSwipeTableViewCellDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
 @property (nonatomic, strong) NSMutableArray *dataArray;
-@property (nonatomic, strong) NSMutableArray *arrSelSection;
 
 
 ///当前页开始索引
@@ -41,39 +38,62 @@
     SafeRelease(_tableView.dataSource);
     SafeRelease(_tableView);
     SafeRelease(_dataArray);
-    SafeRelease(_arrSelSection);
 }
 
 #pragma mark - 获取订单列表
 
 -(void)getOrderList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    self.interfaceTask = [WQAPIClient getOrderListWithParameters:@{@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"count":[NSNumber numberWithInteger:self.limit],@"orderStatus":@"1"} block:^(NSArray *array, NSInteger pageCount, NSError *error) {
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/order/orderList" parameters:@{@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"count":[NSNumber numberWithInteger:self.limit],@"orderStatus":@"1"} success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        if (!error) {
-            if (weakSelf.pageCount<0) {
-                weakSelf.pageCount = pageCount;
-            }
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
             
-            [weakSelf.dataArray addObjectsFromArray:array];
-            if (weakSelf.dataArray.count>0) {
-                [weakSelf.tableView reloadData];
-                [weakSelf setNoneText:nil animated:NO];
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"orderList"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQCustomerOrderObj *orderObj = [[WQCustomerOrderObj alloc] init];
+                    [orderObj mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:orderObj];
+                    SafeRelease(orderObj);
+                }
+                NSInteger orderNumber = [[aDic objectForKey:@"pageCount"]integerValue];
+                
+                if (weakSelf.pageCount<0) {
+                    weakSelf.pageCount = orderNumber;
+                }
+                
+                [weakSelf.dataArray addObjectsFromArray:mutablePosts];
+                if (weakSelf.dataArray.count>0) {
+                    [weakSelf.tableView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+                }
+                
+                if ((weakSelf.start+weakSelf.limit)<weakSelf.pageCount) {
+                    [weakSelf.tableView removeFooter];
+                    [weakSelf addFooter];
+                }else {
+                    [weakSelf.tableView removeFooter];
+                }
             }else {
+                [weakSelf.tableView removeFooter];
                 [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
-            
-            if ((weakSelf.start/10+1)<self.pageCount) {
-                [weakSelf.tableView removeFooter];
-                [weakSelf addFooter];
-            }else {
-                [weakSelf.tableView removeFooter];
-            }
-        }else {
-            [weakSelf.tableView removeFooter];
         }
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.tableView headerEndRefreshing];
+        [weakSelf.tableView footerEndRefreshing];
+        [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -101,6 +121,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -130,17 +151,11 @@
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [_tableView registerClass:[WQOrderHeader class] forHeaderFooterViewReuseIdentifier:@"WQOrderHeader"];
         [self.view addSubview:_tableView];
     }
     return _tableView;
 }
--(NSMutableArray *)arrSelSection {
-    if (!_arrSelSection) {
-        _arrSelSection = [[NSMutableArray alloc]init];
-    }
-    return _arrSelSection;
-}
+
 #pragma mark - private
 // 添加下拉刷新头部控件
 - (void)addHeader {
@@ -166,7 +181,7 @@
         weakSelf.start += weakSelf.limit;
         if (weakSelf.dataArray.count>0) {
             WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)[weakSelf.dataArray lastObject];
-            weakSelf.lastOrderId = orderObj.orderId;
+            weakSelf.lastOrderId = [orderObj.orderId integerValue];
         }
         
         [weakSelf getOrderList];
@@ -174,54 +189,12 @@
 }
 
 #pragma mark - tableView
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if (section==self.dataArray.count-1) {
-        return 0;
-    }
-    return 10;
-}
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 80;
-}
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    WQOrderHeader *header = (WQOrderHeader*)[tableView dequeueReusableHeaderFooterViewWithIdentifier:@"WQOrderHeader"];
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[section];
-    [header setOrderObj:orderObj];
-    header.delegate = self;
-    header.aSection = section;
-    header.type=1;
-    BOOL isSelSection = NO;
-    for (int i = 0; i < self.arrSelSection.count; i++) {
-        if (section == [self.arrSelSection[i] integerValue]) {
-            isSelSection = YES;
-            break;
-        }
-    }
-    header.isSelected = isSelSection;
-    
-    return header;
-}
-
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.tableView.width, 10)];
-    customView.backgroundColor = COLOR(235, 235, 241, 1);
-    
-    return customView;
-}
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    for (int i = 0; i < self.arrSelSection.count; i++) {
-        if (section == [self.arrSelSection[i] integerValue]) {
-            WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[section];
-            return orderObj.productList.count;
-        }
-    }
-    return 0;
-}
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 50;
+    return 112;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -233,52 +206,21 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.section];
+    cell.revealDirection = RMSwipeTableViewCellRevealDirectionBoth;
+    cell.delegate = self;
+    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.row];
     
-    WQCustomerOrderProObj *proObj = (WQCustomerOrderProObj *)orderObj.productList[indexPath.row];
-    
-    [cell setOrderProductObj:proObj];
+    [cell setIndexPath:indexPath];
+    [cell setType:1];
+    [cell setOrderObj:orderObj];
     
     return cell;
 }
 
 #pragma mark -
-
--(void)editDidTapPressedOption:(WQSwipTableHeader *)Header {
-    WQOrderHeader *header = (WQOrderHeader *)Header;
-    
-    //判断打开还是关闭
-    BOOL isSelSection = NO;
-    if (self.arrSelSection.count>0) {
-        
-        for (int i=0; i<self.arrSelSection.count; i++) {
-            if ([self.arrSelSection[i] integerValue]==header.aSection) {//包含
-                isSelSection = YES;
-                break;
-            }
-        }
-    }
-    
-    if (!isSelSection) {//关闭状态
-        WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[header.aSection];
-        if (orderObj.productList.count>0) {
-            [self.arrSelSection addObject:[NSString stringWithFormat:@"%d",header.aSection]];
-            [self.tableView beginUpdates];
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView endUpdates];
-        }
-    }else {//打开状态
-        [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
-        [self.tableView beginUpdates];
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
-    }
-}
-
--(void)swipeTableViewHeaderWillResetState:(WQSwipTableHeader*)swipeTableViewHeader fromPoint:(CGPoint)point animation:(WQSwipTableHeaderAnimationType)animation velocity:(CGPoint)velocity  {
-    
-    WQOrderHeader *header = (WQOrderHeader *)swipeTableViewHeader;
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[header.aSection];
+-(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
+    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.row];
     
     if (point.x >= 50) {
         UITextField *textField;
@@ -289,39 +231,60 @@
         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [WQAPIClient editClassAWithParameters:@{@"orderId":orderObj.orderId,@"price":textField.text} block:^(NSInteger finished, NSError *error) {
-                orderObj.orderPrice = [textField.text floatValue];
+            [[WQAPIClient sharedClient] POST:@"/rest/order/changeOrderPrice" parameters:@{@"orderId":orderObj.orderId,@"price":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
                 
-                [self.tableView beginUpdates];
-                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self.tableView endUpdates];
+                if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                    NSDictionary *jsonData=(NSDictionary *)responseObject;
+                    
+                    if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                        orderObj.orderPrice = [textField.text floatValue];
+                        
+                        [self.tableView beginUpdates];
+                        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                        [self.tableView endUpdates];
+                    }else {
+                        [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                    }
+                }
+                
+            } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
             }];
         }];
         [alert show];
     }else if (point.x < 0 && -point.x >= 50) {
-        header.shouldAnimateCellReset = YES;
+        swipeTableViewCell.shouldAnimateCellReset = YES;
         
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            header.shouldAnimateCellReset = NO;
+            swipeTableViewCell.shouldAnimateCellReset = NO;
             [UIView animateWithDuration:0.25
                                   delay:0
                                 options:UIViewAnimationOptionCurveLinear
                              animations:^{
-                                 header.frame = CGRectOffset(header.bounds, header.width, 0);
+                                 swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
                              }completion:^(BOOL finished) {
                                  
-                                 [WQAPIClient deleteOrderWithParameters:@{@"orderId":orderObj.orderCode} block:^(NSInteger finished, NSError *error) {
-                                     [self.dataArray removeObjectAtIndex:header.aSection];
-                                     if ([self.arrSelSection containsObject:[NSString stringWithFormat:@"%d",header.aSection]]) {
-                                         [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
+                                 [[WQAPIClient sharedClient] POST:@"/rest/order/delOrder" parameters:@{@"orderId":orderObj.orderId} success:^(NSURLSessionDataTask *task, id responseObject) {
+                                     
+                                     if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                                         NSDictionary *jsonData=(NSDictionary *)responseObject;
+                                         
+                                         if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                                             [self.dataArray removeObjectAtIndex:indexPath.row];
+                                             if (self.dataArray.count==0) {
+                                                 [self setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+                                             }
+                                             [self.tableView reloadData];
+                                         }else {
+                                             [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                                         }
                                      }
-                                     if (self.dataArray.count==0) {
-                                         [self setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
-                                     }
-                                     [self.tableView reloadData];
+                                     
+                                 } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                                     [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
                                  }];
                              }];
         }];

@@ -8,54 +8,40 @@
                       {
                       "orderId": 0,
                       "orderTime": "2014-03-11",
-                      "orderPrice": "5409836",
+                      "orderPrice": "158",
                       "orderCode": "23435564733543",
                       "orderStatus": "0",
-                      "customerId": "0",
-                      "customerName": "活动后",
-                      "productList": [
-                                      {
-                                      "proId": "1",
-                                      "proImg": "http://",
-                                      "proName": "篮球",
-                                      "proPrice": "100",
-                                      "proNumber": 3,
-                                      "proSaleType": "1",
-                                      "proDiscount": "0.8",
-                                      "proReducePrice": "30"
-                                      },
-                                      {
-                                      "proId": "2",
-                                      "proImg": "http://",
-                                      "proName": "会计师",
-                                      "proPrice": "130",
-                                      "proNumber": 3,
-                                      "proSaleType": "2",
-                                      "proDiscount": "0",
-                                      "proReducePrice": "30"
-                                      }
-                                      ]
+                      "customerId": "",
+                      "customerName": "sdfdf",
+                      "proId": "1",
+                      "proImg": "http://",
+                      "proColor": "红色",
+                      "proSize": "XL",
+                      "proName": "篮球",
+                      "proPrice": "99",
+                      "proNumber": 3,
+                      "proSaleType": "2",
+                      "proDiscount": "0.8",
+                      "proReducePrice": "30"
                       },
                       {
-                      "orderId": 1,
-                      "orderTime": "2015-05-11",
+                      "orderId": 0,
+                      "orderTime": "2014-03-11",
                       "orderPrice": "158",
-                      "orderCode": "099970435",
+                      "orderCode": "23435564733543",
                       "orderStatus": "0",
-                      "customerId": "0",
-                      "customerName": "就会发生的时代",
-                      "productList": [
-                                      {
-                                      "proId": "1",
-                                      "proImg": "http://",
-                                      "proName": "篮球",
-                                      "proPrice": "158",
-                                      "proNumber": 1,
-                                      "proSaleType": "0",
-                                      "proDiscount": "0.8",
-                                      "proReducePrice": "30"
-                                      }
-                                      ]
+                      "customerId": "",
+                      "customerName": "篮球",
+                      "proId": "1",
+                      "proImg": "http://",
+                      "proColor": "红色",
+                      "proSize": "XL",
+                      "proName": "篮球",
+                      "proPrice": "99",
+                      "proNumber": 3,
+                      "proSaleType": "2",
+                      "proDiscount": "0.8",
+                      "proReducePrice": "30"
                       }
                       ]
     }

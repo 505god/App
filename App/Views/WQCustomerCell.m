@@ -19,6 +19,10 @@
 @property (nonatomic, strong) UILabel *phoneLab;
 
 @property (nonatomic, strong) UIImageView *lineView;
+
+//屏蔽图片
+@property (nonatomic, strong) UIImageView *shieldImg;
+
 @end
 
 @implementation WQCustomerCell
@@ -32,7 +36,14 @@
         
         self.headerImg = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.headerImg.contentMode = UIViewContentModeScaleAspectFill;
+        self.headerImg.layer.cornerRadius = 4;
+        self.headerImg.layer.masksToBounds = YES;
         [self.contentView addSubview:self.headerImg];
+        
+        self.shieldImg = [[UIImageView alloc]initWithFrame:CGRectZero];
+        self.shieldImg.image = [UIImage imageNamed:@"shield"];
+        [self.shieldImg setHidden:YES];
+        [self.contentView addSubview:self.shieldImg];
         
         self.nameLab = [[UILabel alloc]initWithFrame:CGRectZero];
         self.nameLab.backgroundColor = [UIColor clearColor];
@@ -54,6 +65,9 @@
         [self.accessView setHidden:YES];
         [self.accessView setImage:[UIImage imageNamed:@"selectedNormal"]];
         [self.contentView addSubview:self.accessView];
+        
+        self.notificationHub = [[RKNotificationHub alloc]initWithView:self];
+        [self.notificationHub setCount:-1];
         
         WQCellSelectedBackground *selectedBackgroundView = [[WQCellSelectedBackground alloc] initWithFrame:CGRectZero];
         [self setSelectedBackgroundView:selectedBackgroundView];
@@ -77,9 +91,12 @@
     [super layoutSubviews];
     self.contentView.frame = (CGRect){0,0,self.width,self.height};
     
-    self.headerImg.layer.cornerRadius = 4;
-    self.headerImg.layer.masksToBounds = YES;
+    
     self.headerImg.frame = (CGRect){10,(self.contentView.height-40)/2,40,40};
+    
+    [self.notificationHub setCircleAtFrame:(CGRect){self.headerImg.right-5,self.headerImg.top-5,10,10}];
+    
+    self.shieldImg.frame = (CGRect){self.headerImg.right-12,self.headerImg.bottom-12,10,10};
     
     [self.nameLab sizeToFit];
     [self.phoneLab sizeToFit];
@@ -101,7 +118,7 @@
 -(void)setCustomerObj:(WQCustomerObj *)customerObj {
     _customerObj = customerObj;
     
-    if ([Utility checkString:customerObj.customerRemark]) {
+    if ([Utility checkString:[NSString stringWithFormat:@"%@",customerObj.customerRemark]]) {
         self.nameLab.text = [NSString stringWithFormat:@"%@ (%@)",customerObj.customerName,customerObj.customerRemark];
     }else {
         self.nameLab.text = customerObj.customerName;
@@ -109,7 +126,20 @@
     
     self.phoneLab.text = customerObj.customerPhone;
     
-    [self.headerImg sd_setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.headerImg sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,customerObj.customerHeader]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    
+    if (customerObj.customerShield==0) {
+        [self.shieldImg setHidden:YES];
+    }else {
+        [self.shieldImg setHidden:NO];
+    }
+    
+    
+    if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%d",customerObj.customerId]]) {
+        [self.notificationHub setCount:0];
+    }else {
+        [self.notificationHub setCount:-1];
+    }
 }
 
 

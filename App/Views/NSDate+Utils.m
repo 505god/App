@@ -114,25 +114,25 @@
     NSString *week = @"";
     switch (weekday) {
         case 1:
-            week = @"星期日";
+            week = NSLocalizedString(@"Sunday", @"");
             break;
         case 2:
-            week = @"星期一";
+            week = NSLocalizedString(@"Monday", @"");
             break;
         case 3:
-            week = @"星期二";
+            week = NSLocalizedString(@"Tuesday", @"");
             break;
         case 4:
-            week = @"星期三";
+            week = NSLocalizedString(@"Wednesday", @"");
             break;
         case 5:
-            week = @"星期四";
+            week = NSLocalizedString(@"Thursday", @"");
             break;
         case 6:
-            week = @"星期五";
+            week = NSLocalizedString(@"Friday", @"");
             break;
         case 7:
-            week = @"星期六";
+            week = NSLocalizedString(@"Saturday", @"");
             break;
             
         default:
@@ -210,11 +210,11 @@
     NSString *str;
     NSInteger chaDay = [self daysBetweenCurrentDateAndDate];
     if (chaDay == 0) {
-        str = @"Today";
+        str = NSLocalizedString(@"Today", @"");
     }else if (chaDay == 1){
-        str = @"Tomorrow";
+        str = NSLocalizedString(@"Tomorrow", @"");
     }else if (chaDay == -1){
-        str = @"Yesterday";
+        str = NSLocalizedString(@"Yesterday", @"");
     }else{
         str = [self stringYearMonthDay];
     }
@@ -381,6 +381,7 @@
 
 + (NSDate *)dateFromString:(NSString *)string withFormat:(NSString *)format {
     NSDateFormatter *inputFormatter = [[NSDateFormatter alloc] init];
+    [inputFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
     [inputFormatter setDateFormat:format];
     NSDate *date = [inputFormatter dateFromString:string];
     return date;

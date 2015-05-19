@@ -6,34 +6,115 @@
   Copyright (c) 2015年 苏州瑞鹏科技有限公司. All rights reserved.
 */
 
-"MainVC" = "Home";
+"NewMessage" = "新消息";
+"HoldtoTalk" = "按住说话";
+"ReleasetoSend" = "松开发送";
+"Slideuptocancel" = "手指上滑取消发送";
+"Releasetocancel" = "松开手指取消发送";
+"sendMessageError" = "说点什么吧";
+"Success" = "成功";
 
-"CustomerVC" = "Customers";
-"OrderVC" = "Orders";
-"SaleVC" = "Sales";
+"recordingError" = "程序错误，无法继续录音，请重启程序试试";
+"TimeLimit" = "时间限制";
+"recordError" = "录音超时";
+"Tooshort" = "时间太短";
 
-"HotSaleVC" = "Hot Sale";
-"ProductClassifyVC" = "Classify List";
-"NewProductVC" = "Creat Product";
+"Night" = "晚上";
+"Dawn" = "凌晨";
+"Tomorrow" = "明天";
+"Today" = "今天";
+"Yesterday" = "昨天";
 
+"Monday" = "MON";
+"Tuesday" = "TUE";
+"Wednesday" = "WED";
+"Thursday" = "THU";
+"Friday" = "FRI";
+"Saturday" = "SAT";
+"Sunday" = "SUN";
+
+
+"CustomerVC" = "客户管理";
+"OrderVC" = "订单管理";
+"SaleVC" = "销售统计";
+
+"HotSaleVC" = "热卖展示";
+"ProductClassifyVC" = "分类列表";
+
+"NewProductVC" = "创建商品";
+"ProductHotSale" = "店长推荐";
+"ProductOnSale" = "上架";
+"AddMarque" = "添加商品型号";
+"AddMarqueError" = "请添加商品型号";
+"AddProperty" = "添加更多商品规格";
+"ProductDetails" = "商品详情";
+"ProductSaleType" = "优惠方式";
+"ProductPrice" = "价格:";
+"ProductStock" = "库存:";
+"ProductSize" = "尺码:";
+"ProductDetail" = "描述:";
+"AddProductColor" = "选择颜色";
+"RecommendProduct" = "选择推荐客户";
+"SelectedProClass" = "选择分类";
+"SelectedCustomer" = "已选择%d位客户";
+"SelectedProSize" = "选择尺码";
+"AddProduct" = "完成创建";
+"SelectedProCustomers" = "选择客户";
+"Search" = "搜索";
+"CustomerInfoDetail" = "详细资料";
+"CustomerInfoDetailEdit" = "资料设置";
+"ProNumber" = "数量:%ld";
+"ClassSelectedError" = "请选择商品分类";
+"ProTotalPrice" = "成交额:%@";
+
+"CustomerPhone" = "手机";
+"CustomerRemark" = "备注";
+"customerArea" = "地区";
+"customerCode" = "邀请码";
+"customerOrder" = "订单记录";
+"customerChat" = "发消息";
+"customerPhoneCall" = "确定拨打客户电话?";
+"CustomerLevel" = "评级";
+"CustomerShield" = "屏蔽";
+"CustomerNew" = "邀请新的客户";
+
+"saleConfirmError" = "请输入正确的商品优惠价格";
+"disconfirmConfirmError" = "请输入正确的折扣";
+"pricesaleConfirmError" = "商品价格低于优惠价格";
+"NameError" = "请输入商品描述";
+"PriceError" = "请输入商品价格";
+"PriceConfirmError" = "请输入正确的商品价格";
+"StockError" = "请输入商品库存";
+"StockConfirmError" = "请输入正确的商品库存";
+"ImageError" = "请添加商品图片";
+"ColorError" = "请选择商品颜色";
+"SizeError" = "请选择商品尺码";
 //设置
-"SettingVC" = "setting";
-"Header" = "header";
-"ShopName" = "name";
-"ClassifySetup" = "classify";
-"ColorSetup" = "color";
-"SizeSetup" = "size";
-"CurrencySetup" = "currency";
-"LogOut" = "logout";
-
+"SettingVC" = "设置";
+"Header" = "头像";
+"ShopName" = "店铺名称";
+"ClassifySetup" = "分类";
+"ColorSetup" = "颜色";
+"SizeSetup" = "尺码";
+"CurrencySetup" = "货币";
+"LogOut" = "退出";
+"confirmLogOut" = "确定退出?";
 //热卖展示
-"HasSale" = "saled";
-"NoneProducts" = "None Products";
+"HasSale" = "已售出";
+"NoneProducts" = "暂无商品";
 "NoneClass" = "暂无分类";
 "NewClass" = "创建分类";
+"NoneCustomer" = "暂无客户";
+//刷新控件
+"FooterPullToRefresh" = "上拉可以加载更多数据";
+"FooterReleaseToRefresh" = "松开立即加载更多数据";
+"Refreshing" = "正在努力加载中...";
+"HeaderPullToRefresh" = "下拉可以刷新";
+"HeaderReleaseToRefresh" = "松开立即刷新";
+"LastUpDate" = "最后更新:";
 
 //选择照片
-"Cancel" = "cancel";
+"Cancel" = "取消";
 "SelectedMaxPhoto" = "最多选择%ld张照片";
 "NextStep" = "下一步(%ld)";
 "PhotoAlert" = "严禁上传色情裸露、暴力血腥图片，一经核实，立即封号。";
@@ -41,25 +122,131 @@
 "Format_photos" = "%ld 张照片";
 "PhotoSelectedError" = "选择图片失败";
 
-//刷新控件
-"FooterPullToRefresh" = "上拉可以加载更多数据";
-"FooterReleaseToRefresh" = "松开立即加载更多数据";
-"Refreshing" = "Refreshing";
-"HeaderPullToRefresh" = "Pull To Refresh";
-"HeaderReleaseToRefresh" = "Release To Refresh";
-"Today" = "Today";
-"LastUpDate" = "Last UpDate:";
+//修改名称
+"Save" = "保存";
+"Add" = "添加";
+"Finish" = "完成";
+"Delete" = "删除";
+"ConfirmDelete" = "确定删除?";
 
-"ProductCode" = "product code";
-"ProductPrice" = "product price";
-"ProductDetail" = "product description";
+"Confirm" = "确定";
+"ShopNameLimit" = "最多10个字";
+"ConfirmCancelSelected" = "放弃选择?";
 
-"AddProductColor" = "Add product color";
-"RecommendProduct" = "Recommend to customers";
-"SelectedCustomer" = "Selected %ld ustomer";
-"AddProduct" = "Add Product";
+"SaveEdit" = "保存此次编辑?";
+"DontSave" = "不保存";
+"DeleteCustomer" = "删除客户";
+
+"remindAlert" = "已提醒客户";
+
+"ClassDelete" = "该分类下包含子分类不能被删除";
+"ClassBDelete" = "该分类下包含商品不能被删除";
+"AddMoreLevelClass" = "添加更多子分类";
+"ColorDelete" = "该颜色下包含商品不能被删除";
+"SizeDelete" = "该尺码下包含商品不能被删除";
+
+"CreatClass" = "新建分类";
+"EditClass" = "修改分类";
+"CreatColor" = "新建颜色";
+"EditColor" = "修改颜色";
+"CreatSize" = "新建尺码";
+"EditSize" = "修改尺码";
+
+"NoneColor" = "暂无颜色";
+"NoneSize" = "暂无尺码";
+
+"WQTextVC" = "请输入内容";
+
+"CNY" = "人民币";
+"USD" = "美元";
+"EUR" = "欧元";
 
 
+"InterfaceError" = "未能连接到服务器";
 
-"ColorVC" = "Colors";
-"SizeVC" = "Size";
+//订单
+"orderCode" = "订单号:%@";
+"orderPrice" = "交易额:%.2f";
+"orderSale" = "价格优惠:%.2f";
+"proDiscount" = "折优惠";
+
+"NoneOrder" = "暂无订单";
+
+"orderSearch" = "订单检索";
+"orderDeal" = "待处理";
+"orderPay" = "待付款";
+"orderFinish" = "已完成";
+
+"orderChangePrice" = "修改订单价格";
+"orderRemind" = "提醒客户付款";
+"orderSearchPlace" = "输入订单号或日期:2015.4.15";
+"orderSearchError" = "请输入正确的日期";
+"saleNone" = "没有优惠";
+"salePrice" = "价格优惠";
+"saleDisCount" = "折扣优惠";
+
+"salePriceName" = "填写优惠的价格";
+"saleDisCountName" = "填写优惠的折扣";
+"saleStartTime" = "起始时间";
+"saleEndTime" = "结束时间";
+"productLimit" = "产品数量限制";
+
+"salePriceLine" = "价格轴";
+
+"logInCode" = "右边图片的内容";
+"logInName" = "帐号";
+"logInNameError" = "请输入帐号";
+"logInPassword" = "密码";
+"logInPasswordError" = "请输入密码";
+"confirmPassword" = "确认密码";
+"confirmPasswordError" = "两次密码不一致";
+
+"shopSelected" = "选择店铺";
+"forgetPwd" = "忘记密码?";
+"findPwd" = "找回密码";
+"logIn" = "登录";
+"resign" = "注册";
+
+"labelnotice"="请确认你的国家或地区并输入手机号";
+"telfield"="请填写手机号码";
+"nextbtn"="下一步";
+"countrylable"="国家和地区";
+"countrychoose"="选择国家或地区";
+
+"notice"="提示";
+"errorphonenumber"="手机号码非法，请重新填写";
+"sure"="好";
+
+"willsendthecodeto"="我们将发送验证码短信到这个号码";
+"surephonenumber"="确认手机号码";
+"cancel"="取消";
+
+"codesenderrormsg"="验证码发送失败 请稍后重试";
+"codesenderrtitle"="发送失败";
+
+"maxcodemsg"="请求验证码超上限 请稍后重试";
+"maxcode"="超过上限";
+
+"codetoooftenmsg"="客户端请求发送短信验证过于频繁";
+
+"verifycode"="请输入验证码";
+"verifylabel"="我们已发送验证码到这个号码";
+"timelabel"="接受短信大约需要60秒";
+"repeatsms"="收不到短信验证码？";
+"submit"="提交";
+"sendingin"="正在发送中...";
+"timelablemsg"="接收验证码中...";
+"second"="秒";
+
+"verifycoderightmsg"="验证码正确";
+"verifycoderighttitle"="验证成功";
+"verifycodeerrormsg"="验证码无效 请重新获取验证码";
+"verifycodeerrortitle"="验证失败";
+
+"cannotgetsmsmsg"="我们将重新发送验证码短信到这个号码";
+
+"codedelaymsg"="验证码短信可能略有延迟,确定返回并重新开始";
+"wait"="等待";
+
+"verifycodeformaterror"="验证码格式错误,请重新填写";
+"doesnotsupportarea"="暂时不支持该地区";

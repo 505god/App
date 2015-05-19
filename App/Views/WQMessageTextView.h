@@ -10,7 +10,7 @@
 
 @interface WQMessageTextView : WQDismissiveTextView
 
-@property (copy, nonatomic) NSString *placeHolder;
+@property (strong, nonatomic) NSString *placeHolder;
 @property (strong, nonatomic) UIColor *placeHolderTextColor;
 
 - (NSUInteger)numberOfLinesOfText;

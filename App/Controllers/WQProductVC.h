@@ -8,7 +8,16 @@
 
 #import "BaseViewController.h"
 
+@protocol WQProductVCDelegate <NSObject>
+
+-(void)deleteProductRefresh;
+
+@end
+
 @interface WQProductVC : BaseViewController
 
+@property (nonatomic, strong) WQClassObj *classObj;
 @property (nonatomic, strong) WQClassLevelObj *levelClassObj;
+
+@property (nonatomic, assign) id<WQProductVCDelegate>delegate;
 @end

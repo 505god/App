@@ -59,7 +59,7 @@ static const float BUMP_TIME_2 = 0.1;
     
     redCircle = [[UIView alloc]init];
     redCircle.userInteractionEnabled = NO;
-    redCircle.backgroundColor = [UIColor redColor];
+    redCircle.backgroundColor = COLOR(255, 130, 0, 1);
     
     countLabel = [[UILabel alloc]initWithFrame:redCircle.frame];
     countLabel.userInteractionEnabled = NO;
@@ -332,10 +332,13 @@ static const float BUMP_TIME_2 = 0.1;
 //%%% hides the notification if the value is 0
 -(void)checkZero
 {
-    if (count <= 0) {
+    if (count == 0) {
+        redCircle.hidden = NO;
+        countLabel.hidden = YES;
+    }else  if (count < 0) {
         redCircle.hidden = YES;
         countLabel.hidden = YES;
-    } else {
+    }else {
         redCircle.hidden = NO;
         if (!isIndeterminateMode) {
             countLabel.hidden = NO;

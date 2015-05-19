@@ -140,7 +140,6 @@ void writeString(unsigned char *dest, int offset, unsigned char *value, int leng
 }
 
 - (void)encapsulatingOver:(NSNotification *)notification {
-    NSLog(@"encapsulatingOver by %@", [self description]);
     if (self.delegete) {
         [self.delegete encapsulatingOver];
     }
@@ -297,13 +296,13 @@ void writeString(unsigned char *dest, int offset, unsigned char *value, int leng
         [[self.mParent getBufferData] setLength:0];
         
         if (endOfStream) {
-            NSLog(@"end of stream");
+            DLog(@"end of stream");
 //            self.mParent.moreDataInputing = NO;
         }
     }
     else {
         if (ogg_stream_pageout(&oggStreamState, &oggPage)) {
-            NSLog(@"page out");
+            DLog(@"page out");
             [[self.mParent getBufferData] appendBytes:oggPage.header length:oggPage.header_len];
             [[self.mParent getBufferData] appendBytes:oggPage.body length:oggPage.body_len];
             [self writeDataToFile:[self.mParent getBufferData]];

@@ -39,6 +39,4 @@
 @property (nonatomic,strong) WQMessageObj *messageObj;
 @property (nonatomic,strong) WQCustomerObj *customerObj;
 
-@property (nonatomic, assign) BOOL showTime;
-
 @end

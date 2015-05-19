@@ -10,4 +10,6 @@
 
 @interface WQOrderSearchVC : BaseViewController
 
+-(void)addHeader;
+
 @end

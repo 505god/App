@@ -26,20 +26,12 @@
         //语音
         self.voiceBackView = [[UIView alloc]init];
         [self addSubview:self.voiceBackView];
-        self.second = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 70, 30)];
+        self.second = [[UILabel alloc]initWithFrame:CGRectZero];
         self.second.textAlignment = NSTextAlignmentCenter;
         self.second.font = [UIFont systemFontOfSize:14];
-        self.voice = [[UIImageView alloc]initWithFrame:CGRectMake(80, 5, 20, 20)];
-        self.voice.image = [UIImage imageNamed:@"chat_animation_white3"];
-        self.voice.animationImages = [NSArray arrayWithObjects:
-                                      [UIImage imageNamed:@"chat_animation_white1"],
-                                      [UIImage imageNamed:@"chat_animation_white2"],
-                                      [UIImage imageNamed:@"chat_animation_white3"],nil];
+        self.voice = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.voice.animationDuration = 1;
         self.voice.animationRepeatCount = 0;
-        self.indicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-        self.indicator.center=CGPointMake(80, 15);
-        [self.voiceBackView addSubview:self.indicator];
         [self.voiceBackView addSubview:self.voice];
         [self.voiceBackView addSubview:self.second];
         
@@ -55,15 +47,9 @@
     }
     return self;
 }
-- (void)benginLoadVoice
-{
-    self.voice.hidden = YES;
-    [self.indicator startAnimating];
-}
-- (void)didLoadVoice
-{
+
+- (void)didLoadVoice {
     self.voice.hidden = NO;
-    [self.indicator stopAnimating];
     [self.voice startAnimating];
 }
 -(void)stopPlay {
@@ -77,15 +63,31 @@
         self.backImageView.frame = CGRectMake(5, 5, 220, 220);
         self.voiceBackView.frame = CGRectMake(15, 10, 130, 35);
         self.second.textColor = [UIColor whiteColor];
+        
+        self.second.frame = (CGRect){0, 0, 30, 30};
+        self.voice.frame = (CGRect){35, 5, 20, 20};
+        self.voice.image = [UIImage imageNamed:@"chat_animation_white3"];
+        self.voice.animationImages = [NSArray arrayWithObjects:
+                                      [UIImage imageNamed:@"chat_animation_white1"],
+                                      [UIImage imageNamed:@"chat_animation_white2"],
+                                      [UIImage imageNamed:@"chat_animation_white3"],nil];
+        
     }else{
         self.backImageView.frame = CGRectMake(15, 5, 220, 220);
         self.voiceBackView.frame = CGRectMake(25, 10, 130, 35);
         self.second.textColor = [UIColor grayColor];
+        
+        self.second.frame = (CGRect){30, 0, 30, 30};
+        self.voice.frame = (CGRect){5, 5, 20, 20};
+        self.voice.image = [UIImage imageNamed:@"chat_animation3"];
+        self.voice.animationImages = [NSArray arrayWithObjects:
+                                      [UIImage imageNamed:@"chat_animation1"],
+                                      [UIImage imageNamed:@"chat_animation2"],
+                                      [UIImage imageNamed:@"chat_animation3"],nil];
     }
 }
 //添加
-- (BOOL)canBecomeFirstResponder
-{
+- (BOOL)canBecomeFirstResponder {
     return YES;
 }
 -(BOOL)canPerformAction:(SEL)action withSender:(id)sender{

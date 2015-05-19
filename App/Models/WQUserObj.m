@@ -15,7 +15,7 @@
     return  @{@"storeId": mts_key(userId),
               @"storeName": mts_key(userName),
               @"storeImg": mts_key(userHead),
-              @"moneyType": mts_key(moneyType),
+              @"coinType": mts_key(moneyType),
               };
 }
 

@@ -6,6 +6,35 @@
   Copyright (c) 2015年 苏州瑞鹏科技有限公司. All rights reserved.
 */
 
+"confirmSelectedPro" = "颜色:%@ 尺码:%@ 数量:%ld";
+"proprice" = "单价";
+"NewMessage" = "新消息";
+"HoldtoTalk" = "按住说话";
+"ReleasetoSend" = "松开发送";
+"Slideuptocancel" = "手指上滑取消发送";
+"Releasetocancel" = "松开手指取消发送";
+"sendMessageError" = "说点什么吧";
+"Success" = "成功";
+
+"recordingError" = "程序错误，无法继续录音，请重启程序试试";
+"TimeLimit" = "时间限制";
+"recordError" = "录音超时";
+"Tooshort" = "时间太短";
+
+"Night" = "晚上";
+"Dawn" = "凌晨";
+"Tomorrow" = "明天";
+"Today" = "今天";
+"Yesterday" = "昨天";
+
+"Monday" = "星期一";
+"Tuesday" = "星期二";
+"Wednesday" = "星期三";
+"Thursday" = "星期四";
+"Friday" = "星期五";
+"Saturday" = "星期六";
+"Sunday" = "星期日";
+
 
 "CustomerVC" = "客户管理";
 "OrderVC" = "订单管理";
@@ -18,6 +47,7 @@
 "ProductHotSale" = "店长推荐";
 "ProductOnSale" = "上架";
 "AddMarque" = "添加商品型号";
+"AddMarqueError" = "请添加商品型号";
 "AddProperty" = "添加更多商品规格";
 "ProductDetails" = "商品详情";
 "ProductSaleType" = "优惠方式";
@@ -50,6 +80,9 @@
 "CustomerShield" = "屏蔽";
 "CustomerNew" = "邀请新的客户";
 
+"saleConfirmError" = "请输入正确的商品优惠价格";
+"disconfirmConfirmError" = "请输入正确的折扣";
+"pricesaleConfirmError" = "商品价格低于优惠价格";
 "NameError" = "请输入商品描述";
 "PriceError" = "请输入商品价格";
 "PriceConfirmError" = "请输入正确的商品价格";
@@ -67,6 +100,7 @@
 "SizeSetup" = "尺码";
 "CurrencySetup" = "货币";
 "LogOut" = "退出";
+"confirmLogOut" = "确定退出?";
 //热卖展示
 "HasSale" = "已售出";
 "NoneProducts" = "暂无商品";
@@ -79,7 +113,6 @@
 "Refreshing" = "正在努力加载中...";
 "HeaderPullToRefresh" = "下拉可以刷新";
 "HeaderReleaseToRefresh" = "松开立即刷新";
-"Today" = "今天";
 "LastUpDate" = "最后更新:";
 
 //选择照片
@@ -97,6 +130,7 @@
 "Finish" = "完成";
 "Delete" = "删除";
 "ConfirmDelete" = "确定删除?";
+
 "Confirm" = "确定";
 "ShopNameLimit" = "最多10个字";
 "ConfirmCancelSelected" = "放弃选择?";

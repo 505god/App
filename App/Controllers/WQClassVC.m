@@ -51,18 +51,44 @@
 
 -(void)getClassList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    self.interfaceTask = [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
-        [weakSelf.dataArray addObjectsFromArray:array];
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        [WQDataShare sharedService].classArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
-        
-        if (weakSelf.dataArray.count>0) {
-            [weakSelf.tableView reloadData];
-            [weakSelf setNoneText:nil animated:NO];
-        }else {
-            [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"classList"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQClassObj *classObj = [[WQClassObj alloc] init];
+                    [classObj mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:classObj];
+                    SafeRelease(classObj);
+                }
+                
+                [weakSelf.dataArray addObjectsFromArray:mutablePosts];
+                
+                [WQDataShare sharedService].classArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
+                
+                if (weakSelf.dataArray.count>0) {
+                    [weakSelf.tableView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                }
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
         }
         [weakSelf.tableView headerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.tableView headerEndRefreshing];
+        [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -88,7 +114,7 @@
     [super viewWillAppear:animated];
     
     if (self.isPresentVC) {
-        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
+        [self setToolImage:@"" text:NSLocalizedString(@"Finish", @"") animated:YES];
     }
     
     if ([WQDataShare sharedService].classArray.count>0) {
@@ -106,6 +132,7 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -197,14 +224,31 @@
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        weakSelf.interfaceTask = [WQAPIClient addClassAWithParameters:@{@"classAName":textField.text} block:^(WQClassObj *classObject, NSError *error) {
-            [weakSelf.dataArray addObject:classObject];
-            
-            [[WQDataShare sharedService].classArray addObject:classObject];
-            [self setNoneText:nil animated:NO];
-            [weakSelf.tableView beginUpdates];
-            [weakSelf.tableView insertSections:[NSIndexSet indexSetWithIndex:self.dataArray.count-1] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [weakSelf.tableView endUpdates];
+        weakSelf.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/store/addClassA" parameters:@{@"classAName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                    
+                    if ([aDic allKeys].count>0) {
+                        WQClassObj *classObj = [[WQClassObj alloc] init];
+                        [classObj mts_setValuesForKeysWithDictionary:aDic];
+                        
+                        [weakSelf.dataArray addObject:classObj];
+                        
+                        [[WQDataShare sharedService].classArray addObject:classObj];
+                        [weakSelf setNoneText:nil animated:NO];
+                        [weakSelf.tableView beginUpdates];
+                        [weakSelf.tableView insertSections:[NSIndexSet indexSetWithIndex:weakSelf.dataArray.count-1] withRowAnimation:UITableViewRowAnimationAutomatic];
+                        [weakSelf.tableView endUpdates];
+                    }
+                }else {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];
@@ -303,17 +347,37 @@
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-                [WQAPIClient addClassBWithParameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} block:^(WQClassLevelObj *classObject, NSError *error) {
-                    if (classObj.levelClassList) {
-                    }else {
-                        classObj.levelClassList = [[NSMutableArray alloc]init];
-                    }
-                    [classObj.levelClassList addObject:classObject];
-                    classObj.levelClassCount ++;
-                    [self.tableView beginUpdates];
-                    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.tableView endUpdates];
+                [[WQAPIClient sharedClient] POST:@"/rest/store/addClassB" parameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} success:^(NSURLSessionDataTask *task, id responseObject) {
                     
+                    if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                        NSDictionary *jsonData=(NSDictionary *)responseObject;
+                        
+                        if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                            NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                            
+                            if ([aDic allKeys].count>0) {
+                                WQClassLevelObj *levelclassObj = [[WQClassLevelObj alloc] init];
+                                [levelclassObj mts_setValuesForKeysWithDictionary:aDic];
+                                
+                                if (classObj.levelClassList) {
+                                }else {
+                                    classObj.levelClassList = [[NSMutableArray alloc]init];
+                                }
+                                [classObj.levelClassList addObject:levelclassObj];
+                                classObj.levelClassCount ++;
+                                
+                                [self.tableView beginUpdates];
+                                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+                                [self.tableView endUpdates];
+                            }
+                            
+                        }else {
+                            [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                        }
+                    }
+                    
+                } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
                 }];
             }];
             [alert show];
@@ -359,20 +423,37 @@
             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-                DLog(@"Text: %@", textField.text);
-                
-                [WQAPIClient addClassBWithParameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} block:^(WQClassLevelObj *classObject, NSError *error) {
-                    if (classObj.levelClassList) {
-                    }else {
-                        classObj.levelClassList = [[NSMutableArray alloc]init];
+                [[WQAPIClient sharedClient] POST:@"/rest/store/addClassB" parameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} success:^(NSURLSessionDataTask *task, id responseObject) {
+                    
+                    if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                        NSDictionary *jsonData=(NSDictionary *)responseObject;
+                        
+                        if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                            NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                            
+                            if ([aDic allKeys].count>0) {
+                                WQClassLevelObj *levelclassObj = [[WQClassLevelObj alloc] init];
+                                [levelclassObj mts_setValuesForKeysWithDictionary:aDic];
+                                
+                                if (classObj.levelClassList) {
+                                }else {
+                                    classObj.levelClassList = [[NSMutableArray alloc]init];
+                                }
+                                [classObj.levelClassList addObject:levelclassObj];
+                                classObj.levelClassCount ++;
+                                
+                                [self.tableView beginUpdates];
+                                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+                                [self.tableView endUpdates];
+                            }
+                            
+                        }else {
+                            [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                        }
                     }
-                    [classObj.levelClassList addObject:classObject];
-                    classObj.levelClassCount ++;
                     
-                    [self.tableView beginUpdates];
-                    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.tableView endUpdates];
-                    
+                } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
                 }];
             }];
             [alert show];
@@ -402,13 +483,24 @@
                                      swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
                                  }
                                  completion:^(BOOL finished) {
-                                     
-                                     [WQAPIClient deleteClassBWithParameters:@{@"classBId":[NSNumber numberWithInteger:levelClassObj.levelClassId]} block:^(NSInteger finished, NSError *error) {
-                                         [classObj.levelClassList removeObjectAtIndex:indexPath.row];
-                                         classObj.levelClassCount --;
-                                         [swipeTableViewCell setHidden:YES];
+                                     [[WQAPIClient sharedClient] POST:@"/rest/store/delClassB" parameters:@{@"classBId":[NSNumber numberWithInteger:levelClassObj.levelClassId]} success:^(NSURLSessionDataTask *task, id responseObject) {
                                          
-                                         [self.tableView reloadData];
+                                         if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                                             NSDictionary *jsonData=(NSDictionary *)responseObject;
+                                             
+                                             if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                                                 [classObj.levelClassList removeObjectAtIndex:indexPath.row];
+                                                 classObj.levelClassCount --;
+                                                 [swipeTableViewCell setHidden:YES];
+                                                 
+                                                 [self.tableView reloadData];
+                                             }else {
+                                                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                                             }
+                                         }
+                                         
+                                     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                                         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
                                      }];
                                  }
                  ];
@@ -441,19 +533,29 @@
                                  animations:^{
                                      header.frame = CGRectOffset(header.bounds, header.frame.size.width, 0);
                                  }completion:^(BOOL finished) {
-                                     [WQAPIClient deleteClassAWithParameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId]} block:^(NSInteger finished, NSError *error) {
-                                         [self.dataArray removeObjectAtIndex:header.aSection];
-                                         
-                                         if (self.dataArray.count==0) {
-                                             [self setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                                     [[WQAPIClient sharedClient] POST:@"/rest/store/delClassA" parameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId]} success:^(NSURLSessionDataTask *task, id responseObject) {
+                                         if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                                             NSDictionary *jsonData=(NSDictionary *)responseObject;
+                                             
+                                             if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                                                 [self.dataArray removeObjectAtIndex:header.aSection];
+                                                 
+                                                 if (self.dataArray.count==0) {
+                                                     [self setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                                                 }
+                                                 
+                                                 [[WQDataShare sharedService].classArray removeObjectAtIndex:header.aSection];
+                                                 
+                                                 if ([self.arrSelSection containsObject:[NSString stringWithFormat:@"%d",header.aSection]]) {
+                                                     [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
+                                                 }
+                                                 [self.tableView reloadData];
+                                             }else {
+                                                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                                             }
                                          }
-                                         
-                                         [[WQDataShare sharedService].classArray removeObjectAtIndex:header.aSection];
-                                         
-                                         if ([self.arrSelSection containsObject:[NSString stringWithFormat:@"%d",header.aSection]]) {
-                                             [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
-                                         }
-                                         [self.tableView reloadData];
+                                     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                                         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
                                      }];
                                  }];
             }];
@@ -476,12 +578,24 @@
         WQClassObj *classObj = (WQClassObj *)self.dataArray[[[(WQRightCell *)cell indexPath] section]];
         WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[[[(WQRightCell *)cell indexPath] row]];
         
-        [WQAPIClient editClassBWithParameters:@{@"classBId":[NSNumber numberWithInteger:levelClassObj.levelClassId],@"classBName":textField.text} block:^(NSInteger finished, NSError *error) {
-            levelClassObj.levelClassName = textField.text;
+        [[WQAPIClient sharedClient] POST:@"/rest/store/updateClassB" parameters:@{@"classBId":[NSNumber numberWithInteger:levelClassObj.levelClassId],@"classBName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
-            [self.tableView beginUpdates];
-            [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView endUpdates];
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    levelClassObj.levelClassName = textField.text;
+                    
+                    [self.tableView beginUpdates];
+                    [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.tableView endUpdates];
+                }else {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];
@@ -547,12 +661,24 @@
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
         WQClassObj *classObj = (WQClassObj *)self.dataArray[header.aSection];
         
-        [WQAPIClient editClassAWithParameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId ],@"classAName":textField.text} block:^(NSInteger finished, NSError *error) {
-            classObj.className = textField.text;
+        [[WQAPIClient sharedClient] POST:@"/rest/store/updateClassA" parameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId ],@"classAName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
-            [self.tableView beginUpdates];
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView endUpdates];
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    classObj.className = textField.text;
+                    
+                    [self.tableView beginUpdates];
+                    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.tableView endUpdates];
+                }else {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];

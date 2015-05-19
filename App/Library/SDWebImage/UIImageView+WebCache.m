@@ -21,7 +21,7 @@ static char imageURLKey;
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder {
     [self sd_setImageWithURL:url placeholderImage:placeholder options:SDWebImageRetryFailed progress:nil completed:nil];
 }
-//block------------------------------------------------------------------------start
+//block---------------------------------------------------------------------------------------start
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder finishBlock:(void (^)(BOOL finish))finishBlock
 {
     [self sd_setImageWithURL:url placeholderImage:placeholder options:SDWebImageRetryFailed progress:nil completed:nil finishBlock:finishBlock];
@@ -52,7 +52,7 @@ static char imageURLKey;
                     if (finishBlock) {
                         finishBlock (YES);
                     }
-                    
+
                     [wself setNeedsLayout];
                 } else {
                     if (finishBlock) {
@@ -111,7 +111,6 @@ static char imageURLKey;
                 if (!wself) return;
                 if (image) {
                     wself.image = image;
-                    
                     [wself setNeedsLayout];
                 } else {
                     if ((options & SDWebImageDelayPlaceholder)) {

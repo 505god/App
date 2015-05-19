@@ -24,11 +24,15 @@
 @property (nonatomic, strong) WQMessageFrame *messageFrame;
 
 @property (nonatomic, assign) id<WQMessageCellDelegate>delegate;
+
+-(void)startPlay;
+-(void)stopPlay;
 @end
 
 @protocol WQMessageCellDelegate <NSObject>
 
 @optional
 - (void)headImageDidClick:(WQMessageCell *)cell userId:(NSString *)userId;
-- (void)cellContentDidClick:(WQMessageCell *)cell image:(UIImage *)contentImage;
+
+-(void)playVoiceWithCell:(WQMessageCell *)cell sound:(NSString *)soundStr;
 @end

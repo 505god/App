@@ -14,7 +14,7 @@
 
 #import "WQProductDetailVC.h"
 
-@interface WQProductVC ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,WQNavBarViewDelegate>
+@interface WQProductVC ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,WQNavBarViewDelegate,WQProductDetailVCDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 
@@ -36,6 +36,8 @@
     SafeRelease(_collectionView.dataSource);
     SafeRelease(_collectionView);
     SafeRelease(_dataArray);
+    SafeRelease(_classObj);
+    SafeRelease(_levelClassObj);
 }
 
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
@@ -47,34 +49,59 @@
 -(void)getProductList {
     __unsafe_unretained typeof(self) weakSelf = self;
     
-    self.interfaceTask = [WQAPIClient getProductListWithParameters:@{@"lastProductId":[NSNumber numberWithInteger:self.lastProductId],@"count":[NSNumber numberWithInteger:self.limit]} block:^(NSArray *array, NSInteger pageCount, NSError *error) {
-        if (!error) {
-            if (weakSelf.pageCount<0) {
-                weakSelf.pageCount = pageCount;
-            }
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/product/getClassProduct" parameters:@{@"lastProductId":[NSNumber numberWithInteger:self.lastProductId],@"count":[NSNumber numberWithInteger:self.limit],@"classAId":[NSNumber numberWithInteger:self.classObj.classId],@"classBId":[NSNumber numberWithInteger:self.levelClassObj.levelClassId]} success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
             
-            [weakSelf.dataArray addObjectsFromArray:array];
-            if (weakSelf.dataArray.count>0) {
-                [weakSelf.collectionView reloadData];
-                [weakSelf setNoneText:nil animated:NO];
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"resultList"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQProductObj *product = [[WQProductObj alloc]init];
+                    [product mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:product];
+                    SafeRelease(product);
+                }
+                
+                NSInteger proNumber = [[aDic objectForKey:@"pageCount"]integerValue];
+                
+                if (weakSelf.pageCount<0) {
+                    weakSelf.pageCount = proNumber;
+                }
+                
+                [weakSelf.dataArray addObjectsFromArray:mutablePosts];
+                if (weakSelf.dataArray.count>0) {
+                    [weakSelf.collectionView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+                }
+                
+                if ((weakSelf.start+weakSelf.limit)<self.pageCount) {
+                    [weakSelf.collectionView removeFooter];
+                    [weakSelf addFooter];
+                }else {
+                    [weakSelf.collectionView removeFooter];
+                }
             }else {
+                [weakSelf.collectionView removeFooter];
                 [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
-            
-            if ((weakSelf.start/10+1)<self.pageCount) {
-                [weakSelf.collectionView removeFooter];
-                [weakSelf addFooter];
-            }else {
-                [weakSelf.collectionView removeFooter];
-            }
-        }else {
-            [weakSelf.collectionView removeFooter];
         }
         [weakSelf.collectionView headerEndRefreshing];
         [weakSelf.collectionView footerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.collectionView headerEndRefreshing];
+        [weakSelf.collectionView footerEndRefreshing];
+        [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
-
 
 #pragma mark - lifestyle
 
@@ -106,6 +133,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -188,15 +216,52 @@
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(80, 140);
+    return CGSizeMake(100, 120);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    WQProductDetailVC *detailVC = [[WQProductDetailVC alloc]init];
-    WQProductObj *proObj = (WQProductObj *)self.dataArray[indexPath.item];
-    detailVC.productObj = proObj;
-    [self.navigationController pushViewController:detailVC animated:YES];
-    SafeRelease(detailVC);
+    __block UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseIn|UIViewAnimationOptionAllowUserInteraction animations:^{
+        cell.transform = CGAffineTransformMakeScale(1.03, 1.03);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseOut|UIViewAnimationOptionAllowUserInteraction animations:^{
+            cell.transform = CGAffineTransformIdentity;
+        } completion:^(BOOL finished) {
+            WQProductDetailVC *detailVC = [[WQProductDetailVC alloc]init];
+            WQProductObj *proObj = (WQProductObj *)self.dataArray[indexPath.item];
+            detailVC.delegate = self;
+            detailVC.indexPath = indexPath;
+            detailVC.productObj = proObj;
+            [self.navigationController pushViewController:detailVC animated:YES];
+            SafeRelease(detailVC);
+        }];
+    }];
 }
 
+#pragma mark - WQProductDetailVCDelegate
+-(void)editWQProductDetailVC:(WQProductDetailVC *)productDetailVC indexPath:(NSIndexPath *)indexPath {
+    [self.dataArray replaceObjectAtIndex:indexPath.item withObject:productDetailVC.productObj];
+    [self.collectionView reloadData];
+}
+-(void)deleteWQProductDetailVC:(WQProductDetailVC *)productDetailVC indexPath:(NSIndexPath *)indexPath {
+    if ([WQDataShare sharedService].classArray.count>0) {
+        //更新分类下产品数量
+        [[WQDataShare sharedService].classArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            WQClassObj *classObj = (WQClassObj *)obj;
+            if (classObj.classId == productDetailVC.productObj.proClassAId) {
+                [classObj.levelClassList enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                    WQClassLevelObj *levelClassObj = (WQClassLevelObj *)obj;
+                    if (levelClassObj.levelClassId == productDetailVC.productObj.proClassBId) {
+                        levelClassObj.productCount --;
+                        *stop = YES;
+                    }
+                }];
+                *stop = YES;
+            }
+        }];
+    }
+    
+    [self.dataArray removeObjectAtIndex:indexPath.item];
+    [self.collectionView reloadData];
+}
 @end

@@ -86,6 +86,8 @@
     
     self.showingLeft = YES;
     [self configureViewBlurWith:self.view.width scale:0.1 type:0];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isNewMessage:) name:@"isNewMessage" object:nil];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -105,6 +107,7 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showSidebarView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"isNewMessage" object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -133,8 +136,6 @@
         NSArray *bundles = [[NSBundle mainBundle] loadNibNamed:@"WQLeftBarView" owner:self options:nil];
         _leftBarView = (WQLeftBarView*)[bundles objectAtIndex:0];
         _leftBarView.leftDelegate = self;
-        //预留10像素
-        _leftBarView.frame = (CGRect){0,0,LeftWidth,self.view.height};
         [_leftBarView defaultSelected];
     }
     return _leftBarView;
@@ -448,6 +449,23 @@
             [self showRightViewController];
         }
     }
+}
+
+
+#pragma mark 通知
+////消息
+-(void)isNewMessage:(NSNotification *)notification
+{
+    NSInteger isNewMessage = [[notification object] integerValue];
+    
+    if (isNewMessage==1) {
+        [self.leftBarView.customerItem.notificationHub setCount:0];
+        [self.leftBarView.customerItem.notificationHub bump];
+    }else {
+        [self.leftBarView.customerItem.notificationHub setCount:-1];
+    }
+    
+    
 }
 
 @end

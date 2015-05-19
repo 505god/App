@@ -7,16 +7,19 @@
 //
 
 #import "WQCustomerDetailHeader.h"
-#import "UIImageView+Addition.h"
 #import "WQStarView.h"
+#import "WQTapImg.h"
 
-@interface WQCustomerDetailHeader ()
+@interface WQCustomerDetailHeader ()<WQTapImgDelegate>
 
-@property (nonatomic, strong) UIImageView *headerImage;
+@property (nonatomic, strong) WQTapImg *headerImage;
 
 @property (nonatomic, strong) UILabel *nameLab;
 
 @property (nonatomic, strong) WQStarView *starView;
+
+//屏蔽图片
+@property (nonatomic, strong) UIImageView *shieldImg;
 @end
 
 @implementation WQCustomerDetailHeader
@@ -25,12 +28,18 @@
     self = [super initWithFrame:frame];
     if (self) {
         
-        self.headerImage = [[UIImageView alloc]initWithFrame:CGRectZero];
+        self.headerImage = [[WQTapImg alloc]initWithFrame:CGRectZero];
         self.headerImage.layer.cornerRadius = 4;
         self.headerImage.layer.masksToBounds = YES;
         self.headerImage.contentMode = UIViewContentModeScaleAspectFill;
-        [self.headerImage showLargeImage];
+        self.headerImage.delegate = self;
+        
         [self addSubview:self.headerImage];
+        
+        self.shieldImg = [[UIImageView alloc]initWithFrame:CGRectZero];
+        self.shieldImg.image = [UIImage imageNamed:@"shield"];
+        [self.shieldImg setHidden:YES];
+        [self addSubview:self.shieldImg];
         
         self.nameLab = [[UILabel alloc]initWithFrame:CGRectZero];
         self.nameLab.backgroundColor = [UIColor clearColor];
@@ -51,6 +60,7 @@
     [super layoutSubviews];
     
     self.headerImage.frame = (CGRect){10,(self.height-60)/2,60,60};
+    self.shieldImg.frame = (CGRect){self.headerImage.right-17,self.headerImage.bottom-17,15,15};
     
     [self.nameLab sizeToFit];
     self.nameLab.frame = (CGRect){self.headerImage.right+20,self.headerImage.top+10,self.nameLab.width,self.nameLab.height};
@@ -61,10 +71,20 @@
 -(void)setCustomerObj:(WQCustomerObj *)customerObj {
     _customerObj = customerObj;
     
-    [self.headerImage sd_setImageWithURL:[NSURL URLWithString:customerObj.customerHeader] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    [self.headerImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,customerObj.customerHeader]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     self.nameLab.text = customerObj.customerName;
     
     self.starView.starNumber = customerObj.customerDegree;
+    
+    if (customerObj.customerShield==0) {
+        [self.shieldImg setHidden:YES];
+    }else {
+        [self.shieldImg setHidden:NO];
+    }
 }
+- (void)tappedWithObject:(id) sender {
+    [Utility showImage:self.headerImage];
+}
+
 @end

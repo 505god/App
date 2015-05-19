@@ -19,5 +19,6 @@
 @property (nonatomic, strong) WQProductSaleVC *proSaleVC;
 
 @property (nonatomic, strong) WQProductText *textField;
-
+//最低价格
+@property (nonatomic, strong) NSString *lowPrice;
 @end

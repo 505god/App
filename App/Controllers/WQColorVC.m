@@ -41,18 +41,44 @@
 -(void)getColorList {
     __unsafe_unretained typeof(self) weakSelf = self;
     
-    [WQAPIClient getColorListWithBlock:^(NSArray *array, NSError *error) {
-        [weakSelf.dataArray addObjectsFromArray:array];
+    [[WQAPIClient sharedClient] GET:@"/rest/store/colorList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        [WQDataShare sharedService].colorArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
-        
-        if (weakSelf.dataArray.count>0) {
-            [weakSelf.tableView reloadData];
-            [weakSelf setNoneText:nil animated:NO];
-        }else {
-            [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"colorList"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQColorObj *colorObj = [[WQColorObj alloc] init];
+                    [colorObj mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:colorObj];
+                    SafeRelease(colorObj);
+                }
+                
+                [weakSelf.dataArray addObjectsFromArray:mutablePosts];
+                
+                [WQDataShare sharedService].colorArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
+                
+                if (weakSelf.dataArray.count>0) {
+                    [weakSelf.tableView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+                }
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
         }
         [weakSelf.tableView headerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.tableView headerEndRefreshing];
+        [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -77,7 +103,7 @@
     [super viewWillAppear:animated];
     
     if (self.isPresentVC) {
-        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
+        [self setToolImage:@"" text:NSLocalizedString(@"Finish", @"") animated:YES];
     }
     
     if ([WQDataShare sharedService].colorArray.count>0) {
@@ -95,6 +121,7 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -178,15 +205,34 @@
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        [WQAPIClient addColorWithParameters:@{@"colorName":textField.text} block:^(WQColorObj *colorObject, NSError *error) {
-            [self.dataArray addObject:colorObject];
-            [[WQDataShare sharedService].colorArray addObject:colorObject];
-            [self setNoneText:nil animated:NO];
-            NSIndexPath *idx = [NSIndexPath indexPathForRow:self.dataArray.count-1 inSection:0];
+        
+        [[WQAPIClient sharedClient] POST:@"/rest/store/addColor" parameters:@{@"colorName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
-            [self.tableView beginUpdates];
-            [self.tableView insertRowsAtIndexPaths:@[idx] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView endUpdates];
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                    if ([aDic allKeys].count>0) {
+                        WQColorObj *colorObj = [[WQColorObj alloc] init];
+                        [colorObj mts_setValuesForKeysWithDictionary:aDic];
+                        
+                        [self.dataArray addObject:colorObj];
+                        [[WQDataShare sharedService].colorArray addObject:colorObj];
+                        [self setNoneText:nil animated:NO];
+                        NSIndexPath *idx = [NSIndexPath indexPathForRow:self.dataArray.count-1 inSection:0];
+                        
+                        [self.tableView beginUpdates];
+                        [self.tableView insertRowsAtIndexPaths:@[idx] withRowAnimation:UITableViewRowAnimationAutomatic];
+                        [self.tableView endUpdates];
+                    }
+                }else {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];
@@ -223,6 +269,14 @@
         }else {
             [cell setSelectedType:1];
         }
+        
+        if ([self.hasSelectedColor containsObject:[NSString stringWithFormat:@"%d",color.colorId]]) {
+            [cell setIsCanSelected:NO];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+        }else {
+            [cell setIsCanSelected:YES];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleDefault];
+        }
     }
     
     [cell setColorObj:color];
@@ -234,23 +288,28 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if (self.isPresentVC) {
-        WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
-        if (indexPath.row == self.selectedIndex) {
-            [cell setSelectedType:1];
-            self.selectedIndex = -1;
-            self.selectedColorObj = nil;
+        WQColorObj *colorObj = (WQColorObj *)self.dataArray[indexPath.row];
+        if ([self.hasSelectedColor containsObject:[NSString stringWithFormat:@"%d",colorObj.colorId]]) {
+            
         }else {
-            if (self.selectedIndex>=0) {
-                WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
-                [cellOld setSelectedType:1];
-                
-                [cell setSelectedType:2];
-                self.selectedIndex = indexPath.row;
-                self.selectedColorObj = (WQColorObj *)self.dataArray[indexPath.row];
+            WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
+            if (indexPath.row == self.selectedIndex) {
+                [cell setSelectedType:1];
+                self.selectedIndex = -1;
+                self.selectedColorObj = nil;
             }else {
-                [cell setSelectedType:2];
-                self.selectedIndex = indexPath.row;
-                self.selectedColorObj = (WQColorObj *)self.dataArray[indexPath.row];
+                if (self.selectedIndex>=0) {
+                    WQRightCell *cellOld = (WQRightCell *)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.selectedIndex inSection:0]];
+                    [cellOld setSelectedType:1];
+                    
+                    [cell setSelectedType:2];
+                    self.selectedIndex = indexPath.row;
+                    self.selectedColorObj = colorObj;
+                }else {
+                    [cell setSelectedType:2];
+                    self.selectedIndex = indexPath.row;
+                    self.selectedColorObj = colorObj;
+                }
             }
         }
     }
@@ -277,19 +336,30 @@
                                      swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
                                  }
                                  completion:^(BOOL finished) {
-                                     
-                                     [WQAPIClient deleteColorWithParameters:@{@"colorId":[NSNumber numberWithInteger:color.colorId]} block:^(NSInteger finished, NSError *error) {
-                                         [self.dataArray removeObjectAtIndex:indexPath.row];
+                                     [[WQAPIClient sharedClient] POST:@"/rest/store/delColor" parameters:@{@"colorId":[NSNumber numberWithInteger:color.colorId]} success:^(NSURLSessionDataTask *task, id responseObject) {
                                          
-                                         [[WQDataShare sharedService].colorArray removeObjectAtIndex:indexPath.row];
-                                         
-                                         if (self.dataArray.count==0) {
-                                             [self setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+                                         if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                                             NSDictionary *jsonData=(NSDictionary *)responseObject;
+                                             
+                                             if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                                                 [self.dataArray removeObjectAtIndex:indexPath.row];
+                                                 
+                                                 [[WQDataShare sharedService].colorArray removeObjectAtIndex:indexPath.row];
+                                                 
+                                                 if (self.dataArray.count==0) {
+                                                     [self setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+                                                 }
+                                                 
+                                                 [swipeTableViewCell setHidden:YES];
+                                                 
+                                                 [self.tableView reloadData];
+                                             }else {
+                                                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                                             }
                                          }
                                          
-                                         [swipeTableViewCell setHidden:YES];
-                                         
-                                         [self.tableView reloadData];
+                                     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                                         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
                                      }];
                                  }
                  ];
@@ -309,12 +379,25 @@
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
         WQColorObj *colorObj = (WQColorObj *)self.dataArray[[[(WQRightCell *)cell indexPath] row]];
-        [WQAPIClient editColorWithParameters:@{@"colorId":[NSNumber numberWithInteger:colorObj.colorId],@"colorName":textField.text} block:^(NSInteger finished, NSError *error) {
-            colorObj.colorName = textField.text;
+        
+        [[WQAPIClient sharedClient] POST:@"/rest/store/updateColor" parameters:@{@"colorId":[NSNumber numberWithInteger:colorObj.colorId],@"colorName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
-            [self.tableView beginUpdates];
-            [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView endUpdates];
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    colorObj.colorName = textField.text;
+                    
+                    [self.tableView beginUpdates];
+                    [self.tableView reloadRowsAtIndexPaths:@[[(WQRightCell *)cell indexPath]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self.tableView endUpdates];
+                }else {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                }
+            }
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];

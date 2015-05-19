@@ -20,7 +20,7 @@
     [super awakeFromNib];
     
     self.notificationHub = [[RKNotificationHub alloc]initWithView:self];
-    [self.notificationHub moveCircleByX:-5 Y:5];
+    [self.notificationHub setCount:-1];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -56,7 +56,7 @@
 
     self.logoImg.frame = (CGRect){(self.width-self.logoImg.width)/2,(self.height-self.logoImg.height)/2,self.logoImg.width,self.logoImg.height};
     
-    [self.notificationHub setCircleAtFrame:(CGRect){self.logoImg.right-15,self.logoImg.top-15,30,30}];
+    [self.notificationHub setCircleAtFrame:(CGRect){self.logoImg.right-10,self.logoImg.top-10,15,15}];
 }
 
 #pragma mark property

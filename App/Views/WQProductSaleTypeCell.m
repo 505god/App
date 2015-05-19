@@ -55,6 +55,18 @@
     _indexPath = indexPath;
     self.textField.idxPath = indexPath;
     
+    self.textField.placeholder = @"";
+    
+    if (indexPath.section==1) {
+        if (indexPath.row==0 && self.lowPrice!=nil) {
+            self.textField.placeholder = [NSString stringWithFormat:@"0-%@",self.lowPrice];
+        }
+    }else if (indexPath.section==2) {
+        if (indexPath.row==0) {
+            self.textField.placeholder = @"0-10";
+        }
+    }
+    
     if (indexPath.row==0 || indexPath.row==3) {
         self.textField.hidden = NO;
         self.detailTextLabel.hidden = YES;

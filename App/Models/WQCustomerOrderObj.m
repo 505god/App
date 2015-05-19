@@ -7,18 +7,27 @@
 //
 
 #import "WQCustomerOrderObj.h"
-#import "WQCustomerOrderProObj.h"
 
 @implementation WQCustomerOrderObj
 + (NSDictionary*)mts_mapping {
     return  @{@"orderId": mts_key(orderId),
               @"orderTime": mts_key(orderTime),
               @"orderPrice": mts_key(orderPrice),
-              @"orderCode": mts_key(orderCode),
               @"orderStatus": mts_key(orderStatus),
-              @"productList": mts_key(productList),
+
               @"customerId": mts_key(customerId),
               @"customerName": mts_key(customerName),
+              
+              @"proId": mts_key(productId),
+              @"proImg": mts_key(productImg),
+              @"proColor": mts_key(productColor),
+              @"proSize": mts_key(productSize),
+              @"proName": mts_key(productName),
+              @"proPrice": mts_key(productPrice),
+              @"proNumber": mts_key(productNumber),
+              @"proSaleType": mts_key(productSaleType),
+              @"proDiscount": mts_key(productDiscount),
+              @"proReducePrice": mts_key(productReducePrice),
               };
 }
 
@@ -26,9 +35,4 @@
     return NO;
 }
 
-+ (NSDictionary*)mts_arrayClassMapping
-{
-    return @{mts_key(productList) : WQCustomerOrderProObj.class,
-             };
-}
 @end

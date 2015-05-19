@@ -36,4 +36,8 @@
 +(UIImage *)dealImageData:(UIImage *)image;
 
 + (NSString *) md5: (NSString *) input;
+
++(NSString *)returnPath;
+
++(void)showImage:(UIImageView*)avatarImageView;
 @end

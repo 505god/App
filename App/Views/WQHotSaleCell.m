@@ -30,7 +30,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor clearColor];
         self.autoresizesSubviews = YES;
         
         self.proImage = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -44,21 +44,20 @@
         self.priceLab = [[UILabel alloc]initWithFrame:CGRectZero];
         self.priceLab.backgroundColor = [UIColor clearColor];
         self.priceLab.textColor = COLOR(251, 0, 41, 1);
-        self.priceLab.textAlignment = NSTextAlignmentCenter;
+        self.priceLab.font = [UIFont systemFontOfSize:15];
+//        self.priceLab.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:self.priceLab];
         
         self.nameLab = [[UILabel alloc]initWithFrame:CGRectZero];
         self.nameLab.backgroundColor = [UIColor clearColor];
         self.nameLab.lineBreakMode = NSLineBreakByTruncatingTail;
-        self.nameLab.numberOfLines = 2;
-        self.nameLab.textAlignment = NSTextAlignmentCenter;
+        self.nameLab.font = [UIFont systemFontOfSize:15];
         [self.contentView addSubview:self.nameLab];
         
         self.saleLab = [[UILabel alloc]initWithFrame:CGRectZero];
         self.saleLab.backgroundColor = [UIColor clearColor];
         self.saleLab.font = [UIFont systemFontOfSize:12];
         self.saleLab.textColor = [UIColor lightGrayColor];
-        self.saleLab.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:self.saleLab];
     }
     
@@ -79,16 +78,16 @@
 -(void)setProductObj:(WQProductObj *)productObj {
     _productObj = productObj;
     
-    [self.proImage sd_setImageWithURL:[NSURL URLWithString:productObj.proImage] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+    NSArray *imgArray = [productObj.proImage componentsSeparatedByString:@"|"];
+    
+    [self.proImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,[imgArray firstObject]]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     //￥ ＄ €
     self.priceLab.text = [NSString stringWithFormat:@"%@ %@",productObj.proPrice,[self returnMoneyWithType:productObj.moneyType]];
     
     self.nameLab.text = productObj.proName;
-    
-    
-    
-    self.saleLab.text = [NSString stringWithFormat:@"%@%d",NSLocalizedString(@"HasSale", @""),productObj.proSaleCount];
+
+    self.saleLab.text = [NSString stringWithFormat:@"%@:%d",NSLocalizedString(@"HasSale", @""),productObj.proSaleCount];
     
     //未上架
     if (productObj.proIsSale==0) {
@@ -105,11 +104,11 @@
     //(60,60)
     self.proImage.frame = (CGRect){(self.contentView.width-60)/2,10,60,60};
     
-    self.priceLab.frame = (CGRect){0,self.proImage.bottom+2,self.contentView.width,18};
+    self.priceLab.frame = (CGRect){5,self.proImage.bottom+5,self.contentView.width-10,15};
     
-    self.nameLab.frame = (CGRect){0,self.priceLab.bottom+2,self.contentView.width,28};
+    self.nameLab.frame = (CGRect){5,self.priceLab.bottom+5,self.contentView.width-10,15};
     
-    self.saleLab.frame = (CGRect){0,self.nameLab.bottom+2,self.contentView.width,14};
+    self.saleLab.frame = (CGRect){5,self.nameLab.bottom+5,self.contentView.width-10,12};
 }
 
 -(void)prepareForReuse {

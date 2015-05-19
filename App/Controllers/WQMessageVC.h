@@ -8,8 +8,9 @@
 
 #import "BaseViewController.h"
 #import "WQCustomerObj.h"
+#import "WQInputFunctionView.h"
 
-@interface WQMessageVC : BaseViewController
+@interface WQMessageVC : BaseViewController<UITextViewDelegate,WQInputFunctionViewDelegate,WQDismissiveTextViewDelegate>
 
 @property (nonatomic, strong) WQCustomerObj *customerObj;
 

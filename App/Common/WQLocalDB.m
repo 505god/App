@@ -43,6 +43,13 @@
     messageObj.messageContent = [rs stringForColumn:@"messageContent"];
     messageObj.messageDate = [rs stringForColumn:@"messageDate"];
     messageObj.messageType = [[rs stringForColumn:@"messageType"]integerValue];
+    
+    if (messageObj.messageFrom == [WQDataShare sharedService].userObj.userId) {
+        messageObj.fromType = WQMessageFromMe;
+    }else {
+        messageObj.fromType = WQMessageFromOther;
+    }
+    
     return messageObj;
 }
 @end
@@ -120,7 +127,7 @@
 -(void)saveCustomerDataToLocal:(WQCustomerObj *)customerObj completeBlock:(void (^)(BOOL finished))compleBlock {
     [self.db open];
     
-    FMResultSet * rs = [self.db executeQuery:@"select * from WQCustomer where customerId=?",customerObj.customerId];
+    FMResultSet * rs = [self.db executeQuery:@"select * from WQCustomer where customerId=?",[NSString stringWithFormat:@"%d",customerObj.customerId]];
     
     BOOL isExit = NO;
     WQCustomerObj *tempCustomer = [[WQCustomerObj alloc]init];
@@ -134,7 +141,7 @@
     [rs close];
     
     if (isExit==YES) {
-        BOOL res = [self.db executeUpdate:@"update WQCustomer set customerName=?,customerHeader=?,customerDegree=?,customerRemark=?,customerShield=? where customerId= ?",customerObj.customerName,customerObj.customerHeader,customerObj.customerDegree,customerObj.customerRemark,customerObj.customerShield,customerObj.customerId];
+        BOOL res = [self.db executeUpdate:@"update WQCustomer set customerName=?,customerHeader=?,customerDegree=?,customerRemark=?,customerShield=? where customerId= ?",customerObj.customerName,customerObj.customerHeader,[NSString stringWithFormat:@"%d",customerObj.customerDegree],customerObj.customerRemark,[NSString stringWithFormat:@"%d",customerObj.customerShield],[NSString stringWithFormat:@"%d",customerObj.customerId]];
         
         [self.db close];
         

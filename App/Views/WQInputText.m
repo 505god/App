@@ -15,15 +15,9 @@
 {
     UITextField *textField = [[UITextField alloc] init];
     textField.width = [UIScreen mainScreen].bounds.size.width-40;
-    textField.height = 24;
+    textField.height = 40;
     textField.centerX = centerX;
     textField.y = textY;
-    
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, textField.height-1, textField.width, 1)];
-    view.alpha = 1;
-    view.backgroundColor = [UIColor whiteColor];
-    [textField addSubview:view];
-    SafeRelease(view);
     
     textField.placeholder = point;
     textField.font = [UIFont systemFontOfSize:16];
@@ -39,6 +33,8 @@
     textField.leftView = iconView;
     textField.leftViewMode = UITextFieldViewModeAlways;
     SafeRelease(iconView);
+    
+    textField.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"text_bg"]];
     
     return textField;
 }

@@ -17,7 +17,8 @@
 @property (nonatomic, strong) NSMutableDictionary *objectDic;
 
 @property (nonatomic, strong) NSIndexPath *selectedIndexPath;
-
+//最低价格
+@property (nonatomic, strong) NSString *lowPrice;
 @end
 
 @protocol WQProductSaleVCDelegate <NSObject>

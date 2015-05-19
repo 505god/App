@@ -263,7 +263,7 @@
         if ([[dataDic objectForKey:@"type"]integerValue]==0) {
             self.detailLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderSale", @""),[[dataDic objectForKey:@"details"] floatValue]];
         }else if([[dataDic objectForKey:@"type"]integerValue]==1){
-            self.detailLab.text = [NSString stringWithFormat:@"%d%@",(NSInteger)([[dataDic objectForKey:@"details"]floatValue]*10),NSLocalizedString(@"proDiscount", @"")];
+            self.detailLab.text = [NSString stringWithFormat:@"%d%@",(NSInteger)([[dataDic objectForKey:@"details"]floatValue]),NSLocalizedString(@"proDiscount", @"")];
         }else {
             self.detailLab.text = NSLocalizedString(@"saleNone", @"");
         }
@@ -274,6 +274,13 @@
         self.switchBtn.tag = 1000;
         self.titleLab.text = [dataDic objectForKey:@"titleHot"];
         self.switchBtn.on = [[dataDic objectForKey:@"isOn"] boolValue];
+    }else if (status ==9) {//上架
+        self.textLabel.hidden = NO;
+        self.textField.hidden = YES;
+        self.lineView.hidden = YES;
+        self.titleLab.hidden = YES;
+        
+        self.textLabel.text = [dataDic objectForKey:@"titleFinish"];
     }
 }
 

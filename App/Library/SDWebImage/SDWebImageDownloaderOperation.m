@@ -291,11 +291,11 @@
                 UIImage *scaledImage = [self scaledImageForKey:key image:image];
                 image = [UIImage decodedImageWithImage:scaledImage];
                 CGImageRelease(partialImageRef);
-                dispatch_main_sync_safe(^{
+//                dispatch_main_sync_safe(^{
                     if (self.completedBlock) {
                         self.completedBlock(image, nil, nil, NO);
                     }
-                });
+//                });
             }
         }
 

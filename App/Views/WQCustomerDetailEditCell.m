@@ -100,7 +100,7 @@
     NSInteger status = [[dictionary objectForKey:@"status"]integerValue];
     if (status == 0) {
         self.textField.hidden = NO;
-        self.textField.text = [Utility checkString:[dictionary objectForKey:@"detail"]]?[dictionary objectForKey:@"detail"]:@"";
+        self.textField.text = [Utility checkString:[NSString stringWithFormat:@"%@",[dictionary objectForKey:@"detail"]]]?[dictionary objectForKey:@"detail"]:@"";
     }else if (status==1){
         self.starView.hidden = NO;
         self.starView.starNumber =[[dictionary objectForKey:@"detail"] integerValue];

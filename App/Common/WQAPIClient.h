@@ -33,6 +33,10 @@
 
 + (instancetype)sharedClient;
 
++ (void)cancelConnection;
+
+
+/*
 ///判断登录与否
 + (NSURLSessionDataTask *)checkLogInWithBlock:(void (^)(NSInteger status, NSError *error))block;
 ///语言
@@ -125,4 +129,10 @@
 +(NSURLSessionDataTask *)getProductDetailWithParameters:(NSDictionary *)parameters block:(void (^)(NSDictionary *aDic, NSError *error))block;
 //创建商品
 +(NSURLSessionDataTask *)creatProductWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger status, NSError *error))block;
+//删除商品
++(NSURLSessionDataTask *)deleteProductWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger status, NSError *error))block;
+//修改商品
++(NSURLSessionDataTask *)editProductWithParameters:(NSDictionary *)parameters block:(void (^)(WQProductObj *product,NSInteger status, NSError *error))block;
+ 
+ */
 @end

@@ -41,7 +41,9 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CustomerInfoDetailEdit", @"")];
-    [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Finish", @"") forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveAct"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateDisabled];
     self.navBarView.rightBtn.enabled = NO;
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
@@ -64,6 +66,7 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
     
@@ -90,7 +93,7 @@
     self.dataArray = [[NSMutableArray alloc]init];
     
     ///备注
-    NSDictionary *aDic1 = @{@"title":NSLocalizedString(@"CustomerRemark", @""),@"detail":([Utility checkString:self.customerObj.customerRemark]?self.customerObj.customerRemark:@""),@"status":@"0",@"isEdit":@"0"};
+    NSDictionary *aDic1 = @{@"title":NSLocalizedString(@"CustomerRemark", @""),@"detail":([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerRemark]]?self.customerObj.customerRemark:@""),@"status":@"0",@"isEdit":@"0"};
     [self.dataArray addObject:aDic1];
     
     ///评级
@@ -302,26 +305,40 @@
         NSDictionary *dic = (NSDictionary *)self.dataArray[i];
         NSInteger status = [[dic objectForKey:@"status"]integerValue];
         if (status==0) {
-            self.customerObj.customerRemark = [NSString stringWithFormat:@"%@",[dic objectForKey:@"detail"]];
             [mutableDic setObject:[NSString stringWithFormat:@"%@",[dic objectForKey:@"detail"]] forKey:@"remark"];
         }else if(status==1){
-            self.customerObj.customerDegree = [[dic objectForKey:@"detail"] integerValue];
             [mutableDic setObject:[NSString stringWithFormat:@"%@",[dic objectForKey:@"detail"]] forKey:@"degree"];
         }else if(status==2){
-            self.customerObj.customerShield = [[dic objectForKey:@"detail"] integerValue];
             [mutableDic setObject:[NSString stringWithFormat:@"%@",[dic objectForKey:@"detail"]] forKey:@"shield"];
         }
     }
     
-    [mutableDic setObject:[NSNumber numberWithInteger:self.customerObj.customerId] forKey:@"id"];
+    [mutableDic setObject:[NSNumber numberWithInteger:self.customerObj.customerId] forKey:@"userId"];
     
     __unsafe_unretained typeof(self) weakSelf = self;
-    self.interfaceTask = [WQAPIClient editCustomerWithParameters:mutableDic block:^(WQCustomerObj *customer, NSError *error) {
-        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(saveCustomerInfo:)]) {
-            [weakSelf.delegate saveCustomerInfo:customer];
+    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/user/updateCustomer" parameters:mutableDic success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                
+                WQCustomerObj *customerObj = [[WQCustomerObj alloc] init];
+                [customerObj mts_setValuesForKeysWithDictionary:aDic];
+                
+                if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(saveCustomerInfo:)]) {
+                    [weakSelf.delegate saveCustomerInfo:customerObj];
+                }
+                [weakSelf.navigationController popViewControllerAnimated:YES];
+                SafeRelease(mutableDic);
+            }else {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
         }
-        [weakSelf.navigationController popViewControllerAnimated:YES];
-        SafeRelease(mutableDic);
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -331,13 +348,25 @@
     self.delegate = self.customerVC;
     __unsafe_unretained typeof(self) weakSelf = self;
     NSDictionary *dic = @{@"userId":[NSNumber numberWithInteger:self.customerObj.customerId]};
-    self.interfaceTask = [WQAPIClient deleteCustomerWithParameters:dic block:^(NSInteger finished, NSError *error) {
-        weakSelf.delegate = weakSelf.customerVC;
-        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(deleteCustomer:index:)]) {
-            [weakSelf.delegate deleteCustomer:weakSelf.customerObj index:self.indexPath];
+    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/user/delCustomer" parameters:dic success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                weakSelf.delegate = weakSelf.customerVC;
+                if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(deleteCustomer:index:)]) {
+                    [weakSelf.delegate deleteCustomer:weakSelf.customerObj index:self.indexPath];
+                }
+                
+                [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+            }else {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
         }
         
-        [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 @end

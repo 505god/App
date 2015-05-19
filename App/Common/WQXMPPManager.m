@@ -26,7 +26,7 @@ static WQXMPPManager *sharedManager;
     
 #if !TARGET_IPHONE_SIMULATOR
     {
-        xmppStream.enableBackgroundingOnSocket = YES;
+        self.xmppStream.enableBackgroundingOnSocket = YES;
     }
 #endif
     self.xmppReconnect = [[XMPPReconnect alloc] init];
@@ -122,15 +122,13 @@ static WQXMPPManager *sharedManager;
 #pragma mark - XMPPStreamDelegate
 
 - (void)xmppStreamWillConnect:(XMPPStream *)sender {
-    DLog(@"xmpp将要连接");
 }
 //连接服务器
 - (void)xmppStreamDidConnect:(XMPPStream *)sender {
     DLog(@"xmpp连接成功");
     if ([WQDataShare sharedService].idRegister) {
-        NSError *error ;
+        NSError *error;
         if (![self.xmppStream authenticateWithPassword:@"111111" error:&error]){
-            DLog(@"error authenticate : %@",error.description);
         }
     }else {
         if ([self.xmppStream isConnected] && [self.xmppStream supportsInBandRegistration]) {
@@ -140,7 +138,8 @@ static WQXMPPManager *sharedManager;
             NSError *error ;
             [WQDataShare sharedService].idRegister = [self.xmppStream registerWithPassword:@"111111" error:&error];
             if (![WQDataShare sharedService].idRegister) {
-                DLog(@"注册失败");
+                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"register"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
             }
         }
     }
@@ -153,12 +152,9 @@ static WQXMPPManager *sharedManager;
     
     NSError *error ;
     if (![self.xmppStream authenticateWithPassword:@"111111" error:&error]) {
-        DLog(@"error authenticate : %@",error.description);
     }
 }
 - (void)xmppStream:(XMPPStream *)sender didNotRegister:(NSXMLElement *)error{
-    DLog(@"注册失败:%@",error.description);
-    
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"register"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     

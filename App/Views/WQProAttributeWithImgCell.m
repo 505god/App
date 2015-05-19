@@ -64,7 +64,7 @@
         UIImage *image = (UIImage *)[dictionary objectForKey:@"image"];
         self.proImgView.image = image;
     }else if (![[dictionary objectForKey:@"image"]isKindOfClass:[NSNull class]] && [dictionary objectForKey:@"image"]!=nil){
-        [self.proImgView sd_setImageWithURL:[NSURL URLWithString:[dictionary objectForKey:@"image"]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
+        [self.proImgView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,[dictionary objectForKey:@"image"]]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     }else {
         self.proImgView.image = [UIImage imageNamed:@"assets_placeholder_picture"];
     }
@@ -134,7 +134,7 @@
         [self.contentView addSubview:priceLab];
         
         WQProductText *priceTxt = [self addText:(CGRect){priceLab.right+5,priceLab.top,[UIScreen mainScreen].bounds.size.width-priceLab.right-10,20}];
-        priceTxt.text = [Utility checkString:[aDic objectForKey:@"priceDetail"]]?[aDic objectForKey:@"priceDetail"]:@"";
+        priceTxt.text = [Utility checkString:[NSString stringWithFormat:@"%@",[aDic objectForKey:@"priceDetail"]]]?[NSString stringWithFormat:@"%@",[aDic objectForKey:@"priceDetail"]]:@"";
         priceTxt.idxPath = self.indexPath;
         priceTxt.tag = PriceTextFieldTag+i;
         if (self.productVC) {

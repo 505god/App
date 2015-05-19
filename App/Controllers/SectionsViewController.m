@@ -4,6 +4,7 @@
 #import "NSDictionary-DeepMutableCopy.h"
 
 #import <SMS_SDK/SMS_SDK.h>
+#import "BlockAlertView.h"
 
 @interface SectionsViewController ()<WQNavBarViewDelegate>
 {
@@ -218,11 +219,9 @@ sectionForSectionIndexTitle:(NSString *)title
     
     if (!compareResult)
     {
-        UIAlertView* alert=[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"notice", nil)
-                                                      message:NSLocalizedString(@"doesnotsupportarea", nil)
-                                                     delegate:self
-                                            cancelButtonTitle:NSLocalizedString(@"sure", nil)
-                                            otherButtonTitles:nil, nil];
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:NSLocalizedString(@"notice", nil) message:NSLocalizedString(@"doesnotsupportarea", @"")];
+        
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
         [alert show];
         return;
     }

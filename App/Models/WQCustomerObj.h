@@ -29,5 +29,5 @@
 @property (nonatomic, strong) NSString *customerRemark;//+1
 
 ///客户屏蔽
-@property (nonatomic, assign) NSInteger customerShield;
+@property (nonatomic, assign) BOOL customerShield;
 @end

@@ -29,8 +29,8 @@
         
         self.leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         self.leftBtn.frame = (CGRect){10,frame.size.height-37,30,30};
-        [self.leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
-        [self.leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateHighlighted];
+        [self.leftBtn setImage:[UIImage imageNamed:@"webback"] forState:UIControlStateNormal];
+        [self.leftBtn setImage:[UIImage imageNamed:@"webbackNor"] forState:UIControlStateHighlighted];
         [self.leftBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [self.leftBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
         [self.leftBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateDisabled];

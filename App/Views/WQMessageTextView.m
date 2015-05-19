@@ -16,6 +16,7 @@
 
 - (void)didReceiveTextDidChangeNotification:(NSNotification *)notification;
 
+
 @end
 
 @implementation WQMessageTextView
@@ -26,6 +27,8 @@
                                                  name:UITextViewTextDidChangeNotification
                                                object:self];
     
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChangeMode:) name:UITextInputCurrentInputModeDidChangeNotification object:nil];
     _placeHolderTextColor = [UIColor lightGrayColor];
     
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
@@ -39,7 +42,7 @@
     self.backgroundColor = [UIColor whiteColor];
     self.keyboardAppearance = UIKeyboardAppearanceDefault;
     self.keyboardType = UIKeyboardTypeDefault;
-    self.returnKeyType = UIReturnKeyDefault;
+    self.returnKeyType = UIReturnKeySend;
     self.textAlignment = NSTextAlignmentLeft;
 }
 
@@ -67,6 +70,9 @@
     _placeHolderTextColor = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UITextViewTextDidChangeNotification
+                                                  object:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextInputCurrentInputModeDidChangeNotification
                                                   object:self];
 }
 
@@ -107,13 +113,23 @@
 
 + (NSUInteger)maxCharactersPerLine
 {
-    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) ? 33 : 109;
+    return 33;
 }
 
-+ (NSUInteger)numberOfLinesForMessage:(NSString *)text
-{
++ (NSUInteger)numberOfLinesForMessage:(NSString *)text{
+
+    if ([[WQDataShare sharedService].getLanguage isEqualToString:@"zh-Hans"] || [[WQDataShare sharedService].getLanguage isEqualToString:@"zh-Hant"]) {
+        return (text.length*2 / [WQMessageTextView maxCharactersPerLine]) + 1;
+    }
     return (text.length / [WQMessageTextView maxCharactersPerLine]) + 1;
 }
+
+-(void) keyboardChangeMode:(NSNotification *)notification {
+    UITextInputMode *currentInputMode = self.textInputMode;
+    [WQDataShare sharedService].getLanguage = currentInputMode.primaryLanguage;
+
+}
+
 
 #pragma mark - Text view overrides
 
@@ -167,19 +183,10 @@
         
         [self.placeHolderTextColor set];
         
-        
-        NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
-        paragraph.alignment = self.textAlignment;
-        
-        NSDictionary *dic = @{NSFontAttributeName:self.font,
-                              NSParagraphStyleAttributeName:paragraph
-                              };
-        [self.placeHolder drawInRect:placeHolderRect withAttributes:dic];
-//        
-//        [self.placeHolder drawInRect:placeHolderRect
-//                            withFont:self.font
-//                       lineBreakMode:NSLineBreakByTruncatingTail
-//                           alignment:self.textAlignment];
+        [self.placeHolder drawInRect:placeHolderRect
+                            withFont:self.font
+                       lineBreakMode:NSLineBreakByTruncatingTail
+                           alignment:self.textAlignment];
     }
 }
 

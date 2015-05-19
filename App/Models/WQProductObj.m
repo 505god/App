@@ -15,7 +15,7 @@
               @"productId": mts_key(proId),
               @"productImg": mts_key(proImage),
               @"productName": mts_key(proName),
-              @"productPrice": mts_key(proPrice),
+              @"proPriceBetween": mts_key(proPrice),
               @"productStock": mts_key(proStock),
               @"moneyType": mts_key(moneyType),
               @"productSaleCount": mts_key(proSaleCount),
@@ -33,6 +33,7 @@
               @"proClassAId": mts_key(proClassAId),
               @"proClassBId": mts_key(proClassBId),
               @"proClassBName": mts_key(proClassBName),
+              
               };
 }
 

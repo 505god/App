@@ -76,8 +76,6 @@ AudioQueueLevelMeterState *levelMeterStates;
     SafeRelease(dateformat);
     
     filename = [NSString stringWithString:[Encapsulator defaultFileNameWithVoice:voiceName]];
-    DLog(@"filename:%@",filename);
-    
     if ( ! self.encapsulator) {
         self.encapsulator = [[Encapsulator alloc] initWithFileName:filename];
         self.encapsulator.delegete = self;
@@ -87,11 +85,10 @@ AudioQueueLevelMeterState *levelMeterStates;
     }
     
     if ( ! mAQRecorder->IsRunning()) {
-        DLog(@"audio session category : %@", [[AVAudioSession sharedInstance] category]);
         Boolean recordingWillBegin = mAQRecorder->StartRecord(encapsulator);
         if ( ! recordingWillBegin) {
             if ([self.delegate respondsToSelector:@selector(recordingFailed:)]) {
-                [self.delegate recordingFailed:@"程序错误，无法继续录音，请重启程序试试"];
+                [self.delegate recordingFailed:NSLocalizedString(@"recordingError", @"")];
             }
             return;
         }
@@ -99,8 +96,7 @@ AudioQueueLevelMeterState *levelMeterStates;
     
     self.dateStartRecording = [NSDate date];
     
-    if (!levelMeterStates)
-    {
+    if (!levelMeterStates) {
         levelMeterStates = (AudioQueueLevelMeterState *)malloc(sizeof(AudioQueueLevelMeterState) * 1);
     }
     self.timerLevelMeter = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateLevelMeter:) userInfo:nil repeats:YES];

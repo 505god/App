@@ -63,9 +63,10 @@
     label.font = [UIFont systemFontOfSize:16];
     [self.view addSubview:label];
     
-    UITableView* tableView=[[UITableView alloc] initWithFrame:CGRectMake(10, label.bottom, self.view.frame.size.width - 20, NavgationHeight) style:UITableViewStylePlain];
+    UITableView* tableView=[[UITableView alloc] initWithFrame:CGRectMake(0, label.bottom, self.view.width, NavgationHeight) style:UITableViewStylePlain];
     tableView.backgroundColor = [UIColor clearColor];
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    tableView.scrollEnabled = NO;
     [self.view addSubview:tableView];
     
     //区域码
@@ -76,6 +77,10 @@
     areaCodeField.textAlignment=NSTextAlignmentCenter;
     areaCodeField.font=[UIFont systemFontOfSize:16];
     areaCodeField.keyboardType=UIKeyboardTypePhonePad;
+    areaCodeField.backgroundColor = [UIColor whiteColor];
+    areaCodeField.layer.cornerRadius = 4.0;
+    areaCodeField.layer.masksToBounds = YES;
+    
     [self.view addSubview:areaCodeField];
     
     //
@@ -86,6 +91,9 @@
     telField.font=[UIFont systemFontOfSize:16];
     telField.keyboardType=UIKeyboardTypePhonePad;
     telField.clearButtonMode=UITextFieldViewModeWhileEditing;
+    telField.backgroundColor = [UIColor whiteColor];
+    telField.layer.cornerRadius = 4.0;
+    telField.layer.masksToBounds = YES;
     [self.view addSubview:telField];
     
     //
@@ -178,6 +186,27 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"countrychoose", @"")];
         return;
     }
+    //TODO: 验证手机号码有没有被注册
+//    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+//    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/login/checkPhoneNumber" parameters:@{@"phoneNumber":self.telField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
+//        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+//        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+//            NSDictionary *jsonData=(NSDictionary *)responseObject;
+//            
+//            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+//            
+//            }else {
+//                
+//            }
+//        }
+//        
+//    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+//        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+//        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+//    }];
+//
+//    return;
+    
     
     _str=[NSString stringWithFormat:@"%@",self.telField.text];
     
@@ -314,10 +343,19 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier] ;
         
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        UIView *bgView = [[UIView alloc]init];
+        bgView.frame = CGRectMake(10, 0, self.view.width-20, 44);
+        bgView.layer.cornerRadius = 4.0;
+        bgView.layer.masksToBounds = YES;
+        bgView.backgroundColor = [UIColor whiteColor];
+        [cell.contentView addSubview:bgView];
+        
     }
     cell.textLabel.text=NSLocalizedString(@"countrylable", nil);
     cell.textLabel.textColor=[UIColor darkGrayColor];
-    
+    cell.imageView.image = [UIImage imageNamed:@"acount_country"];
     if (_data2)
     {
         cell.detailTextLabel.text=_data2.countryName;

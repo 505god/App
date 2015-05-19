@@ -94,7 +94,7 @@
 
 -(UILabel *)noneLabel {
     if (!_noneLabel) {
-        _noneLabel = [[UILabel alloc]initWithFrame:(CGRect){(self.view.width-60)/2,(self.view.height-20)/2,60,20}];
+        _noneLabel = [[UILabel alloc]initWithFrame:(CGRect){(self.view.width-60)/2,(self.view.height-20)/2,120,20}];
         _noneLabel.backgroundColor = [UIColor clearColor];
         _noneLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  |UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
         _noneLabel.textColor = [UIColor lightGrayColor];
@@ -127,6 +127,7 @@
     self.noneView.hidden = !animated;
     if (animated) {
         self.noneLabel.text = text;
+        [self.noneLabel sizeToFit];
     }else {
         self.noneLabel.text = @"";
         [self.noneView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -140,10 +141,10 @@
     self.isToolBarHidden = animated;
     self.toolControl.hidden= !self.isToolBarHidden;
     if (animated) {
-        if ([Utility checkString:imageString]) {
+        if ([Utility checkString:[NSString stringWithFormat:@"%@",imageString]]) {
             [self.toolControl setImage:[UIImage imageNamed:imageString] forState:UIControlStateNormal];
         }
-        if ([Utility checkString:text]) {
+        if ([Utility checkString:[NSString stringWithFormat:@"%@",text]]) {
             [self.toolControl setTitle:text forState:UIControlStateNormal];
         }
     }else {

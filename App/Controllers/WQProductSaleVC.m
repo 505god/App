@@ -40,7 +40,9 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"ProductSaleType", @"")];
-    [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Add", @"") forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveAct"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateDisabled];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
@@ -89,6 +91,7 @@
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
 //右侧边栏的代理
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
@@ -98,14 +101,40 @@
             [self.delegate selectedSale:self object:self.objectDic];
         }
         [self dismissViewControllerAnimated:YES completion:nil];
-    }else {
-        if ([Utility checkString:[self.objectDic objectForKey:@"details"]]){
-            if (self.delegate && [self.delegate respondsToSelector:@selector(selectedSale:object:)]) {
-                [self.delegate selectedSale:self object:self.objectDic];
+    }else if (self.selectedIndex==1){
+        if ([Utility checkString:[NSString stringWithFormat:@"%@",[self.objectDic objectForKey:@"details"]]]){
+            if (self.lowPrice != nil) {
+                if (([[self.objectDic objectForKey:@"details"]floatValue]-[self.lowPrice floatValue])>0.000001) {
+                    [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"saleConfirmError", @"")];
+                }else {
+                    self.lowPrice = [self.objectDic objectForKey:@"details"];
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(selectedSale:object:)]) {
+                        [self.delegate selectedSale:self object:self.objectDic];
+                    }
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }
+            }else {
+                self.lowPrice = [self.objectDic objectForKey:@"details"];
+                if (self.delegate && [self.delegate respondsToSelector:@selector(selectedSale:object:)]) {
+                    [self.delegate selectedSale:self object:self.objectDic];
+                }
+                [self dismissViewControllerAnimated:YES completion:nil];
             }
-            [self dismissViewControllerAnimated:YES completion:nil];
         }else {
-            [WQPopView showWithImageName:@"PriceConfirmError" message:NSLocalizedString(@"PriceError", @"")];
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"saleConfirmError", @"")];
+        }
+    }else if (self.selectedIndex==2){
+        if ([Utility checkString:[NSString stringWithFormat:@"%@",[self.objectDic objectForKey:@"details"]]]){
+            if (([[self.objectDic objectForKey:@"details"]floatValue]-10)>0.000001) {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"disconfirmConfirmError", @"")];
+            }else {
+                if (self.delegate && [self.delegate respondsToSelector:@selector(selectedSale:object:)]) {
+                    [self.delegate selectedSale:self object:self.objectDic];
+                }
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
+        }else {
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"disconfirmConfirmError", @"")];
         }
     }
 }
@@ -259,6 +288,7 @@
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
+    cell.lowPrice = self.lowPrice;
     cell.indexPath = indexPath;
     cell.proSaleVC = self;
     
@@ -283,13 +313,13 @@
     
     if ((indexPath.section-1) == [[self.objectDic objectForKey:@"type"] integerValue]) {
         if (indexPath.row==0) {
-            cell.textField.text = [Utility checkString:[self.objectDic objectForKey:@"details"]]?[self.objectDic objectForKey:@"details"]:@"";
+            cell.textField.text = [Utility checkString:[NSString stringWithFormat:@"%@",[self.objectDic objectForKey:@"details"]]]?[self.objectDic objectForKey:@"details"]:@"";
         }else if (indexPath.row==1) {
-            cell.detailTextLabel.text = [Utility checkString:[self.objectDic objectForKey:@"start"]]?[self.objectDic objectForKey:@"start"]:@"";
+            cell.detailTextLabel.text = [Utility checkString:[NSString stringWithFormat:@"%@",[self.objectDic objectForKey:@"start"]]]?[self.objectDic objectForKey:@"start"]:@"";
         }else if (indexPath.row==2) {
-            cell.detailTextLabel.text = [Utility checkString:[self.objectDic objectForKey:@"end"]]?[self.objectDic objectForKey:@"end"]:@"";
+            cell.detailTextLabel.text = [Utility checkString:[NSString stringWithFormat:@"%@",[self.objectDic objectForKey:@"end"]]]?[self.objectDic objectForKey:@"end"]:@"";
         }else if (indexPath.row==3) {
-            cell.textField.text = [Utility checkString:[self.objectDic objectForKey:@"limit"]]?[self.objectDic objectForKey:@"limit"]:@"";
+            cell.textField.text = [Utility checkString:[NSString stringWithFormat:@"%@",[self.objectDic objectForKey:@"limit"]]]?[self.objectDic objectForKey:@"limit"]:@"";
         }
     }
     return cell;

@@ -23,6 +23,11 @@
     return _sharedClient;
 }
 
++ (void)cancelConnection {
+    [[WQAPIClient sharedClient].operationQueue cancelAllOperations];
+}
+
+/*
 #pragma mark -
 
 ///判断登录与否
@@ -44,6 +49,7 @@
         }
     }];
 }
+ 
 ///语言
 + (NSURLSessionDataTask *)postLanguageWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger status, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/login/langType" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -158,6 +164,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 ///退出
 + (NSURLSessionDataTask *)logOutWithBlock:(void (^)(NSInteger status, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/login/logout" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -174,7 +181,7 @@
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
     }];
 }
-
+ 
 #pragma mark -
 #pragma mark - 店铺
 ///修改店铺名称
@@ -287,6 +294,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 ///删除一级分类
 +(NSURLSessionDataTask *)deleteClassAWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/delClassA" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -305,6 +313,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 ///添加二级分类
 +(NSURLSessionDataTask *)addClassBWithParameters:(NSDictionary *)parameters block:(void (^)(WQClassLevelObj *classObject, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/addClassB" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -354,6 +363,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 ///删除二级分类
 +(NSURLSessionDataTask *)deleteClassBWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/delClassB" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -415,6 +425,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 ///添加颜色
 +(NSURLSessionDataTask *)addColorWithParameters:(NSDictionary *)parameters block:(void (^)(WQColorObj *colorObject, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/addColor" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -462,6 +473,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 ///删除颜色
 +(NSURLSessionDataTask *)deleteColorWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/delColor" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -524,6 +536,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 ///添加尺寸
 +(NSURLSessionDataTask *)addSizeWithParameters:(NSDictionary *)parameters block:(void (^)(WQSizeObj *sizeObject, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/addSize" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -551,7 +564,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
-
+ 
 ///修改尺寸
 +(NSURLSessionDataTask *)editSizeWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/updateSize" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -572,6 +585,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 ///删除尺寸
 +(NSURLSessionDataTask *)deleteSizeWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/delSize" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -592,7 +606,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
-
+ 
 #pragma mark - 货币
 +(NSURLSessionDataTask *)selectedCoinWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/store/updateSize" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -654,9 +668,10 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 ///修改用户信息
 +(NSURLSessionDataTask *)editCustomerWithParameters:(NSDictionary *)parameters block:(void (^)(WQCustomerObj *customer, NSError *error))block {
-    return [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+    return [[WQAPIClient sharedClient] POST:@"/rest/user/updateCustomer" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -679,6 +694,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 ///删除用户
 +(NSURLSessionDataTask *)deleteCustomerWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/user/delCustomer" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -699,9 +715,10 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 ///获取用户订单记录
 +(NSURLSessionDataTask *)getCustomerOrderListWithParameters:(NSDictionary *)parameters block:(void (^)(NSArray *array,NSInteger pageCount,CGFloat totalPrice, NSError *error))block {
-    return [[WQAPIClient sharedClient] GET:@"/rest/order/userOrderList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+    return [[WQAPIClient sharedClient] GET:@"/rest/order/userOrderList" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -766,7 +783,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
-
+ 
 #pragma mark - 订单
 
 //获取订单列表
@@ -840,9 +857,10 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 //删除订单
 +(NSURLSessionDataTask *)deleteOrderWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    return [[WQAPIClient sharedClient] POST:@"/rest/store/delColor" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+    return [[WQAPIClient sharedClient] POST:@"/rest/order/delOrder" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -860,9 +878,10 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 //订单改价
 +(NSURLSessionDataTask *)editOrderWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    return [[WQAPIClient sharedClient] POST:@"/rest/store/delColor" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+    return [[WQAPIClient sharedClient] POST:@"/rest/order/changeOrderPrice" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -880,9 +899,10 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 //订单付款提醒
 +(NSURLSessionDataTask *)remindOrderWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger finished, NSError *error))block {
-    return [[WQAPIClient sharedClient] POST:@"/rest/store/delColor" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+    return [[WQAPIClient sharedClient] POST:@"/rest/order/noticeOrder" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -902,7 +922,7 @@
 }
 
 #pragma mark - 商品
-
+ 
 //获取热卖商品
 +(NSURLSessionDataTask *)getHotSaleListWithParameters:(NSDictionary *)parameters block:(void (^)(NSArray *array,NSInteger pageCount, NSError *error))block {
     return [[WQAPIClient sharedClient] GET:@"/rest/product/getHostProduct" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -943,16 +963,17 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
 //获取分类下商品
 +(NSURLSessionDataTask *)getProductListWithParameters:(NSDictionary *)parameters block:(void (^)(NSArray *array,NSInteger pageCount, NSError *error))block {
-    return [[WQAPIClient sharedClient] POST:@"/rest/product/getClassProduct" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+    return [[WQAPIClient sharedClient] GET:@"/rest/product/getClassProduct" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
             
             if ([[jsonData objectForKey:@"status"]integerValue]==1) {
                 NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
-                NSArray *postsFromResponse = [aDic objectForKey:@"productList"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"resultList"];
                 
                 NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
                 
@@ -983,6 +1004,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+ 
 //获取商品详情
 +(NSURLSessionDataTask *)getProductDetailWithParameters:(NSDictionary *)parameters block:(void (^)(NSDictionary *aDic, NSError *error))block {
     return [[WQAPIClient sharedClient] POST:@"/rest/user/getStoreCustomers" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -1032,4 +1054,55 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
+
+//删除商品
++(NSURLSessionDataTask *)deleteProductWithParameters:(NSDictionary *)parameters block:(void (^)(NSInteger status, NSError *error))block {
+    return [[WQAPIClient sharedClient] POST:@"/rest/product/delProduct" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                if (block) {
+                    block([[jsonData objectForKey:@"status"]integerValue], nil);
+                }
+            }else {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
+        }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+    }];
+}
+ 
+//修改商品
++(NSURLSessionDataTask *)editProductWithParameters:(NSDictionary *)parameters block:(void (^)(WQProductObj *product,NSInteger status, NSError *error))block {
+    return [[WQAPIClient sharedClient] POST:@"/rest/product/productEdit" parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                WQProductObj *productObj = [[WQProductObj alloc]init];
+                [productObj mts_setValuesForKeysWithDictionary:[jsonData objectForKey:@"returnObj"]];
+                if (block) {
+                    block(productObj,1,nil);
+                }
+            }else {
+                if (block) {
+                    block(nil,0,nil);
+                }
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
+        }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (block) {
+            block(nil,0,nil);
+        }
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+    }];
+}
+ */
 @end

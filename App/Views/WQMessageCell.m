@@ -8,15 +8,12 @@
 
 #import "WQMessageCell.h"
 
-#import "UIButton+AFNetworking.h"
+#import "UIButton+WebCache.h"
 #import "WQMessageObj.h"
-#import "WQPlayerManager.h"
-#import "UIImageView+Addition.h"
 
-@interface WQMessageCell ()<PlayingDelegate>
-{
+
+@interface WQMessageCell () {
     UIView *headImageBackView;
-    BOOL contentVoiceIsPlaying;
 }
 @end
 
@@ -65,42 +62,21 @@
         self.btnContent.titleLabel.numberOfLines = 0;
         [self.btnContent addTarget:self action:@selector(btnContentClick)  forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:self.btnContent];
-        
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(UUAVAudioPlayerDidFinishPlay) name:@"VoicePlayHasInterrupt" object:nil];
-        
-        //红外线感应监听
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(sensorStateChange:)
-                                                     name:UIDeviceProximityStateDidChangeNotification
-                                                   object:nil];
-        contentVoiceIsPlaying = NO;
-        
     }
     return self;
 }
-- (void)UUAVAudioPlayerDidFinishPlay {
-    //关闭红外线感应
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
-    contentVoiceIsPlaying = NO;
-    [self.btnContent stopPlay];
-    [WQPlayerManager sharedManager].delegate = nil;
-    [[WQPlayerManager sharedManager] stopPlaying];
-}
-
 //内容及Frame设置
 - (void)setMessageFrame:(WQMessageFrame *)messageFrame{
     
     _messageFrame = messageFrame;
     // 1、设置时间
-    self.labelTime.text = messageFrame.messageObj.messageDate;
+    self.labelTime.text = messageFrame.messageObj.messageShowDate;
     self.labelTime.frame = messageFrame.timeF;
     
     // 2、设置头像
     headImageBackView.frame = messageFrame.iconF;
     self.btnHeadImage.frame = CGRectMake(2, 2, ChatIconWH-4, ChatIconWH-4);
-    [self.btnHeadImage setBackgroundImageForState:UIControlStateNormal
-                                          withURL:[NSURL URLWithString:messageFrame.customerObj.customerHeader]
-                                 placeholderImage:[UIImage imageNamed:@"headImage.jpeg"]];
+    [self.btnHeadImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,messageFrame.customerObj.customerHeader]] forState:UIControlStateNormal placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     // 3、设置下标
     self.labelNum.text = messageFrame.customerObj.customerName;
@@ -120,7 +96,7 @@
     
     if (messageFrame.messageObj.fromType == WQMessageFromMe) {
         self.btnContent.isMyMessage = YES;
-        [self.btnContent setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.btnContent setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         self.btnContent.contentEdgeInsets = UIEdgeInsetsMake(ChatContentTop, ChatContentRight, ChatContentBottom, ChatContentLeft);
     }else{
         self.btnContent.isMyMessage = NO;
@@ -132,11 +108,11 @@
     UIImage *normal;
     if (messageFrame.messageObj.fromType == WQMessageFromMe) {
         normal = [UIImage imageNamed:@"chatto_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
+        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(28, 11, 30, 13)];
     }
     else{
         normal = [UIImage imageNamed:@"chatfrom_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
+        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(28, 13, 30, 11)];
     }
     [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
     [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
@@ -148,7 +124,7 @@
         case WQMessageTypePicture:
         {
             self.btnContent.backImageView.hidden = NO;
-            self.btnContent.backImageView.image = messageFrame.messageObj.messageImg;
+            [self.btnContent.backImageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,messageFrame.messageObj.messageContent]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
             self.btnContent.backImageView.frame = CGRectMake(0, 0, self.btnContent.frame.size.width, self.btnContent.frame.size.height);
             [self makeMaskView:self.btnContent.backImageView withImage:normal];
         }
@@ -156,7 +132,7 @@
         case WQMessageTypeVoice:
         {
             self.btnContent.voiceBackView.hidden = NO;
-//            self.btnContent.second.text = [NSString stringWithFormat:@"%@'s Voice",unionObj.messageObj.strVoiceTime];
+            self.btnContent.second.text = [NSString stringWithFormat:@"%@''",messageFrame.messageObj.messageContent];
         }
             break;
             
@@ -179,33 +155,35 @@
     }
 }
 
+-(NSString *)defaultFileNameWithVoice:(NSString *)name {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *voiceDirectory = [documentsDirectory stringByAppendingPathComponent:@"voice"];
+    if ( ! [[NSFileManager defaultManager] fileExistsAtPath:voiceDirectory]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:voiceDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+    }
+    return [voiceDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.spx",name]];
+}
 
 - (void)btnContentClick{
     //play audio
     if (self.messageFrame.messageObj.messageType == WQMessageTypeVoice) {
-        if(!contentVoiceIsPlaying){
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
-            contentVoiceIsPlaying = YES;
-            
-            [[WQPlayerManager sharedManager] playAudioWithFileName:@"" delegate:self];
-        }else{
-            [WQPlayerManager sharedManager].delegate = nil;
-            [[WQPlayerManager sharedManager] stopPlaying];
+        
+        if (self.delegate && [self.delegate respondsToSelector:@selector(playVoiceWithCell:sound:)]) {
+            [self.delegate playVoiceWithCell:self sound:[self defaultFileNameWithVoice:self.messageFrame.messageObj.messageVoicePath]];
         }
     }
     //show the picture
-    else if (self.messageFrame.messageObj.messageType == WQMessageTypePicture)
-    {
+    else if (self.messageFrame.messageObj.messageType == WQMessageTypePicture) {
         if (self.btnContent.backImageView) {
-            [self.btnContent.backImageView showLargeImage];
+            [Utility showImage:self.btnContent.backImageView];
         }
         if ([self.delegate isKindOfClass:[UIViewController class]]) {
             [[(UIViewController *)self.delegate view] endEditing:YES];
         }
     }
     // show text and gonna copy that
-    else if (self.messageFrame.messageObj.messageType == WQMessageTypeText)
-    {
+    else if (self.messageFrame.messageObj.messageType == WQMessageTypeText) {
         [self.btnContent becomeFirstResponder];
         UIMenuController *menu = [UIMenuController sharedMenuController];
         [menu setTargetRect:self.btnContent.frame inView:self.btnContent.superview];
@@ -213,24 +191,10 @@
     }
 }
 
-
-//处理监听触发事件
--(void)sensorStateChange:(NSNotificationCenter *)notification;
-{
-    if ([[UIDevice currentDevice] proximityState] == YES){
-        DLog(@"Device is close to user");
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-    }
-    else{
-        DLog(@"Device is not close to user");
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-    }
+-(void)startPlay {
+    [self.btnContent didLoadVoice];
 }
-
-- (void)playingStoped {
-    contentVoiceIsPlaying = NO;
+-(void)stopPlay {
     [self.btnContent stopPlay];
-    [WQPlayerManager sharedManager].delegate = nil;
-    [[WQPlayerManager sharedManager] stopPlaying];
 }
 @end

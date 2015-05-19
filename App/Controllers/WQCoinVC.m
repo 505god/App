@@ -34,7 +34,9 @@
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CurrencySetup", @"")];
     
-    [self.navBarView.rightBtn setTitle:@"保存" forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveAct"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateDisabled];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
@@ -54,6 +56,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask= nil;
 }
@@ -82,9 +85,21 @@
 
 #pragma mark - 导航栏代理
 -(void)changeTheCoin {
-    self.interfaceTask = [WQAPIClient selectedCoinWithParameters:@{} block:^(NSInteger finished, NSError *error) {
-        [WQDataShare sharedService].userObj.moneyType = self.selectedIndex;
-        [self.navigationController popViewControllerAnimated:YES];
+    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/store/updateSize" parameters:@{} success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                [WQDataShare sharedService].userObj.moneyType = self.selectedIndex;
+                [self.navigationController popViewControllerAnimated:YES];
+            }else {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
+        }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 //左侧边栏的代理

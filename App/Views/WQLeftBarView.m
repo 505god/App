@@ -50,7 +50,6 @@
     [self whiteViewSelected];
     self.orderItem.isSelected = YES;
     [self.shopItem.whiteView setHidden:YES];
-    [self.shopItem.whiteView setHidden:YES];
     if (self.leftDelegate && [self.leftDelegate respondsToSelector:@selector(leftTabBar:selectedItem:)]) {
         [self.leftDelegate leftTabBar:self selectedItem:LeftTabBarItemType_order];
     }
@@ -76,6 +75,7 @@
 
 -(void)awakeFromNib {
     [super awakeFromNib];
+    self.frame = (CGRect){0,0,60,[UIScreen mainScreen].bounds.size.height};
     
     self.shopItem.frame = (CGRect){0,0,ItemWidth,self.height/4};
     self.orderItem.frame = (CGRect){0,self.shopItem.bottom,ItemWidth,self.height/4};

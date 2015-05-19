@@ -10,7 +10,7 @@
 
 @interface WQProAttributrFooter ()
 
-@property (nonatomic, assign) UIButton *coverBtn;
+@property (nonatomic, strong) UIButton *coverBtn;
 
 @end
 

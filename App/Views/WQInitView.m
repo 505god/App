@@ -25,7 +25,7 @@ static CGFloat animationDuration = 1.0;
         self.logoImg = [[UIImageView alloc]init];
         self.logoImg.contentMode = UIViewContentModeScaleAspectFit;
         self.logoImg.frame = CGRectMake(0, 0, 40, 40);
-        self.logoImg.image = [UIImage imageNamed:@"back"];
+        self.logoImg.image = [UIImage imageNamed:@"shopAct"];
         self.logoImg.center = self.center;
         [self addSubview:self.logoImg];
     }

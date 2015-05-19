@@ -17,6 +17,8 @@
 #import "WQCustomerVC.h"
 #import "WQCustomerOrderVC.h"
 
+#import "WQMessageVC.h"
+
 @interface WQCustomerDetailVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource,WQCustomerDetailEditVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
@@ -76,30 +78,28 @@
 }
 
 -(void)dealData {
-    NSInteger rowCount = 0;
     self.dataArray = [NSMutableArray array];
     
     ///手机
-    if ([Utility checkString:self.customerObj.customerPhone]) {
-        rowCount ++;
+    if ([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerPhone]]) {
         NSDictionary *dic = @{NSLocalizedString(@"CustomerPhone", @""):self.customerObj.customerPhone};
         [self.dataArray addObject:dic];
     }
     ///备注
-    if ([Utility checkString:self.customerObj.customerRemark]) {
-        rowCount ++;
+    if ([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerRemark]]) {
         NSDictionary *dic = @{NSLocalizedString(@"CustomerRemark", @""):self.customerObj.customerRemark};
         [self.dataArray addObject:dic];
     }
     ///地区
-    if ([Utility checkString:self.customerObj.customerArea]) {
-        rowCount ++;
+    if ([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerArea]]) {
         NSDictionary *dic = @{NSLocalizedString(@"customerArea", @""):self.customerObj.customerArea};
         [self.dataArray addObject:dic];
     }
-//    NSDictionary *dic = @{NSLocalizedString(@"customerCode", @""):self.customerObj.customerCode};
-     NSDictionary *dic = @{NSLocalizedString(@"customerCode", @""):@"test"};
-    [self.dataArray addObject:dic];
+
+    if ([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerCode]]) {
+        NSDictionary *dic = @{NSLocalizedString(@"customerCode", @""):self.customerObj.customerCode};
+        [self.dataArray addObject:dic];
+    }
     
     NSDictionary *dic2 = @{NSLocalizedString(@"customerOrder", @""):@""};
     [self.dataArray addObject:dic2];
@@ -126,7 +126,7 @@
     UIView *footerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.width, 60)];
     UIButton *quitBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     
-    quitBtn.frame = CGRectMake((self.view.width-250)/2, 10, 250, 40);
+    quitBtn.frame = CGRectMake(10, 10, self.view.width-20, 40);
     [quitBtn setTitle:NSLocalizedString(@"customerChat", @"") forState:UIControlStateNormal];
     [quitBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [quitBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
@@ -230,6 +230,18 @@
 #pragma mark - 发起消息
 
 -(void)chatWithCustomer:(id)sender {
+    if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%d",self.customerObj.customerId]]) {
+        [[WQDataShare sharedService].messageArray removeObject:[NSString stringWithFormat:@"%d",self.customerObj.customerId]];
+        
+        if ([WQDataShare sharedService].messageArray.count==0) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"isNewMessage" object:@"0" userInfo:nil];
+        }
+    }
+    
+    WQMessageVC *messageVC = [[WQMessageVC alloc]init];
+    messageVC.customerObj = self.customerObj;
+    [self.navigationController pushViewController:messageVC animated:YES];
+    SafeRelease(messageVC);
     
 }
 

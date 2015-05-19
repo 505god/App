@@ -16,10 +16,10 @@
     CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
     
     // 1、计算时间的位置
-    if (_showTime) {
+    if (messageObj.showDateLabel) {
         CGFloat timeY = ChatMargin;
         
-        CGSize timeSize = [messageObj.messageDate boundingRectWithSize:CGSizeMake(300, 100) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:ChatTimeFont,NSFontAttributeName, nil] context:nil].size;
+        CGSize timeSize = [messageObj.messageShowDate boundingRectWithSize:CGSizeMake(300, 100) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:ChatTimeFont,NSFontAttributeName, nil] context:nil].size;
         
         CGFloat timeX = (screenW - timeSize.width) / 2;
         _timeF = CGRectMake(timeX, timeY, timeSize.width + ChatTimeMarginW, timeSize.height + ChatTimeMarginH);
@@ -50,7 +50,7 @@
             contentSize = CGSizeMake(ChatPicWH, ChatPicWH-20);
             break;
         case WQMessageTypeVoice:
-            contentSize = CGSizeMake(120, 20);
+            contentSize = CGSizeMake(60, 20);
             break;
         default:
             break;

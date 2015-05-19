@@ -125,12 +125,15 @@ static int count = 0;
     
     self.verifyCodeField=[[UITextField alloc] init];
     self.verifyCodeField.frame=CGRectMake(15, self.telLabel.bottom+10, self.view.frame.size.width - 30, NavgationHeight);
-    self.verifyCodeField.borderStyle=UITextBorderStyleRoundedRect;
+    self.verifyCodeField.borderStyle=UITextBorderStyleNone;
     self.verifyCodeField.textAlignment=NSTextAlignmentCenter;
     self.verifyCodeField.placeholder=NSLocalizedString(@"verifycode", nil);
     self.verifyCodeField.font=[UIFont systemFontOfSize:16];
     self.verifyCodeField.keyboardType=UIKeyboardTypePhonePad;
     self.verifyCodeField.clearButtonMode=UITextFieldViewModeWhileEditing;
+    self.verifyCodeField.backgroundColor = [UIColor whiteColor];
+    self.verifyCodeField.layer.cornerRadius = 4.0;
+    self.verifyCodeField.layer.masksToBounds = YES;
     [self.view addSubview:self.verifyCodeField];
     
     self.timeLabel=[[UILabel alloc] init];

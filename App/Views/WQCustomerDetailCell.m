@@ -79,7 +79,7 @@
     
     self.titleLab.text = array[0];
     
-    self.detailLab.text = [Utility checkString:[dictionary objectForKey:array[0]]]?[dictionary objectForKey:array[0]]:@"";
+    self.detailLab.text = [Utility checkString:[NSString stringWithFormat:@"%@",[dictionary objectForKey:array[0]]]]?[dictionary objectForKey:array[0]]:@"";
 }
 
 -(void)prepareForReuse {

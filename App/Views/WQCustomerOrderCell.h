@@ -6,12 +6,15 @@
 //  Copyright (c) 2015年 Just Do It. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "RMSwipeTableViewCell.h"
+#import "WQCustomerOrderObj.h"
 
-#import "WQCustomerOrderProObj.h"
+@interface WQCustomerOrderCell : RMSwipeTableViewCell
 
-@interface WQCustomerOrderCell : UITableViewCell
+@property (nonatomic, strong) NSIndexPath *indexPath;
+///type:0=客户1=待处理2=待付款3=已完成
+@property (nonatomic, assign) NSInteger type;
 
-@property (nonatomic, strong) WQCustomerOrderProObj *orderProductObj;
+@property (nonatomic, strong) WQCustomerOrderObj *orderObj;
 
 @end

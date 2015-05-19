@@ -32,7 +32,9 @@
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"ShopName", @"")];
     self.navBarView.navDelegate = self;
-    [self.navBarView.rightBtn setTitle:NSLocalizedString(@"Save", @"") forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveAct"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateDisabled];
     self.navBarView.rightBtn.enabled = NO;
     self.navBarView.isShowShadow = YES;
     [self.view addSubview:self.navBarView];
@@ -68,6 +70,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
     
@@ -108,10 +111,22 @@
 //右侧边栏的代理
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
     
-    self.interfaceTask = [WQAPIClient editShopNameWithParameters:@{@"storeName":self.nameTxt.text} block:^(NSInteger finished, NSError *error) {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(editNameVCDidChange:)]) {
-            [self.delegate editNameVCDidChange:self];
+    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/store/updateStoreName" parameters:@{@"storeName":self.nameTxt.text} success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                if (self.delegate && [self.delegate respondsToSelector:@selector(editNameVCDidChange:)]) {
+                    [self.delegate editNameVCDidChange:self];
+                }
+            }else {
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
         }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 

@@ -16,7 +16,7 @@
 
 @property (nonatomic, assign) id<WQInputFunctionViewDelegate>delegate;
 
-///发送
+//图片
 @property (nonatomic, strong) UIButton *btnSendMessage;
 ///语音
 @property (nonatomic, strong) UIButton *btnChangeVoiceState;
@@ -25,14 +25,12 @@
 ///文本
 @property (nonatomic, strong) WQMessageTextView *TextViewInput;
 
-@property (nonatomic, assign) BOOL isAbleToSendTextMessage;
-
 @property (nonatomic, strong) UIViewController *superVC;
 
-- (id)initWithSuperVC:(UIViewController *)superVC;
-
-- (void)changeSendBtnWithPhoto:(BOOL)isPhoto;
-
+- (instancetype)initWithFrame:(CGRect)frame
+                      superVC:(UIViewController *)superVC
+                     delegate:(id<UITextViewDelegate, WQDismissiveTextViewDelegate>)delegate
+         panGestureRecognizer:(UIPanGestureRecognizer *)panGestureRecognizer;
 
 #pragma mark - Message input view
 - (void)adjustTextViewHeightBy:(CGFloat)changeInHeight;
@@ -47,13 +45,10 @@
 
 @protocol WQInputFunctionViewDelegate <NSObject>
 
-// text
-- (void)WQInputFunctionView:(WQInputFunctionView *)funcView sendMessage:(NSString *)message;
-
 // image
 - (void)WQInputFunctionView:(WQInputFunctionView *)funcView sendPicture:(UIImage *)image;
 
 // audio
-- (void)WQInputFunctionView:(WQInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second;
+- (void)WQInputFunctionView:(WQInputFunctionView *)funcView fileName:(NSString *)filePath name:(NSString *)name time:(NSTimeInterval)interval;
 
 @end

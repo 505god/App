@@ -49,23 +49,44 @@
 #pragma mark - 获取客户列表
 -(void)getCustomerList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    self.interfaceTask = [WQAPIClient getCustomerListWithBlock:^(NSArray *array, NSError *error) {
-        if (!error) {
-            [weakSelf.customerList addObjectsFromArray:array];
-            [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:weakSelf.customerList];
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/user/getStoreCustomers" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
             
-            if (weakSelf.customerList.count>0) {
-                [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
-                    weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
-                    [weakSelf.tableView setHeaderAnimated:YES];
-                    [weakSelf.tableView reloadData];
-                    [weakSelf setNoneText:nil animated:NO];
-                }];
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSArray *postsFromResponse = [jsonData objectForKey:@"returnObj"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQCustomerObj *customerObj = [[WQCustomerObj alloc] init];
+                    [customerObj mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:customerObj];
+                    SafeRelease(customerObj);
+                }
+                
+                [weakSelf.customerList addObjectsFromArray:mutablePosts];
+                [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:weakSelf.customerList];
+                
+                if (weakSelf.customerList.count>0) {
+                    [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
+                        weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
+                        [weakSelf.tableView setHeaderAnimated:YES];
+                        [weakSelf.tableView reloadData];
+                        [weakSelf setNoneText:nil animated:NO];
+                    }];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneCustomer", @"") animated:YES];
+                }
             }else {
-                [weakSelf setNoneText:NSLocalizedString(@"NoneCustomer", @"") animated:YES];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
-            [weakSelf.tableView.tableView headerEndRefreshing];
         }
+        [weakSelf.tableView.tableView headerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.tableView.tableView headerEndRefreshing];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 #pragma mark - lifestyle
@@ -94,7 +115,7 @@
     if (self.isPresentVC) {
         [self.navBarView setTitleString:NSLocalizedString(@"SelectedProCustomers", @"")];
         [self.navBarView.leftBtn setHidden:NO];
-        [self setToolImage:@"compose_photograph_highlighted" text:NSLocalizedString(@"Finish", @"") animated:YES];
+        [self setToolImage:@"" text:NSLocalizedString(@"Finish", @"") animated:YES];
         
         self.toolControl.enabled = self.selectedList.count>0?YES:NO;
     }
@@ -121,6 +142,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -227,7 +249,9 @@
 }
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.dataArray[section][@"data"] count];
+    NSDictionary *aDic = (NSDictionary *)self.dataArray[section];
+    NSArray *array = (NSArray *)aDic[@"data"];
+    return [array count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -244,6 +268,7 @@
     WQCustomerObj *customer = nil;
     customer = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
     [cell setCustomerObj:customer];
+    
     
     //判断选择客户列表
     if (self.isPresentVC) {

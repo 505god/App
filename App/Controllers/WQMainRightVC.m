@@ -21,6 +21,8 @@
 #import "WQCoinVC.h"
 #import "WQLocalDB.h"
 
+#import "BlockAlertView.h"
+
 @interface WQMainRightVC ()<UITableViewDataSource, UITableViewDelegate,WQNavBarViewDelegate,JKImagePickerControllerDelegate,WQEditNameVCDelegate,MBProgressHUDDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
@@ -189,20 +191,35 @@
             SafeRelease(coinVC);
         }
     }else {
-        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         
-        [WQAPIClient logOutWithBlock:^(NSInteger status, NSError *error) {
-            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-                [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-                if (finished) {
-                    //TODO:xmpp退出
-                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
-
-                    [self.appDel showRootVC];
-                }
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"confirmLogOut", @"")];
+        
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+        [alert setDestructiveButtonWithTitle:NSLocalizedString(@"LogOut", @"") block:^{
+            [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            
+            [[WQAPIClient sharedClient] POST:@"/rest/login/logout" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+                
+                [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                    [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+                    if (finished) {
+                        //TODO:xmpp退出
+                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        
+                        [self.appDel.xmppManager goOffline];
+                        [self.appDel.xmppManager teardownStream];
+                        self.appDel.xmppManager = nil;
+                        [WQDataShare sharedService].userObj = nil;
+                        
+                        [self.appDel showRootVC];
+                    }
+                }];
+                
+            } failure:^(NSURLSessionDataTask *task, NSError *error) {
             }];
         }];
+        [alert show];
     }
 }
 
@@ -230,6 +247,7 @@
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
             [weakSelf saveShopHeaderWithImg:image];
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         });
     }];
 }

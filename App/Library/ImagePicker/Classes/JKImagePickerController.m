@@ -119,7 +119,9 @@ ALAssetsFilter * ALAssetsFilterFromJKImagePickerControllerFilterType(JKImagePick
                         @(ALAssetsGroupAlbum)];
     [self.navBarView addSubview:self.titleButton];
     
-    [self.navBarView.rightBtn setTitle:[NSString stringWithFormat:NSLocalizedString(@"NextStep", @""),self.selectedAssetArray.count] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveAct"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"saveNor"] forState:UIControlStateDisabled];
     self.navBarView.rightBtn.enabled = NO;
 }
 
@@ -527,7 +529,6 @@ static NSString *kJKAssetsFooterViewIdentifier = @"kJKAssetsFooterViewIdentifier
 }
 
 - (void)resetFinishFrame {
-    [self.navBarView.rightBtn setTitle:[NSString stringWithFormat:NSLocalizedString(@"NextStep", @""),self.selectedAssetArray.count] forState:UIControlStateNormal];
     self.navBarView.rightBtn.enabled = (self.selectedAssetArray.count>0);
 }
 

@@ -23,6 +23,9 @@
 @property (nonatomic, strong) WQColorObj *selectedColorObj;
 
 @property (nonatomic, strong) NSIndexPath *selectedIndexPath;
+
+///已选择的颜色
+@property (nonatomic, strong) NSMutableArray *hasSelectedColor;
 @end
 
 @protocol WQColorVCDelegate <NSObject>

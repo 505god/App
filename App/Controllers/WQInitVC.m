@@ -32,9 +32,14 @@
     __block WQInitView *initView = [[WQInitView alloc]initWithBackgroundImage:nil];
     initView.delegate = self;
     [self.view addSubview:initView];
-    
-    [WQAPIClient checkLogInWithBlock:^(NSInteger status, NSError *error) {
-        if (!error) {
+
+    ///判断登录与否
+    self.interfaceTask  = [[WQAPIClient sharedClient] GET:@"/rest/login/checkLogin" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            NSInteger status = [[jsonData objectForKey:@"status"]integerValue];
             if (status==0) {
                 [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
                     [initView startAnimation];
@@ -44,12 +49,13 @@
                 [initView startAnimation];
                 SafeRelease(initView);
             }
-        }else {
-            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-                [initView startAnimation];
-                SafeRelease(initView);
-            }];
         }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+            [initView startAnimation];
+            SafeRelease(initView);
+        }];
     }];
 }
 
@@ -65,6 +71,10 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [WQAPIClient cancelConnection];
+    [self.interfaceTask cancel];
+    self.interfaceTask = nil;
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -76,7 +86,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - WQInitViewDelegate 
+#pragma mark - WQInitViewDelegate
 //开始
 -(void)initViewDidBeginAnimating:(WQInitView *)initView {
     

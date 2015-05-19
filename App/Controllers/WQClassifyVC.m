@@ -20,7 +20,7 @@
 
 #import "WQProductVC.h"
 
-@interface WQClassifyVC ()<UITableViewDataSource, UITableViewDelegate,RMSwipeTableViewCellDelegate,WQSwipTableHeaderDelegate>
+@interface WQClassifyVC ()<UITableViewDataSource, UITableViewDelegate,RMSwipeTableViewCellDelegate,WQSwipTableHeaderDelegate,WQProductVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
@@ -44,16 +44,44 @@
 
 -(void)getClassList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    self.interfaceTask = [WQAPIClient getClassListWithBlock:^(NSArray *array, NSError *error) {
-        [weakSelf.dataArray addObjectsFromArray:array];
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
-        if (weakSelf.dataArray.count>0) {
-            [weakSelf.tableView reloadData];
-            [weakSelf setNoneText:nil animated:NO];
-        }else {
-            [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"classList"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQClassObj *classObj = [[WQClassObj alloc] init];
+                    [classObj mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:classObj];
+                    SafeRelease(classObj);
+                }
+                
+                [weakSelf.dataArray addObjectsFromArray:mutablePosts];
+                
+                [WQDataShare sharedService].classArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
+                
+                if (weakSelf.dataArray.count>0) {
+                    [weakSelf.tableView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                }
+            }else {
+                [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+            }
         }
         [weakSelf.tableView headerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.tableView headerEndRefreshing];
+        [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -90,6 +118,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -204,6 +233,7 @@
     WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
     
     WQProductVC *productVC = [[WQProductVC alloc]init];
+    productVC.classObj = classObj;
     productVC.levelClassObj = levelClassObj;
     [self.navControl pushViewController:productVC animated:YES];
     SafeRelease(productVC);
@@ -293,9 +323,8 @@
     }
 }
 
-#pragma mark - toolBar事件
--(void)toolControlPressed {
-    
+-(void)deleteProductRefresh {
+    self.dataArray = [NSMutableArray arrayWithArray:[WQDataShare sharedService].classArray];
+    [self.tableView reloadData];
 }
-
 @end

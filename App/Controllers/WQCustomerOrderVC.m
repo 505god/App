@@ -10,18 +10,14 @@
 
 #import "MJRefresh.h"
 #import "WQCustomerOrderObj.h"
-#import "WQCustomerOrderProObj.h"
-#import "WQOrderHeader.h"
 #import "WQCustomerOrderCell.h"
 
 
-@interface WQCustomerOrderVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource,WQSwipTableHeaderDelegate>
+@interface WQCustomerOrderVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource>
 
 @property (nonatomic, strong) UITableView *tableView;
 
 @property (nonatomic, strong) NSMutableArray *dataArray;
-
-@property (nonatomic, strong) NSMutableArray *arrSelSection;
 
 ///当前页开始索引
 @property (nonatomic, assign) NSInteger start;
@@ -36,37 +32,70 @@
 
 @implementation WQCustomerOrderVC
 
+-(void)dealloc {
+    SafeRelease(_tableView.delegate);
+    SafeRelease(_tableView.dataSource);
+    SafeRelease(_tableView);
+    SafeRelease(_dataArray);
+}
+
 #pragma mark - 获取订单列表
 
 -(void)getOrderList {
     __unsafe_unretained typeof(self) weakSelf = self;
     
-    self.interfaceTask = [WQAPIClient getCustomerOrderListWithParameters:@{@"count":[NSNumber numberWithInteger:self.limit],@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"userId":[NSNumber numberWithInteger:self.customerObj.customerId]} block:^(NSArray *array, NSInteger pageCount, CGFloat totalPrice, NSError *error) {
-        if (!error) {
-            if (weakSelf.pageCount<0) {
-                weakSelf.pageCount = pageCount;
-                weakSelf.orderPrice = totalPrice;
-            }
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/order/userOrderList" parameters:@{@"count":[NSNumber numberWithInteger:self.limit],@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"userId":[NSNumber numberWithInteger:self.customerObj.customerId]} success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
             
-            [weakSelf.dataArray addObjectsFromArray:array];
-            if (weakSelf.dataArray.count>0) {
-                [weakSelf.tableView reloadData];
-                [weakSelf setNoneText:nil animated:NO];
+            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                NSDictionary *aDic = [jsonData objectForKey:@"returnObj"];
+                NSArray *postsFromResponse = [aDic objectForKey:@"orderList"];
+                
+                NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+                
+                for (NSDictionary *attributes in postsFromResponse) {
+                    WQCustomerOrderObj *orderObj = [[WQCustomerOrderObj alloc] init];
+                    [orderObj mts_setValuesForKeysWithDictionary:attributes];
+                    [mutablePosts addObject:orderObj];
+                    SafeRelease(orderObj);
+                }
+                
+                NSInteger orderNumber = [[aDic objectForKey:@"pageCount"]integerValue];
+                
+                CGFloat price = [[aDic objectForKey:@"totalPrice"]floatValue];
+                
+                if (weakSelf.pageCount<0) {
+                    weakSelf.pageCount = orderNumber;
+                    weakSelf.orderPrice = price;
+                }
+                
+                [weakSelf.dataArray addObjectsFromArray:mutablePosts];
+                if (weakSelf.dataArray.count>0) {
+                    [weakSelf.tableView reloadData];
+                    [weakSelf setNoneText:nil animated:NO];
+                }else {
+                    [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+                }
+                
+                if ((weakSelf.start+weakSelf.limit)<weakSelf.pageCount) {
+                    [weakSelf.tableView removeFooter];
+                    [weakSelf addFooter];
+                }else {
+                    [weakSelf.tableView removeFooter];
+                }
             }else {
-                [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
-            }
-            
-            if ((weakSelf.start/10+1)<self.pageCount) {
                 [weakSelf.tableView removeFooter];
-                [weakSelf addFooter];
-            }else {
-                [weakSelf.tableView removeFooter];
+                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
-        }else {
-            [weakSelf.tableView removeFooter];
         }
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [weakSelf.tableView headerEndRefreshing];
+        [weakSelf.tableView footerEndRefreshing];
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -83,7 +112,7 @@
     
     
     self.limit = 10;
-
+    
     //集成刷新控件
     [self addHeader];
     
@@ -101,6 +130,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
 }
@@ -128,17 +158,11 @@
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        [_tableView registerClass:[WQOrderHeader class] forHeaderFooterViewReuseIdentifier:@"WQOrderHeader"];
         [self.view addSubview:_tableView];
     }
     return _tableView;
 }
--(NSMutableArray *)arrSelSection {
-    if (!_arrSelSection) {
-        _arrSelSection = [[NSMutableArray alloc]init];
-    }
-    return _arrSelSection;
-}
+
 
 -(void)initHeaderView {
     UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.tableView.width, 40)];
@@ -205,7 +229,7 @@
         weakSelf.start += weakSelf.limit;
         if (weakSelf.dataArray.count>0) {
             WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)[weakSelf.dataArray lastObject];
-            weakSelf.lastOrderId = orderObj.orderId;
+            weakSelf.lastOrderId = [orderObj.orderId integerValue];
         }
         
         [weakSelf getOrderList];
@@ -219,55 +243,11 @@
 }
 
 #pragma mark - tableView
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if (section==self.dataArray.count-1) {
-        return 0;
-    }
-    return 10;
-}
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 60;
-}
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    WQOrderHeader *header = (WQOrderHeader*)[tableView dequeueReusableHeaderFooterViewWithIdentifier:@"WQOrderHeader"];
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[section];
-    [header setOrderObj:orderObj];
-    header.delegate = self;
-    header.aSection = section;
-    header.type=0;
-    header.revealDirection = WQSwipTableHeaderRevealDirectionNone;
-    BOOL isSelSection = NO;
-    for (int i = 0; i < self.arrSelSection.count; i++) {
-        if (section == [self.arrSelSection[i] integerValue]) {
-            isSelSection = YES;
-            break;
-        }
-    }
-    header.isSelected = isSelSection;
-    
-    return header;
-}
-
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.tableView.width, 10)];
-    customView.backgroundColor = COLOR(235, 235, 241, 1);
-    
-    return customView;
-}
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    for (int i = 0; i < self.arrSelSection.count; i++) {
-        if (section == [self.arrSelSection[i] integerValue]) {
-            WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[section];
-            return orderObj.productList.count;
-        }
-    }
-    return 0;
-}
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 50;
+    return 112;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -279,43 +259,14 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.section];
+    cell.revealDirection = RMSwipeTableViewCellRevealDirectionNone;
     
-    WQCustomerOrderProObj *proObj = (WQCustomerOrderProObj *)orderObj.productList[indexPath.row];
+    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.row];
     
-    [cell setOrderProductObj:proObj];
+    [cell setIndexPath:indexPath];
+    [cell setType:0];
+    [cell setOrderObj:orderObj];
     
     return cell;
-}
-
--(void)editDidTapPressedOption:(WQSwipTableHeader *)Header {
-    WQOrderHeader *header = (WQOrderHeader *)Header;
-    
-    //判断打开还是关闭
-    BOOL isSelSection = NO;
-    if (self.arrSelSection.count>0) {
-        
-        for (int i=0; i<self.arrSelSection.count; i++) {
-            if ([self.arrSelSection[i] integerValue]==header.aSection) {//包含
-                isSelSection = YES;
-                break;
-            }
-        }
-    }
-    
-    if (!isSelSection) {//关闭状态
-        WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[header.aSection];
-        if (orderObj.productList.count>0) {
-            [self.arrSelSection addObject:[NSString stringWithFormat:@"%d",header.aSection]];
-            [self.tableView beginUpdates];
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView endUpdates];
-        }
-    }else {//打开状态
-        [self.arrSelSection removeObject:[NSString stringWithFormat:@"%d",header.aSection]];
-        [self.tableView beginUpdates];
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:header.aSection] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableView endUpdates];
-    }
 }
 @end

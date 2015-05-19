@@ -50,4 +50,5 @@
 @property (nonatomic, assign) NSInteger proClassAId;
 @property (nonatomic, strong) NSString *proClassBName;
 @property (nonatomic, assign) NSInteger proClassBId;
+
 @end
