@@ -50,5 +50,6 @@
 
 // audio
 - (void)WQInputFunctionView:(WQInputFunctionView *)funcView fileName:(NSString *)filePath name:(NSString *)name time:(NSTimeInterval)interval;
-
+//record
+-(void)beginRecord;
 @end

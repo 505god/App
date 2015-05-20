@@ -43,6 +43,8 @@
 @property (nonatomic, assign) BOOL isCanLoadingMore;
 
 @property (nonatomic, assign) BOOL isPlaying;
+
+@property (nonatomic, assign) BOOL isShowKeyboard;
 @end
 
 @implementation WQMessageVC
@@ -186,14 +188,16 @@
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     [textView becomeFirstResponder];
     
+    self.isShowKeyboard = YES;
+    
     if(!self.previousTextViewContentHeight)
         self.previousTextViewContentHeight = textView.contentSize.height;
-    
-    [self scrollToBottomAnimated:YES];
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
     [textView resignFirstResponder];
+    
+    self.isShowKeyboard = NO;
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -283,6 +287,10 @@
                          CGFloat keyboardY = [self.view convertRect:keyboardRect fromView:nil].origin.y;
                          
                          CGRect inputViewFrame = self.messageInputView.frame;
+                         if (keyboardRect.origin.y < self.view.height) {
+                             inputViewFrame.size.height = self.messageInputView.TextViewInput.height+NavgationHeight-36;
+                         }
+                         
                          CGFloat inputViewFrameY = keyboardY - inputViewFrame.size.height;
                          
                          // for ipad modal form presentations
@@ -297,14 +305,14 @@
                          
                          UIEdgeInsets insets = self.originalTableViewContentInset;
                          insets.bottom = self.view.frame.size.height
-                         - self.messageInputView.frame.origin.y
-                         - inputViewFrame.size.height;
+                         - self.messageInputView.frame.origin.y-NavgationHeight;
                          
                          self.tableView.contentInset = insets;
                          self.tableView.scrollIndicatorInsets = insets;
                      }
                      completion:^(BOOL finished) {
                      }];
+    [self scrollToBottomAnimated:YES];
 }
 #pragma mark - Dismissive text view delegate
 
@@ -502,6 +510,24 @@
     [self.tempMessageDic setObject:[NSString stringWithFormat:@"%d",2] forKey:kMESSAGE_TYPE];
     [self sendMessage:self.tempMessageDic];
 }
+
+-(void)beginRecord {
+    [UIView animateWithDuration:0.25f
+                     animations:^{
+                         UIEdgeInsets insets = UIEdgeInsetsMake(0.0f,0.0f,0.0f,0.0f);
+                         
+                         self.tableView.contentInset = insets;
+                         self.tableView.scrollIndicatorInsets = insets;
+                         [self scrollToBottomAnimated:NO];
+                         
+                         CGRect inputViewFrame = self.messageInputView.frame;
+                         self.messageInputView.frame = CGRectMake(0.0f,self.view.height-NavgationHeight,inputViewFrame.size.width,NavgationHeight);
+                         
+                     }completion:^(BOOL finished) {
+                     }];
+}
+
+
 #pragma mark - chatDelegate
 -(void)getNewMessage:(NSNotification *)notification {
     WQMessageObj *messageObj = (WQMessageObj *)notification.object;
@@ -521,8 +547,10 @@
 }
 //列表展示
 -(void)dealTheFunctionData:(WQMessageObj *)messageObj {
-    self.messageInputView.TextViewInput.text = nil;
-    [self textViewDidChange:self.messageInputView.TextViewInput];
+    if (self.isShowKeyboard) {
+        self.messageInputView.TextViewInput.text = nil;
+        [self textViewDidChange:self.messageInputView.TextViewInput];
+    }
     
     [self.chatModel addMessageFrameWithMessageObj:messageObj];
     

@@ -61,13 +61,13 @@
         self.subTitleLabel.text = NSLocalizedString(@"Slideuptocancel", @"");
         self.subTitleLabel.textAlignment = NSTextAlignmentCenter;
         self.subTitleLabel.font = [UIFont boldSystemFontOfSize:14];
-        self.subTitleLabel.textColor = [UIColor whiteColor];
+        self.subTitleLabel.textColor = COLOR(251, 0, 41, 1);
         
         self.titleLabel.center = CGPointMake([[UIScreen mainScreen] bounds].size.width/2,[[UIScreen mainScreen] bounds].size.height/2 - 30);
         self.titleLabel.text = NSLocalizedString(@"TimeLimit", @"");
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         self.titleLabel.font = [UIFont boldSystemFontOfSize:18];
-        self.titleLabel.textColor = [UIColor whiteColor];
+        self.titleLabel.textColor = COLOR(251, 0, 41, 1);
         
         centerLabel.center = CGPointMake([[UIScreen mainScreen] bounds].size.width/2,[[UIScreen mainScreen] bounds].size.height/2);
         centerLabel.text = @"60";
@@ -146,7 +146,7 @@
         self.subTitleLabel.text = nil;
         self.titleLabel.text = nil;
         centerLabel.text = state;
-        centerLabel.textColor = [UIColor whiteColor];
+        centerLabel.textColor = [UIColor blackColor];
         
         CGFloat timeLonger;
         if ([state isEqualToString:@"TooShort"]) {
