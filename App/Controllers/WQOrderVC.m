@@ -9,8 +9,10 @@
 #import "WQOrderVC.h"
 
 #import "DAPagesContainer.h"
-#import "WQOrderDealVC.h"
+
 #import "WQOrderPayVC.h"
+#import "WQOrderDeliveryVC.h"
+#import "WQOrderReceivingVC.h"
 #import "WQOrderFinishVC.h"
 
 #import "WQOrderSearchVC.h"
@@ -76,20 +78,24 @@
     [self.view addSubview:self.pagesContainer.view];
     [self.pagesContainer didMoveToParentViewController:self];
     
-    //待处理
-    WQOrderDealVC *dealVC = [[WQOrderDealVC alloc]init];
-    dealVC.title = NSLocalizedString(@"orderDeal", @"");
-    
     //待付款
     WQOrderPayVC *payVC = [[WQOrderPayVC alloc]init];
     payVC.title = NSLocalizedString(@"orderPay", @"");
     
-    //已完成
+    //待发货
+    WQOrderDeliveryVC *deliveryVC = [[WQOrderDeliveryVC alloc]init];
+    deliveryVC.title = NSLocalizedString(@"DeliveryVC",@"");
+    
+    //待收货
+    WQOrderReceivingVC *receivingVC = [[WQOrderReceivingVC alloc]init];
+    receivingVC.title = NSLocalizedString(@"ReceivingVC",@"");
+    
+    //已关闭
     WQOrderFinishVC *finishVC = [[WQOrderFinishVC alloc]init];;
     finishVC.title = NSLocalizedString(@"orderFinish", @"");
     
-    self.pagesContainer.viewControllers = @[dealVC,payVC,finishVC];
-    SafeRelease(dealVC);SafeRelease(payVC);SafeRelease(finishVC);
+    self.pagesContainer.viewControllers = @[payVC,deliveryVC,receivingVC,finishVC];
+    SafeRelease(deliveryVC);SafeRelease(payVC);SafeRelease(finishVC);SafeRelease(receivingVC);
 }
 
 #pragma mark - 导航栏代理

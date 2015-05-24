@@ -257,7 +257,7 @@
     self.navBarView.rightBtn.enabled = [self checkNavRight];
     
     //字数限制
-    NSInteger kMaxLength = 20;
+    NSInteger kMaxLength = 10;
     
     NSString *toBeString = text.text;
     NSString *lang = text.textInputMode.primaryLanguage;

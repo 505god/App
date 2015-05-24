@@ -14,25 +14,27 @@
 
 //订单
 @property (nonatomic, strong) UILabel *codeLab;
-@property (nonatomic, strong) UILabel *customerLab;
-@property (nonatomic, strong) UIImageView *customerImg;
-@property (nonatomic, strong) UILabel *priceLab;
 @property (nonatomic, strong) UILabel *timeLab;
-
+@property (nonatomic, strong) UIImageView *lineView1;
 //产品
 @property (nonatomic, strong) WQTapImg *proImage;
 @property (nonatomic, strong) UILabel *proNameLab;
 @property (nonatomic, strong) UILabel *proPriceLab;
 @property (nonatomic, strong) UILabel *proSaleLab;
 @property (nonatomic, strong) UILabel *proTypeLab;
+@property (nonatomic, strong) UIImageView *lineView2;
+//总价
+@property (nonatomic, strong) UILabel *priceLab;
+
+@property (nonatomic, strong) UIButton *cancelBtn;
+@property (nonatomic, strong) UIButton *payBtn;
+@property (nonatomic, strong) UIButton *alertBtn;
+@property (nonatomic, strong) UIButton *editPriceBtn;
+@property (nonatomic, strong) UIButton *deliveryBtn;
+@property (nonatomic, strong) UIButton *receiveBtn;
 
 @property (nonatomic, strong) UIImageView *lineView;
 
-@property (nonatomic, strong) UIImageView *editGreyImageView;
-@property (nonatomic, strong) UIImageView *editRedImageView;
-
-@property (nonatomic, strong) UIImageView *deleteGreyImageView;
-@property (nonatomic, strong) UIImageView *deleteRedImageView;
 @end
 
 @implementation WQCustomerOrderCell
@@ -47,41 +49,45 @@
         [self.contentView addSubview:self.codeLab];
         
         self.timeLab = [self returnLab];
-        self.timeLab.font = [UIFont systemFontOfSize:12];
         self.timeLab.textColor = [UIColor lightGrayColor];
         [self.contentView addSubview:self.timeLab];
         
-        self.priceLab = [self returnLab];
-        [self.contentView addSubview:self.priceLab];
-        
-        self.customerLab = [self returnLab];
-        self.customerLab.font = [UIFont systemFontOfSize:14];
-        [self.contentView addSubview:self.customerLab];
-        
-        self.customerImg = [[UIImageView alloc]initWithFrame:CGRectZero];
-        self.customerImg.image = [UIImage imageNamed:@"customer"];
-        self.customerImg.backgroundColor = [UIColor clearColor];
-        [self.contentView addSubview:self.customerImg];
+        self.lineView1 = [[UIImageView alloc]initWithFrame:CGRectZero];
+        self.lineView1.image = [UIImage imageNamed:@"line"];
+        [self.contentView addSubview:self.lineView1];
         
         //产品
         self.proImage = [[WQTapImg alloc]initWithFrame:CGRectZero];
         self.proImage.delegate = self;
-        self.proImage.layer.cornerRadius = 4;
-        self.proImage.layer.masksToBounds = YES;
+        self.proImage.clipsToBounds = YES;
         self.proImage.contentMode = UIViewContentModeScaleAspectFill;
         [self.contentView addSubview:self.proImage];
         
         self.proNameLab = [self returnLab];
+        self.proNameLab.textColor = [UIColor lightGrayColor];
         [self.contentView addSubview:self.proNameLab];
         
         self.proPriceLab = [self returnLab];
+        self.proPriceLab.textColor = COLOR(251, 0, 41, 1);
+        self.proPriceLab.textAlignment = NSTextAlignmentRight;
         [self.contentView addSubview:self.proPriceLab];
         
         self.proSaleLab = [self returnLab];
+        self.proSaleLab.textColor = [UIColor lightGrayColor];
         [self.contentView addSubview:self.proSaleLab];
         
         self.proTypeLab = [self returnLab];
+        self.proTypeLab.textColor = [UIColor lightGrayColor];
         [self.contentView addSubview:self.proTypeLab];
+        
+        self.lineView2 = [[UIImageView alloc]initWithFrame:CGRectZero];
+        self.lineView2.image = [UIImage imageNamed:@"line"];
+        [self.contentView addSubview:self.lineView2];
+        
+        //总价
+        self.priceLab = [self returnLab];
+        self.priceLab.textAlignment = NSTextAlignmentRight;
+        [self.contentView addSubview:self.priceLab];
         
         self.lineView = [[UIImageView alloc]initWithFrame:CGRectZero];
         self.lineView.image = [UIImage imageNamed:@"line"];
@@ -94,26 +100,27 @@
 -(UILabel *)returnLab {
     UILabel *lab = [[UILabel alloc]initWithFrame:CGRectZero];
     lab.backgroundColor = [UIColor clearColor];
-    lab.font = [UIFont systemFontOfSize:15];
+    lab.font = [UIFont systemFontOfSize:14];
     return lab;
 }
 
 /*
  type:
- 0=客户
- 1=待处理
- 2=待付款
- 3=已完成
+ * 全部 0
+ * 待付款 1
+ * 待发货 2
+ * 待收货 3
+ * 已完成 4
+ * 客户 9
  */
 -(void)setType:(NSInteger)type {
     _type = type;
     
-    if (type ==0) {
-        self.customerImg.hidden = YES;
-        self.customerLab.hidden = YES;
-    }else {
-        self.customerImg.hidden = NO;
-        self.customerLab.hidden = NO;
+    if (type==1) {
+        [self.contentView addSubview:self.alertBtn];
+        [self.contentView addSubview:self.editPriceBtn];
+    }else if (type==2){
+        [self.contentView addSubview:self.deliveryBtn];
     }
 }
 
@@ -127,30 +134,28 @@
     self.contentView.frame = (CGRect){0,0,self.width,self.height};
     
     [self.codeLab sizeToFit];
-    [self.priceLab sizeToFit];
     [self.timeLab sizeToFit];
-    [self.customerLab sizeToFit];
+    [self.priceLab sizeToFit];
+    self.codeLab.frame = (CGRect){10,20,self.codeLab.width,15};
+    self.lineView1.frame = (CGRect){10,self.codeLab.bottom+9,self.width-20,2};
     
-    self.codeLab.frame = (CGRect){10,5,self.codeLab.width,self.codeLab.height};
-
-    self.customerImg.frame = (CGRect){10,self.codeLab.bottom+3,self.customerLab.height,self.customerLab.height};
-    self.customerLab.frame = (CGRect){self.customerImg.right+5,self.codeLab.bottom+3,self.customerLab.width,self.customerLab.height};
     
-    self.timeLab.frame = (CGRect){self.width-self.timeLab.width-10,self.codeLab.top,self.timeLab.width,self.timeLab.height};
+    self.proImage.frame = (CGRect){10,self.lineView1.bottom+9,80,80};
+    self.proNameLab.frame = (CGRect){self.proImage.right+10,self.proImage.top,self.width-self.proImage.right-20,15};
+    self.proSaleLab.frame = (CGRect){self.proImage.right+10,self.proNameLab.bottom+5,self.width-self.proImage.right-20,15};
+    self.proTypeLab.frame = (CGRect){self.proImage.right+10,self.proSaleLab.bottom+5,self.width-self.proImage.right-20,15};
+    self.proPriceLab.frame = (CGRect){self.proImage.right+10,self.proImage.bottom-15,self.width-self.proImage.right-20,15};
+    self.lineView2.frame = (CGRect){5,self.proImage.bottom+9,self.width-10,2};
     
-    if (self.type==0) {
-        self.priceLab.frame = (CGRect){10,self.codeLab.bottom+3,self.priceLab.width,self.priceLab.height};
-    }else {
-        self.priceLab.frame = (CGRect){self.customerLab.right+20,self.codeLab.bottom+3,self.priceLab.width,self.priceLab.height};
+    self.timeLab.frame = (CGRect){10,self.lineView2.bottom+9,self.timeLab.width,16};
+    self.priceLab.frame = (CGRect){self.width-self.priceLab.width-10,self.lineView2.bottom+9,self.priceLab.width,16};
+    
+    if (self.type==1) {
+        self.alertBtn.frame = (CGRect){10,self.priceLab.bottom+10,120,30};
+        self.editPriceBtn.frame = (CGRect){self.width-130,self.priceLab.bottom+10,120,30};
+    }else if (self.type==2){
+        self.deliveryBtn.frame = (CGRect){self.width-130,self.priceLab.bottom+10,120,30};
     }
-    
-    [self.proPriceLab sizeToFit];
-    [self.proSaleLab sizeToFit];
-    self.proImage.frame = (CGRect){10,self.priceLab.bottom+3,60,60};
-    self.proNameLab.frame = (CGRect){self.proImage.right+10,self.proImage.top,self.width-self.proImage.right-15,18};
-    self.proPriceLab.frame = (CGRect){self.proImage.right+10,self.proNameLab.bottom+3,self.proPriceLab.width,self.proPriceLab.height};
-    self.proSaleLab.frame = (CGRect){self.proPriceLab.right+10,self.proNameLab.bottom+3,self.proSaleLab.width,self.proSaleLab.height};
-    self.proTypeLab.frame = (CGRect){self.proImage.right+10,self.proPriceLab.bottom+3,self.width-self.proImage.right-15,18};
     
     self.lineView.frame = (CGRect){0,self.height-1,self.width,2};
 }
@@ -158,45 +163,76 @@
 -(void)prepareForReuse {
     [super prepareForReuse];
     self.codeLab.text = @"";
-    self.customerLab.text = @"";
-    self.priceLab.text = @"";
-    self.orderObj = nil;
     self.timeLab.text = @"";
+    
+    self.orderObj = nil;
+    self.priceLab.text = @"";
     self.proImage.image = nil;
     self.proNameLab.text = @"";
     self.proPriceLab.text = @"";
     self.proSaleLab.text = @"";
     self.proTypeLab.text = @"";
     
-    [self cleanupBackView];
+    [self.cancelBtn removeFromSuperview];
+    [self.payBtn removeFromSuperview];
+    [self.alertBtn removeFromSuperview];
+    [self.editPriceBtn removeFromSuperview];
+    [self.deliveryBtn removeFromSuperview];
+    [self.receiveBtn removeFromSuperview];
+    self.cancelBtn = nil;
+    self.payBtn = nil;
+    self.alertBtn = nil;
+    self.editPriceBtn = nil;
+    self.deliveryBtn = nil;
+    self.receiveBtn = nil;
 }
 
+-(void)dealloc {
+    SafeRelease(_cancelBtn);
+    SafeRelease(_payBtn);
+    SafeRelease(_alertBtn);
+    SafeRelease(_receiveBtn);
+    SafeRelease(_deliveryBtn);
+    SafeRelease(_editPriceBtn);
+    SafeRelease(_delegate)
+    SafeRelease(_timeLab);
+    SafeRelease(_codeLab);
+    SafeRelease(_orderObj);
+    SafeRelease(_priceLab);
+    SafeRelease(_proImage.delegate);
+    SafeRelease(_proImage);
+    SafeRelease(_proNameLab);
+    SafeRelease(_proPriceLab);
+    SafeRelease(_proTypeLab);
+    SafeRelease(_proSaleLab);
+    SafeRelease(_indexPath);
+    
+}
 -(void)setOrderObj:(WQCustomerOrderObj *)orderObj {
     _orderObj = orderObj;
     
     self.codeLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderCode", @""),orderObj.orderId];
+    self.timeLab.text = [NSString stringWithFormat:@"%@",orderObj.orderTime];
     
-    self.priceLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderPrice", @""),orderObj.orderPrice];
-    NSString *priceString = [NSString stringWithFormat:@"%.2f",orderObj.orderPrice];
+    NSString *priceString = [NSString stringWithFormat:@"%@%.2f",NSLocalizedString(@"totalPrice", @""),orderObj.orderPrice];
+    self.priceLab.text = priceString;
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.priceLab.text];
-    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:251/255.0 green:0/255.0 blue:41/255.0 alpha:1] range:NSMakeRange(self.priceLab.text.length-priceString.length, priceString.length)];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:251/255.0 green:0/255.0 blue:41/255.0 alpha:1] range:NSMakeRange(3, priceString.length-3)];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:NSMakeRange(0, 3)];
     self.priceLab.attributedText = attributedString;
     SafeRelease(attributedString);
     SafeRelease(priceString);
     
-    self.timeLab.text = [NSString stringWithFormat:@"%@",orderObj.orderTime];
-    
-    self.customerLab.text = [Utility checkString:[NSString stringWithFormat:@"%@",orderObj.customerName]]?orderObj.customerName:@"";
-    
     [self.proImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,orderObj.productImg]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
-    self.proNameLab.text = orderObj.productName;
     
-    self.proPriceLab.text = [NSString stringWithFormat:@"%@:%.2f",NSLocalizedString(@"proprice", @""),orderObj.productPrice];
+    self.proNameLab.text = [NSString stringWithFormat:@"%@",orderObj.productName];
+    
+    self.proPriceLab.text = [NSString stringWithFormat:@"%.2f",orderObj.productPrice];
     
     if (orderObj.productSaleType ==0) {
         self.proSaleLab.text = @"";
     }else if (orderObj.productSaleType ==1) {
-        self.proSaleLab.text = [NSString stringWithFormat:@"%d%@",(int)(orderObj.productDiscount),NSLocalizedString(@"proDiscount", @"")];
+        self.proSaleLab.text = [NSString stringWithFormat:@"%@:%.2f",NSLocalizedString(@"saleDisCount", @""),orderObj.productReducePrice];
     }else if (orderObj.productSaleType ==2) {
         self.proSaleLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderSale", @""),orderObj.productReducePrice];
     }
@@ -204,122 +240,129 @@
     self.proTypeLab.text = [NSString stringWithFormat:NSLocalizedString(@"confirmSelectedPro", @""),orderObj.productColor,orderObj.productSize,orderObj.productNumber];
 }
 
+#pragma mark -
+-(void)cancelOrder {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(cancelOrderWithCell:orderObj:)]) {
+        [self.delegate cancelOrderWithCell:self orderObj:self.orderObj];
+    }
+}
+
+-(void)payOrder {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(payOrderWithCell:orderObj:)]) {
+        [self.delegate payOrderWithCell:self orderObj:self.orderObj];
+    }
+}
+-(void)editPriceOrder {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(editPriceOrderWithCell:orderObj:)]) {
+        [self.delegate editPriceOrderWithCell:self orderObj:self.orderObj];
+    }
+}
+-(void)alertOrder {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(alertOrderWithCell:orderObj:)]) {
+        [self.delegate alertOrderWithCell:self orderObj:self.orderObj];
+    }
+}
+-(void)deliveryOrder {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(deliveryOrderWithCell:orderObj:)]) {
+        [self.delegate deliveryOrderWithCell:self orderObj:self.orderObj];
+    }
+}
+-(void)receiveOrder {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(receiveOrderWithCell:orderObj:)]) {
+        [self.delegate receiveOrderWithCell:self orderObj:self.orderObj];
+    }
+}
+
+
 #pragma mark - property
 
--(UIImageView*)deleteGreyImageView {
-    if (!_deleteGreyImageView) {
-        _deleteGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.frame), (self.height-40)/2, 40, 40)];
-        [_deleteGreyImageView setImage:[UIImage imageNamed:@"DeleteGrey"]];
-        [_deleteGreyImageView setContentMode:UIViewContentModeCenter];
-        [self.backView addSubview:_deleteGreyImageView];
+-(UIButton *)cancelBtn {
+    if (!_cancelBtn) {
+        _cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_cancelBtn setTitle:NSLocalizedString(@"cancelOrder", @"") forState:UIControlStateNormal];
+        [_cancelBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
+        [_cancelBtn setTitleColor:COLOR(244, 242, 242, 1) forState:UIControlStateHighlighted];
+        [_cancelBtn setBackgroundColor:COLOR(244, 242, 242, 1)];
+        [_cancelBtn addTarget:self action:@selector(cancelOrder) forControlEvents:UIControlEventTouchUpInside];
+        _cancelBtn.layer.cornerRadius = 2;
+        _cancelBtn.layer.masksToBounds = YES;
+        _cancelBtn.titleLabel.font = [UIFont systemFontOfSize:16];
     }
-    return _deleteGreyImageView;
+    return _cancelBtn;
 }
-
--(UIImageView*)deleteRedImageView {
-    if (!_deleteRedImageView) {
-        _deleteRedImageView = [[UIImageView alloc] initWithFrame:self.deleteGreyImageView.bounds];
-        [_deleteRedImageView setImage:[UIImage imageNamed:@"DeleteRed"]];
-        [_deleteRedImageView setContentMode:UIViewContentModeCenter];
-        [self.deleteGreyImageView addSubview:_deleteRedImageView];
+-(UIButton *)payBtn {
+    if (!_payBtn) {
+        _payBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_payBtn setTitle:NSLocalizedString(@"payOrder", @"") forState:UIControlStateNormal];
+        [_payBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_payBtn setTitleColor:COLOR(244, 242, 242, 1) forState:UIControlStateHighlighted];
+        [_payBtn setBackgroundColor:COLOR(251, 0, 41, 1)];
+        
+        [_payBtn addTarget:self action:@selector(payOrder) forControlEvents:UIControlEventTouchUpInside];
+        _payBtn.layer.cornerRadius = 2;
+        _payBtn.layer.masksToBounds = YES;
+        _payBtn.titleLabel.font = [UIFont systemFontOfSize:16];
     }
-    return _deleteRedImageView;
+    return _payBtn;
 }
-
--(UIImageView*)editGreyImageView {
-    if (!_editGreyImageView) {
-        _editGreyImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, (self.height-40)/2, 40, 40)];
-        [_editGreyImageView setImage:[UIImage imageNamed:self.type==1?@"orderEditGrey":@"orderRemindGrey"]];
-        [_editGreyImageView setContentMode:UIViewContentModeCenter];
-        [self.backView addSubview:_editGreyImageView];
+-(UIButton *)alertBtn {
+    if (!_alertBtn) {
+        _alertBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_alertBtn setTitle:NSLocalizedString(@"RemindOrder", @"") forState:UIControlStateNormal];
+        [_alertBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
+        [_alertBtn setTitleColor:COLOR(244, 242, 242, 1) forState:UIControlStateHighlighted];
+        [_alertBtn setBackgroundColor:COLOR(244, 242, 242, 1)];
+        [_alertBtn addTarget:self action:@selector(alertOrder) forControlEvents:UIControlEventTouchUpInside];
+        _alertBtn.layer.cornerRadius = 2;
+        _alertBtn.layer.masksToBounds = YES;
+        _alertBtn.titleLabel.font = [UIFont systemFontOfSize:16];
     }
-    return _editGreyImageView;
+    return _alertBtn;
 }
-
--(UIImageView*)editRedImageView {
-    if (!_editRedImageView) {
-        _editRedImageView = [[UIImageView alloc] initWithFrame:self.editGreyImageView.bounds];
-        [_editRedImageView setImage:[UIImage imageNamed:self.type==1?@"orderEditRed":@"orderRemindRed"]];
-        [_editRedImageView setContentMode:UIViewContentModeCenter];
-        [self.editGreyImageView addSubview:_editRedImageView];
+-(UIButton *)editPriceBtn {
+    if (!_editPriceBtn) {
+        _editPriceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_editPriceBtn setTitle:NSLocalizedString(@"changeOrder", @"") forState:UIControlStateNormal];
+        [_editPriceBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_editPriceBtn setTitleColor:COLOR(244, 242, 242, 1) forState:UIControlStateHighlighted];
+        [_editPriceBtn setBackgroundColor:COLOR(251, 0, 41, 1)];
+        [_editPriceBtn addTarget:self action:@selector(editPriceOrder) forControlEvents:UIControlEventTouchUpInside];
+        _editPriceBtn.layer.cornerRadius = 2;
+        _editPriceBtn.layer.masksToBounds = YES;
+        _editPriceBtn.titleLabel.font = [UIFont systemFontOfSize:16];
     }
-    return _editRedImageView;
+    return _editPriceBtn;
 }
--(void)cleanupBackView {
-    [super cleanupBackView];
-    [_deleteGreyImageView removeFromSuperview];
-    _deleteGreyImageView = nil;
-    [_deleteRedImageView removeFromSuperview];
-    _deleteRedImageView = nil;
-    [_editGreyImageView removeFromSuperview];
-    _editGreyImageView = nil;
-    [_editRedImageView removeFromSuperview];
-    _editRedImageView = nil;
+-(UIButton *)deliveryBtn {
+    if (!_deliveryBtn) {
+        _deliveryBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_deliveryBtn setTitle:NSLocalizedString(@"deliveryOrder", @"") forState:UIControlStateNormal];
+        [_deliveryBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_deliveryBtn setTitleColor:COLOR(244, 242, 242, 1) forState:UIControlStateHighlighted];
+        [_deliveryBtn setBackgroundColor:COLOR(251, 0, 41, 1)];
+        [_deliveryBtn addTarget:self action:@selector(deliveryOrder) forControlEvents:UIControlEventTouchUpInside];
+        _deliveryBtn.layer.cornerRadius = 2;
+        _deliveryBtn.layer.masksToBounds = YES;
+        _deliveryBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    }
+    return _deliveryBtn;
+}
+-(UIButton *)receiveBtn {
+    if (!_receiveBtn) {
+        _receiveBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_receiveBtn setTitle:NSLocalizedString(@"receiveOrder", @"") forState:UIControlStateNormal];
+        [_receiveBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_receiveBtn setTitleColor:COLOR(244, 242, 242, 1) forState:UIControlStateHighlighted];
+        [_receiveBtn setBackgroundColor:COLOR(251, 0, 41, 1)];
+        [_receiveBtn addTarget:self action:@selector(receiveOrder) forControlEvents:UIControlEventTouchUpInside];
+        _receiveBtn.layer.cornerRadius = 2;
+        _receiveBtn.layer.masksToBounds = YES;
+        _receiveBtn.titleLabel.font = [UIFont systemFontOfSize:16];
+    }
+    return _receiveBtn;
 }
 
 - (void)tappedWithObject:(id) sender {
     [Utility showImage:self.proImage];
 }
-
-#pragma mark -
-
--(void)animateContentViewForPoint:(CGPoint)point velocity:(CGPoint)velocity {
-    [super animateContentViewForPoint:point velocity:velocity];
-    
-    CGFloat width = 50;
-    
-    if (point.x > 0) {
-        [self.editGreyImageView setFrame:CGRectMake(MIN(CGRectGetMinX(self.contentView.frame) - self.editGreyImageView.width, 0), CGRectGetMinY(self.editGreyImageView.frame), self.editGreyImageView.width,self.editGreyImageView.height)];
-        
-        if (point.x >= width) {
-            [self.editRedImageView setAlpha:1];
-        }else {
-            [self.editRedImageView setAlpha:0];
-        }
-    }else if (point.x < 0) {
-        [self.deleteGreyImageView setFrame:CGRectMake(MAX(CGRectGetMaxX(self.frame) - self.deleteGreyImageView.width, CGRectGetMaxX(self.contentView.frame)), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
-        
-        if (-point.x >= width) {
-            [self.deleteRedImageView setAlpha:1];
-        } else {
-            [self.deleteRedImageView setAlpha:0];
-        }
-    }
-}
-
--(void)resetCellFromPoint:(CGPoint)point velocity:(CGPoint)velocity {
-    [super resetCellFromPoint:point velocity:velocity];
-    if (point.x > 0) {
-        if (point.x <= self.contentView.height) {
-            [UIView animateWithDuration:self.animationDuration
-                             animations:^{
-                                 [self.editGreyImageView setFrame:CGRectMake(-CGRectGetWidth(self.editGreyImageView.frame), CGRectGetMinY(self.editGreyImageView.frame), CGRectGetWidth(self.editGreyImageView.frame), CGRectGetHeight(self.editGreyImageView.frame))];
-                             }];
-        }else {
-            [UIView animateWithDuration:self.animationDuration
-                             animations:^{
-                                 [self.editGreyImageView.layer setTransform:CATransform3DMakeScale(2, 2, 2)];
-                                 [self.editGreyImageView setAlpha:0];
-                                 [self.editRedImageView.layer setTransform:CATransform3DMakeScale(2, 2, 2)];
-                                 [self.editRedImageView setAlpha:0];
-                             }];
-        }
-    }else if (point.x < 0) {
-        if (-point.x <= self.contentView.height) {
-            [UIView animateWithDuration:self.animationDuration
-                             animations:^{
-                                 [self.deleteGreyImageView setFrame:CGRectMake(CGRectGetMaxX(self.contentView.frame), CGRectGetMinY(self.deleteGreyImageView.frame), self.deleteGreyImageView.width, self.deleteGreyImageView.height)];
-                             }];
-        } else {
-            [UIView animateWithDuration:self.animationDuration
-                             animations:^{
-                                 [self.deleteGreyImageView.layer setTransform:CATransform3DMakeScale(2, 2, 2)];
-                                 [self.deleteGreyImageView setAlpha:0];
-                                 [self.deleteRedImageView.layer setTransform:CATransform3DMakeScale(2, 2, 2)];
-                                 [self.deleteRedImageView setAlpha:0];
-                             }];
-        }
-    }
-}
-
 @end

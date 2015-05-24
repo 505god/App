@@ -15,7 +15,7 @@
 
 static NSInteger showCount = 0;
 
-@interface WQOrderFinishVC ()<UITableViewDelegate,UITableViewDataSource,RMSwipeTableViewCellDelegate>
+@interface WQOrderFinishVC ()<UITableViewDelegate,UITableViewDataSource,WQCustomerOrderCellDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
@@ -28,9 +28,12 @@ static NSInteger showCount = 0;
 @property (nonatomic, assign) NSInteger lastOrderId;
 ///总页数
 @property (nonatomic, assign) NSInteger pageCount;
+///加载更多
+@property (nonatomic, assign) BOOL isLoadingMore;
 @end
 
 @implementation WQOrderFinishVC
+
 
 -(void)dealloc {
     SafeRelease(_tableView.delegate);
@@ -42,8 +45,10 @@ static NSInteger showCount = 0;
 
 -(void)getOrderList {
     __unsafe_unretained typeof(self) weakSelf = self;
-    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/order/orderList" parameters:@{@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"count":[NSNumber numberWithInteger:self.limit],@"orderStatus":@"3"} success:^(NSURLSessionDataTask *task, id responseObject) {
-        
+    self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/order/orderList" parameters:@{@"lastOrderId":[NSNumber numberWithInteger:self.lastOrderId],@"count":[NSNumber numberWithInteger:self.limit],@"orderStatus":@"4"} success:^(NSURLSessionDataTask *task, id responseObject) {
+        if (weakSelf.isLoadingMore==NO) {
+        weakSelf.dataArray = nil;
+        }
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
             
@@ -59,40 +64,45 @@ static NSInteger showCount = 0;
                     [mutablePosts addObject:orderObj];
                     SafeRelease(orderObj);
                 }
-                NSInteger orderNumber = [[aDic objectForKey:@"pageCount"]integerValue];
+                NSInteger orderNumber = [[aDic objectForKey:@"totalOrder"]integerValue];
                 
                 if (weakSelf.pageCount<0) {
                     weakSelf.pageCount = orderNumber;
                 }
                 
                 [weakSelf.dataArray addObjectsFromArray:mutablePosts];
-                if (weakSelf.dataArray.count>0) {
-                    [weakSelf.tableView reloadData];
-                    [weakSelf setNoneText:nil animated:NO];
-                }else {
-                    [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
-                }
                 
                 if ((weakSelf.start+weakSelf.limit)<weakSelf.pageCount) {
-                    [weakSelf.tableView removeFooter];
-                    [weakSelf addFooter];
+                    if (weakSelf.isLoadingMore == NO) {
+                        [weakSelf addFooter];
+                    }
                 }else {
                     [weakSelf.tableView removeFooter];
                 }
             }else {
-                [weakSelf.tableView removeFooter];
-                [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+                weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
         }
+        [weakSelf.tableView reloadData];
+        [weakSelf checkDataArray];
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
-        [weakSelf setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+        [weakSelf checkDataArray];
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
+}
+
+-(void)checkDataArray {
+    if (self.dataArray.count==0) {
+        [self setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
+    }else {
+        [self setNoneText:nil animated:NO];
+    }
 }
 
 #pragma mark - lifestyle
@@ -101,7 +111,7 @@ static NSInteger showCount = 0;
     [super viewDidLoad];
     
     self.isFirstShow = YES;
-    
+    self.limit = 10;
     //集成刷新控件
     [self addHeader];
 }
@@ -135,7 +145,6 @@ static NSInteger showCount = 0;
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
 #pragma mark - property
 -(NSMutableArray *)dataArray {
     if (!_dataArray) {
@@ -164,14 +173,15 @@ static NSInteger showCount = 0;
     __unsafe_unretained typeof(self) weakSelf = self;
     
     [self.tableView addHeaderWithCallback:^{
-        weakSelf.dataArray = nil;
+        
         weakSelf.start = 0;
         weakSelf.lastOrderId = 0;
         weakSelf.pageCount = -1;
-        
+        weakSelf.isLoadingMore = NO;
+        [weakSelf.tableView removeFooter];
         
         [weakSelf getOrderList];
-    } dateKey:@"WQOrderDealVC"];
+    } dateKey:@"WQOrderDeliveryVC"];
 }
 // 添加上拉刷新尾部控件
 - (void)addFooter {
@@ -185,18 +195,18 @@ static NSInteger showCount = 0;
             WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)[weakSelf.dataArray lastObject];
             weakSelf.lastOrderId = [orderObj.orderId integerValue];
         }
-        
+        weakSelf.isLoadingMore = YES;
         [weakSelf getOrderList];
     }];
 }
 
-
 #pragma mark - tableView
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 112;
+    return 185;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -208,16 +218,18 @@ static NSInteger showCount = 0;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
-    cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
-    cell.delegate = self;
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.row];
-    
     [cell setIndexPath:indexPath];
-    [cell setType:3];
-    [cell setOrderObj:orderObj];
+    [cell setType:4];
+    cell.delegate = self;
+    if (self.dataArray.count>0) {
+        WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.row];
+        [cell setOrderObj:orderObj];
+    }
     return cell;
 }
 
+#pragma mark -
+/*
 #pragma mark -
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
@@ -261,5 +273,5 @@ static NSInteger showCount = 0;
         [alert show];
     }
 }
-
+*/
 @end

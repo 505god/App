@@ -12,8 +12,9 @@
 @implementation WQOrderSearchObj
 
 + (NSDictionary*)mts_mapping {
-    return  @{@"dealArray": mts_key(dealArray),
-              @"payArray": mts_key(payArray),
+    return  @{@"payArray": mts_key(payArray),
+              @"deliveryArray": mts_key(deliveryArray),
+              @"receiveArray": mts_key(receiveArray),
               @"finishArray": mts_key(finishArray),
               };
 }
@@ -24,8 +25,9 @@
 
 + (NSDictionary*)mts_arrayClassMapping
 {
-    return @{mts_key(dealArray) : WQCustomerOrderObj.class,
-             mts_key(payArray) : WQCustomerOrderObj.class,
+    return @{mts_key(payArray) : WQCustomerOrderObj.class,
+             mts_key(deliveryArray) : WQCustomerOrderObj.class,
+             mts_key(receiveArray) : WQCustomerOrderObj.class,
              mts_key(finishArray) : WQCustomerOrderObj.class,
              };
 }

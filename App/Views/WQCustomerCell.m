@@ -119,7 +119,11 @@
     _customerObj = customerObj;
     
     if ([Utility checkString:[NSString stringWithFormat:@"%@",customerObj.customerRemark]]) {
-        self.nameLab.text = [NSString stringWithFormat:@"%@ (%@)",customerObj.customerName,customerObj.customerRemark];
+        if ([customerObj.customerRemark isEqualToString:customerObj.customerName]) {
+            self.nameLab.text = customerObj.customerName;
+        }else {
+            self.nameLab.text = [NSString stringWithFormat:@"%@ (%@)",customerObj.customerName,customerObj.customerRemark];
+        }
     }else {
         self.nameLab.text = customerObj.customerName;
     }

@@ -11,6 +11,7 @@
 
 @interface WQHotSaleCell : UICollectionViewCell
 
+@property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, strong) WQProductObj *productObj;
 
 @end

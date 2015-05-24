@@ -19,6 +19,7 @@
 
 #import "WQMessageVC.h"
 
+
 @interface WQCustomerDetailVC ()<WQNavBarViewDelegate,UITableViewDelegate,UITableViewDataSource,WQCustomerDetailEditVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
@@ -230,8 +231,8 @@
 #pragma mark - 发起消息
 
 -(void)chatWithCustomer:(id)sender {
-    if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%d",self.customerObj.customerId]]) {
-        [[WQDataShare sharedService].messageArray removeObject:[NSString stringWithFormat:@"%d",self.customerObj.customerId]];
+    if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%ld",self.customerObj.customerId]]) {
+        [[WQDataShare sharedService].messageArray removeObject:[NSString stringWithFormat:@"%ld",self.customerObj.customerId]];
         
         if ([WQDataShare sharedService].messageArray.count==0) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"isNewMessage" object:@"0" userInfo:nil];
@@ -256,4 +257,5 @@
         [self.delegate customerDetailVC:self customer:customer];
     }
 }
+
 @end

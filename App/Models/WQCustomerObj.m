@@ -20,6 +20,7 @@
               @"customerArea": mts_key(customerArea),
               @"customerRemark": mts_key(customerRemark),
               @"customerShield": mts_key(customerShield),
+              @"isActive": mts_key(customerResign),
               
               };
 }

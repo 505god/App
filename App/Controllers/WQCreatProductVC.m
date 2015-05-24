@@ -93,6 +93,7 @@ static NSInteger selectedIndex = -1;
     //滑动scrollview
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(containerWillBeginDragging:) name:@"containerWillBeginDragging" object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -106,6 +107,8 @@ static NSInteger selectedIndex = -1;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"containerWillBeginDragging" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
     
     [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
@@ -925,6 +928,31 @@ static NSInteger selectedIndex = -1;
     }
     return YES;
 }
+-(void)textFieldDidChange:(NSNotification *)notification {
+    WQProductText *text = (WQProductText *)notification.object;
+    
+    if (text.idxPath.section==0) {
+        NSInteger kMaxLength = 100;
+        
+        NSString *toBeString = text.text;
+        
+        NSString *lang = text.textInputMode.primaryLanguage;
+        if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
+            UITextRange *selectedRange = [text markedTextRange];
+            UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];
+            if (!position) {
+                if (toBeString.length > kMaxLength) {
+                    text.text = [toBeString substringToIndex:kMaxLength];
+                }
+            }
+        }else {
+            if (toBeString.length > kMaxLength) {
+                text.text = [toBeString substringToIndex:kMaxLength];
+            }
+        }
+    }
+}
+
 
 #pragma mark -
 

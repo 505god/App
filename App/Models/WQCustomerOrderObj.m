@@ -15,19 +15,19 @@
               @"orderPrice": mts_key(orderPrice),
               @"orderStatus": mts_key(orderStatus),
 
-              @"customerId": mts_key(customerId),
-              @"customerName": mts_key(customerName),
+              @"userId": mts_key(customerId),
+              @"userName": mts_key(customerName),
               
-              @"proId": mts_key(productId),
-              @"proImg": mts_key(productImg),
-              @"proColor": mts_key(productColor),
-              @"proSize": mts_key(productSize),
-              @"proName": mts_key(productName),
-              @"proPrice": mts_key(productPrice),
-              @"proNumber": mts_key(productNumber),
-              @"proSaleType": mts_key(productSaleType),
-              @"proDiscount": mts_key(productDiscount),
-              @"proReducePrice": mts_key(productReducePrice),
+              @"productId": mts_key(productId),
+              @"productImg": mts_key(productImg),
+              @"detailColorName": mts_key(productColor),
+              @"detailSizeName": mts_key(productSize),
+              @"productName": mts_key(productName),
+              @"detailMoney": mts_key(productPrice),
+              @"detailNum": mts_key(productNumber),
+              @"proOnSaleType": mts_key(productSaleType),
+              @"disCountPrice": mts_key(productDiscount),
+              @"onSalePrice": mts_key(productReducePrice),
               };
 }
 

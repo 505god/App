@@ -67,7 +67,7 @@
 "CustomerInfoDetailEdit" = "资料设置";
 "ProNumber" = "数量:%ld";
 "ClassSelectedError" = "请选择商品分类";
-"ProTotalPrice" = "成交额:%@";
+
 
 "CustomerPhone" = "手机";
 "CustomerRemark" = "备注";
@@ -175,9 +175,19 @@
 "NoneOrder" = "暂无订单";
 
 "orderSearch" = "订单检索";
-"orderDeal" = "待处理";
 "orderPay" = "待付款";
-"orderFinish" = "已完成";
+"DeliveryVC" = "待发货";
+"ReceivingVC" = "待收货";
+"orderFinish" = "已关闭";
+
+"cancelOrder" = "关闭订单";
+"payOrder" = "继续支付";
+"changeOrder" = "修改价格";
+"RemindOrder" = "提醒付款";
+"deliveryOrder" = "确认发货";
+"receiveOrder" = "确认收货";
+"totalPrice" = "总价:";
+
 
 "orderChangePrice" = "修改订单价格";
 "orderRemind" = "提醒客户付款";
@@ -193,7 +203,6 @@
 "saleEndTime" = "结束时间";
 "productLimit" = "产品数量限制";
 
-"salePriceLine" = "价格轴";
 
 "logInCode" = "右边图片的内容";
 "logInName" = "帐号";

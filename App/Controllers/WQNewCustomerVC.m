@@ -18,6 +18,7 @@
 @interface WQNewCustomerVC ()<WQNavBarViewDelegate,UITextFieldDelegate>
 
 @property (nonatomic, strong) UITextField *userText;
+@property (nonatomic, strong) UITextField *remarkText;
 
 @property (nonatomic, strong) UIButton *sureBtn;
 
@@ -130,26 +131,37 @@
     CGFloat userY = 100;
     
     //帐号
-    self.userText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:NSLocalizedString(@"telfield", @"")];
+    self.userText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:NSLocalizedString(@"CustomerPhone", @"")];
     self.userText.delegate = self;
-    [self.userText setReturnKeyType:UIReturnKeyDone];
+    self.userText.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+    [self.userText setReturnKeyType:UIReturnKeyNext];
     [self.view addSubview:self.userText];
     
-    
+    //备注
+    userY = self.userText.bottom + 5;
+    self.remarkText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:nil];
+    self.remarkText.delegate = self;
+    self.remarkText.keyboardType = UIKeyboardTypeDefault;
+    self.remarkText.placeholder = [NSString stringWithFormat:@"%@ %@",NSLocalizedString(@"CustomerRemark", @""),NSLocalizedString(@"ShopNameLimit", @"")] ;
+    [self.remarkText setReturnKeyType:UIReturnKeyDone];
+    [self.view addSubview:self.remarkText];
+
     self.codeBtn = [UICustomerBtn buttonWithType:UIButtonTypeCustom];
     self.codeBtn.width = self.userText.width;
     self.codeBtn.height = 40;
     self.codeBtn.x = self.userText.left;
-    self.codeBtn.y = self.userText.bottom + 20;
+    self.codeBtn.y = self.remarkText.bottom + 10;
+    [self.codeBtn setBackgroundColor:COLOR(244, 242, 242, 1)];
     [self.codeBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
     [self.codeBtn addTarget:self action:@selector(codeBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    self.codeBtn.hidden = YES;
     [self.view addSubview:self.codeBtn];
     
     self.sureBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.sureBtn.width = self.userText.width;
     self.sureBtn.height = 40;
     self.sureBtn.x = self.userText.left;
-    self.sureBtn.y = self.codeBtn.bottom + 20;
+    self.sureBtn.y = self.remarkText.bottom + 10;
     [self.sureBtn setTitle:NSLocalizedString(@"submit", @"") forState:UIControlStateNormal];
     self.sureBtn.backgroundColor = COLOR(251, 0, 41, 1);
     self.sureBtn.titleLabel.font = [UIFont systemFontOfSize:20];
@@ -164,6 +176,7 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -173,6 +186,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -190,8 +204,8 @@
 
 -(void)submitBtnClick {
     [self.view endEditing:YES];
-    
-    int compareResult = 0;
+//    
+//    int compareResult = 0;
 //    for (int i=0; i<self.areaArray.count; i++) {
 //        NSDictionary* dict1=[self.areaArray objectAtIndex:i];
 //        NSString* code1=[dict1 valueForKey:@"zone"];
@@ -215,7 +229,7 @@
     
     
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/user/addCustomer" parameters:@{@"userPhone":self.userText.text} success:^(NSURLSessionDataTask *task, id responseObject) {
+    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/user/addCustomer" parameters:@{@"userPhone":self.userText.text,@"remark":self.remarkText.text} success:^(NSURLSessionDataTask *task, id responseObject) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -224,6 +238,17 @@
                 NSDictionary *dic = [jsonData objectForKey:@"returnObj"];
                 NSString *code = [dic objectForKey:@"storeValidate"];
                 [self.codeBtn setTitle:code forState:UIControlStateNormal];
+                self.codeBtn.hidden = NO;
+                CGRect frame = self.sureBtn.frame;
+                frame.origin.y = self.codeBtn.bottom + 10;
+                self.sureBtn.frame = frame;
+                
+                WQCustomerObj *customerObj = [[WQCustomerObj alloc]init];
+                [customerObj mts_setValuesForKeysWithDictionary:dic];
+                if (self.delegate && [self.delegate respondsToSelector:@selector(addNewCustomer:)]) {
+                    [self.delegate addNewCustomer:customerObj];
+                }
+                
             }else {
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
@@ -246,8 +271,42 @@
     UIMenuController *menu = [UIMenuController sharedMenuController];
     [menu setTargetRect:self.codeBtn.frame inView:self.codeBtn.superview];
     [menu setMenuVisible:YES animated:YES];
-    
-//    UIPasteboard *pboard = [UIPasteboard generalPasteboard];
-//    pboard.string = self.codeBtn.titleLabel.text;
 }
+
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    if ([textField isEqual:self.userText]) {
+        [self.userText resignFirstResponder];
+        [self.remarkText becomeFirstResponder];
+    }else {
+        [self.remarkText resignFirstResponder];
+    }
+    return YES;
+}
+-(void)textFieldDidChange:(NSNotification *)notification {
+    UITextField *text = (UITextField *)notification.object;
+    
+    if ([text isEqual:self.remarkText]) {
+        NSInteger kMaxLength = 10;
+        
+        NSString *toBeString = text.text;
+        
+        NSString *lang = text.textInputMode.primaryLanguage;
+        if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
+            UITextRange *selectedRange = [text markedTextRange];
+            UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];
+            if (!position) {
+                if (toBeString.length > kMaxLength) {
+                    text.text = [toBeString substringToIndex:kMaxLength];
+                }
+            }
+        }else {
+            if (toBeString.length > kMaxLength) {
+                text.text = [toBeString substringToIndex:kMaxLength];
+            }
+        }
+    }
+}
+
 @end

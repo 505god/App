@@ -22,7 +22,7 @@
 #import "WQLocalDB.h"
 
 #import "JSONKit.h"
-#import "MobClick.h"
+
 @interface AppDelegate ()<ChatDelegate>
 
 @property (strong, nonatomic) Reachability *hostReach;//网络监听所用
@@ -64,9 +64,6 @@
 #endif
     [APService setupWithOption:launchOptions];
     
-    
-    [MobClick startWithAppkey:@"554efcf267e58e54b8001625" reportPolicy:BATCH   channelId:@"Web"];
-    [MobClick setAppVersion:XcodeAppVersion]; 
     
     //短信
     [SMS_SDK registerApp:@"46c880df3c3f" withSecret:@"e5d8a4bb450b2e2f2076bffdf57b2ec7"];

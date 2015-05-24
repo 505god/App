@@ -36,7 +36,7 @@ CGFloat const DAPagesContainerTopBarItemsOffset = 30.;
         [self addSubview:lineView];
         SafeRelease(lineView);
         
-        [self setShadow:[UIColor blackColor] rect:(CGRect){0,self.height,self.width,4} opacity:0.5 blurRadius:3];
+//        [self setShadow:[UIColor blackColor] rect:(CGRect){0,self.height,self.width,4} opacity:0.5 blurRadius:3];
     }
     return self;
 }

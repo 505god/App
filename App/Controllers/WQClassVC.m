@@ -52,7 +52,7 @@
 -(void)getClassList {
     __unsafe_unretained typeof(self) weakSelf = self;
     self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/store/classList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
+        weakSelf.dataArray = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
             
@@ -72,26 +72,27 @@
                 [weakSelf.dataArray addObjectsFromArray:mutablePosts];
                 
                 [WQDataShare sharedService].classArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
-                
-                if (weakSelf.dataArray.count>0) {
-                    [weakSelf.tableView reloadData];
-                    [weakSelf setNoneText:nil animated:NO];
-                }else {
-                    [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
-                }
             }else {
-                [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
         }
+        [weakSelf.tableView reloadData];
+        [weakSelf checkDataArray];
         [weakSelf.tableView headerEndRefreshing];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.tableView headerEndRefreshing];
-        [weakSelf setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+        [weakSelf checkDataArray];
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
+-(void)checkDataArray {
+    if (self.dataArray.count==0) {
+        [self setNoneText:NSLocalizedString(@"NoneClass", @"") animated:YES];
+    }else {
+        [self setNoneText:nil animated:NO];
+    }
+}
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
@@ -176,7 +177,6 @@
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
     [self.tableView addHeaderWithCallback:^{
-        weakSelf.dataArray = nil;
         [weakSelf getClassList];
     } dateKey:@"WQClassVC"];
 }

@@ -23,8 +23,9 @@
 #import "WQCustomerDetailVC.h"
 
 #import "WQNewCustomerVC.h"
+#import <MessageUI/MFMessageComposeViewController.h>
 
-@interface WQCustomerVC ()<WQCustomerTableDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate>
+@interface WQCustomerVC ()<WQCustomerTableDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate,WQNewCustomerVCDelegate,MFMessageComposeViewControllerDelegate>
 
 //通讯录列表
 @property (nonatomic, strong) WQCustomerTable *tableView;
@@ -50,7 +51,7 @@
 -(void)getCustomerList {
     __unsafe_unretained typeof(self) weakSelf = self;
     self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/user/getStoreCustomers" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
+        weakSelf.customerList = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
             
@@ -73,21 +74,41 @@
                     [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
                         weakSelf.dataArray = [NSMutableArray arrayWithArray:array];
                         [weakSelf.tableView setHeaderAnimated:YES];
-                        [weakSelf.tableView reloadData];
-                        [weakSelf setNoneText:nil animated:NO];
                     }];
-                }else {
-                    [weakSelf setNoneText:NSLocalizedString(@"NoneCustomer", @"") animated:YES];
                 }
             }else {
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
         }
+        [weakSelf.tableView reloadData];
+        [weakSelf checkDataArray];
         [weakSelf.tableView.tableView headerEndRefreshing];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.tableView.tableView headerEndRefreshing];
+        [weakSelf checkDataArray];
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
+}
+
+-(void)checkDataArray {
+    if (self.dataArray.count==0) {
+        [self setNoneText:NSLocalizedString(@"NoneCustomer", @"") animated:YES];
+    }else {
+        [self setNoneText:nil animated:NO];
+    }
+}
+
+-(void)addNewCustomer:(WQCustomerObj *)customerObj {
+    [self.customerList addObject:customerObj];
+    [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:self.customerList];
+    
+    if (self.customerList.count>0) {
+        [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
+            self.dataArray = [NSMutableArray arrayWithArray:array];
+            [self.tableView setHeaderAnimated:YES];
+        }];
+    }
+    [self.tableView reloadData];
 }
 #pragma mark - lifestyle
 
@@ -161,7 +182,7 @@
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
     [self.tableView.tableView addHeaderWithCallback:^{
-        weakSelf.customerList = nil;
+        
         [weakSelf getCustomerList];
 
     } dateKey:@"WQCustomerVC"];
@@ -191,6 +212,7 @@
 //右侧边栏的代理---添加客户
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
     WQNewCustomerVC *customerVC = [[WQNewCustomerVC alloc]init];
+    customerVC.delegate = self;
     [self.navigationController pushViewController:customerVC animated:YES];
     SafeRelease(customerVC);
 }
@@ -302,17 +324,34 @@
         }
         self.toolControl.enabled = self.selectedList.count>0?YES:NO;
     }else {
-        //详细信息页面
-        WQCustomerDetailVC *detailVC = [[WQCustomerDetailVC alloc]init];
-        detailVC.indexPath = indexPath;
-        detailVC.delegate = self;
-        detailVC.customerVC = self;
-        detailVC.customerObj = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
-        [self.navigationController pushViewController:detailVC animated:YES];
-        SafeRelease(detailVC);
+        WQCustomerObj *customerObj = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
+        if (customerObj.customerResign) {//详细信息页面
+            WQCustomerDetailVC *detailVC = [[WQCustomerDetailVC alloc]init];
+            detailVC.indexPath = indexPath;
+            detailVC.delegate = self;
+            detailVC.customerVC = self;
+            detailVC.customerObj = customerObj;
+            [self.navigationController pushViewController:detailVC animated:YES];
+            SafeRelease(detailVC);
+        }else {//发短信
+            MFMessageComposeViewController *controller = [[MFMessageComposeViewController alloc] init];
+            if([MFMessageComposeViewController canSendText])
+            {
+                controller.body = @"hi";
+                controller.recipients = @[customerObj.customerPhone];
+                controller.messageComposeDelegate = self;
+                [self presentViewController:controller animated:YES completion:nil];
+            }
+        }
     }
 }
-
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result {
+    if (result == MessageComposeResultCancelled){
+        DLog(@"Message cancelled");
+    }else if (result == MessageComposeResultSent) {
+        
+    }
+}
 //确认选择
 -(void)toolControlPressed {
     if (self.delegate && [self.delegate respondsToSelector:@selector(customerVC:didSelectCustomers:)]) {

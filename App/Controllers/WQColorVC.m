@@ -42,7 +42,7 @@
     __unsafe_unretained typeof(self) weakSelf = self;
     
     [[WQAPIClient sharedClient] GET:@"/rest/store/colorList" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
+        weakSelf.dataArray = nil;
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
             
@@ -62,24 +62,26 @@
                 [weakSelf.dataArray addObjectsFromArray:mutablePosts];
                 
                 [WQDataShare sharedService].colorArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
-                
-                if (weakSelf.dataArray.count>0) {
-                    [weakSelf.tableView reloadData];
-                    [weakSelf setNoneText:nil animated:NO];
-                }else {
-                    [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
-                }
             }else {
-                [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
         }
+        [weakSelf.tableView reloadData];
+        [weakSelf checkDataArray];
         [weakSelf.tableView headerEndRefreshing];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.tableView headerEndRefreshing];
-        [weakSelf setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+        [weakSelf checkDataArray];
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
+}
+
+-(void)checkDataArray {
+    if (self.dataArray.count==0) {
+        [self setNoneText:NSLocalizedString(@"NoneColor", @"") animated:YES];
+    }else {
+        [self setNoneText:nil animated:NO];
+    }
 }
 
 #pragma mark - lifestyle
@@ -160,7 +162,6 @@
     __unsafe_unretained typeof(self) weakSelf = self;
     
     [self.tableView addHeaderWithCallback:^{
-        weakSelf.dataArray = nil;
         [weakSelf getColorList];
     } dateKey:@"WQColorVC"];
 }
@@ -256,6 +257,9 @@
     cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
     [cell setSelectedType:0];
     
+    if (self.dataArray.count>0) {
+        
+    }
     WQColorObj *color = (WQColorObj *)self.dataArray[indexPath.row];
     
     if (self.isPresentVC) {//弹出选择分类

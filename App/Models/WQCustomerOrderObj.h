@@ -14,6 +14,16 @@
 @property (nonatomic, strong) NSString *orderTime;
 ///订单价格
 @property (nonatomic, assign) CGFloat orderPrice;
+
+/**
+ *  @author 邱成西, 15-05-22 17:05:36
+ 
+ * 全部 0
+ * 待付款 1
+ * 待发货 2
+ * 待收货 3
+ * 已完成 4
+ */
 ///订单状态
 @property (nonatomic, assign) NSInteger orderStatus;
 
@@ -30,6 +40,8 @@
 @property (nonatomic, assign) NSInteger productNumber;
 ///产品优惠  0=无  1=折扣  2＝优惠价格
 @property (nonatomic, assign) NSInteger productSaleType;
+//表店主给订单修改的价格
 @property (nonatomic, assign) CGFloat productDiscount;
+//优惠价
 @property (nonatomic, assign) CGFloat productReducePrice;
 @end

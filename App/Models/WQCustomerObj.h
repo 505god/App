@@ -30,4 +30,7 @@
 
 ///客户屏蔽
 @property (nonatomic, assign) BOOL customerShield;
+
+///客户注册
+@property (nonatomic, assign) BOOL customerResign;
 @end

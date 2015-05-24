@@ -7,7 +7,17 @@
 //
 
 #import "BaseViewController.h"
+#import "WQCustomerObj.h"
+
+@protocol WQNewCustomerVCDelegate;
 
 @interface WQNewCustomerVC : BaseViewController
 
+@property (nonatomic, assign) id<WQNewCustomerVCDelegate>delegate;
+
+@end
+
+@protocol WQNewCustomerVCDelegate <NSObject>
+
+-(void)addNewCustomer:(WQCustomerObj *)customerObj;
 @end

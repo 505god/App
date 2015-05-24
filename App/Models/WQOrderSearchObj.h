@@ -16,7 +16,8 @@
 
 @interface WQOrderSearchObj : NSObject
 
-@property (nonatomic, strong) NSMutableArray *dealArray;
 @property (nonatomic, strong) NSMutableArray *payArray;
+@property (nonatomic, strong) NSMutableArray *deliveryArray;
+@property (nonatomic, strong) NSMutableArray *receiveArray;
 @property (nonatomic, strong) NSMutableArray *finishArray;
 @end

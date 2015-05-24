@@ -27,6 +27,8 @@
 @property (nonatomic, assign) NSInteger limit;
 ///总页数
 @property (nonatomic, assign) NSInteger pageCount;
+///加载更多
+@property (nonatomic, assign) BOOL isLoadingMore;
 @end
 
 @implementation WQProductVC
@@ -50,7 +52,9 @@
     __unsafe_unretained typeof(self) weakSelf = self;
     
     self.interfaceTask = [[WQAPIClient sharedClient] GET:@"/rest/product/getClassProduct" parameters:@{@"lastProductId":[NSNumber numberWithInteger:self.lastProductId],@"count":[NSNumber numberWithInteger:self.limit],@"classAId":[NSNumber numberWithInteger:self.classObj.classId],@"classBId":[NSNumber numberWithInteger:self.levelClassObj.levelClassId]} success:^(NSURLSessionDataTask *task, id responseObject) {
-        
+        if (weakSelf.isLoadingMore==NO) {
+        weakSelf.dataArray = nil;
+        }
         if ([responseObject isKindOfClass:[NSDictionary class]]) {
             NSDictionary *jsonData=(NSDictionary *)responseObject;
             
@@ -74,33 +78,38 @@
                 }
                 
                 [weakSelf.dataArray addObjectsFromArray:mutablePosts];
-                if (weakSelf.dataArray.count>0) {
-                    [weakSelf.collectionView reloadData];
-                    [weakSelf setNoneText:nil animated:NO];
-                }else {
-                    [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
-                }
                 
                 if ((weakSelf.start+weakSelf.limit)<self.pageCount) {
-                    [weakSelf.collectionView removeFooter];
-                    [weakSelf addFooter];
+                    if (weakSelf.isLoadingMore == NO) {
+                        [weakSelf addFooter];
+                    }
                 }else {
                     [weakSelf.collectionView removeFooter];
                 }
             }else {
-                [weakSelf.collectionView removeFooter];
-                [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+                weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
             }
         }
+        [weakSelf.collectionView reloadData];
+        [weakSelf checkDataArray];
         [weakSelf.collectionView headerEndRefreshing];
         [weakSelf.collectionView footerEndRefreshing];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
         [weakSelf.collectionView headerEndRefreshing];
         [weakSelf.collectionView footerEndRefreshing];
-        [weakSelf setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+        [weakSelf checkDataArray];
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
+}
+
+-(void)checkDataArray {
+    if (self.dataArray.count==0) {
+        [self setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
+    }else {
+        [self setNoneText:nil animated:NO];
+    }
 }
 
 #pragma mark - lifestyle
@@ -152,11 +161,12 @@
 - (void)addHeader {
     __unsafe_unretained typeof(self) weakSelf = self;
     [self.collectionView addHeaderWithCallback:^{
-        weakSelf.dataArray = nil;
+        
         weakSelf.start = 0;
         weakSelf.lastProductId = 0;
         weakSelf.pageCount = -1;
-        
+        weakSelf.isLoadingMore = NO;
+        [weakSelf.collectionView removeFooter];
         [weakSelf getProductList];
     } dateKey:@"WQProductVC"];
 }
@@ -169,7 +179,7 @@
             WQProductObj *proObj = (WQProductObj *)[weakSelf.dataArray lastObject];
             weakSelf.lastProductId = proObj.proId;
         }
-        
+        weakSelf.isLoadingMore = YES;
         [weakSelf getProductList];
     }];
 }
@@ -184,7 +194,9 @@
 -(UICollectionView *)collectionView {
     if (!_collectionView) {
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-        layout.minimumLineSpacing = 5.0;
+        layout.minimumLineSpacing = 0.0;
+        layout.minimumInteritemSpacing = 0;
+        layout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0);
         layout.scrollDirection = UICollectionViewScrollDirectionVertical;
         
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, self.navBarView.bottom+10, self.view.width, self.view.height-self.navBarView.height-10) collectionViewLayout:layout];
@@ -209,14 +221,17 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     WQHotSaleCell *cell = (WQHotSaleCell *)[collectionView dequeueReusableCellWithReuseIdentifier:@"WQHotSaleCell" forIndexPath:indexPath];
     
-    WQProductObj *proObj = (WQProductObj *)self.dataArray[indexPath.item];
-    [cell setProductObj:proObj];
+    [cell setIndexPath:indexPath];
+    if (self.dataArray.count>0) {
+        WQProductObj *proObj = (WQProductObj *)self.dataArray[indexPath.item];
+        [cell setProductObj:proObj];
+    }
     
     return cell;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(100, 120);
+    return CGSizeMake(self.view.width/2, self.view.width/2+60);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
