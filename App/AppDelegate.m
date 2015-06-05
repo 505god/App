@@ -22,6 +22,8 @@
 #import "WQLocalDB.h"
 
 #import "JSONKit.h"
+#import "MobClick.h"
+#import "BlockAlertView.h"
 
 @interface AppDelegate ()<ChatDelegate>
 
@@ -36,6 +38,8 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    [MobClick startWithAppkey:@"554efcf267e58e54b8001625" reportPolicy:BATCH   channelId:@"Web"];
     
     //statusBar
     if (Platform>=7.0) {
@@ -96,6 +100,16 @@
     SafeRelease(filenameMessage);
     SafeRelease(path);
     
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:1 forKey:@"isOn"];
+    [defaults synchronize];
+    
+    //点击推送进入App
+    NSDictionary *pushDict = [launchOptions objectForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"];
+    if (pushDict) {
+    }
+    SafeRelease(pushDict);
+    
     [WQDataShare sharedService].idRegister = [[[NSUserDefaults standardUserDefaults] objectForKey:@"register"]boolValue];
     
     [self getCurrentLanguage];
@@ -112,8 +126,22 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:2 forKey:@"isOn"];
+    [defaults synchronize];
+    
+    [self.xmppManager goOffline];
+    [self.xmppManager teardownStream];
+    self.xmppManager = nil;
+    
+    NSFileManager *fileManage = [NSFileManager defaultManager];
+    NSString *path = [Utility returnPath];
+    //保存未读消息的数组
+    NSString *filenameMessage = [path stringByAppendingPathComponent:@"message.plist"];
+    if ([fileManage fileExistsAtPath:filenameMessage]) {
+        [fileManage removeItemAtPath:filenameMessage error:nil];
+    }
+    [NSKeyedArchiver archiveRootObject:[WQDataShare sharedService].messageArray toFile:filenameMessage];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -121,10 +149,47 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:1 forKey:@"isOn"];
+    [defaults synchronize];
     
+    [[WQLocalDB sharedWQLocalDB] getLocalUserDataWithCompleteBlock:^(NSArray *array) {
+        if (array.count==0) {//未登录
+        }else {//已登录
+            [WQDataShare sharedService].userObj = (WQUserObj *)[array firstObject];
+            
+            //登录成功之后连接XMPP
+            self.xmppManager = [WQXMPPManager sharedInstance];
+            
+            [self.xmppManager setupStream];
+            self.xmppManager.chatDelegate = self;
+            //xmpp连接
+            if (![self.xmppManager.xmppStream isConnected]) {
+                [self.xmppManager myConnect];
+            }
+        }
+    }];
+    
+    //获取未读信息
+    NSFileManager *fileManage = [NSFileManager defaultManager];
+    NSString *path = [Utility returnPath];
+    NSString *filenameMessage = [path stringByAppendingPathComponent:@"message.plist"];
+    if (![fileManage fileExistsAtPath:filenameMessage]) {
+        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithCapacity:0];
+    }else {
+        NSArray *arr = [NSKeyedUnarchiver unarchiveObjectWithFile:filenameMessage];
+        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithArray:arr];
+        SafeRelease(arr);
+    }
+    SafeRelease(filenameMessage);
+    SafeRelease(path);
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:0 forKey:@"isOn"];
+    [defaults synchronize];
+    
     [self.xmppManager goOffline];
     [self.xmppManager teardownStream];
     self.xmppManager = nil;
@@ -148,6 +213,30 @@
     
     [APService handleRemoteNotification:userInfo];
     completionHandler(UIBackgroundFetchResultNewData);
+    
+    NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
+    int type = [[userInfo objectForKey:@"type"]intValue];
+    if (type==0) {//异地登陆
+        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+            if (finished) {
+                //TODO:xmpp退出
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [self.xmppManager goOffline];
+                [self.xmppManager teardownStream];
+                self.xmppManager = nil;
+                [WQDataShare sharedService].userObj = nil;
+                
+                [self showRootVC];
+            }
+        }];
+        
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
+        
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:nil];
+        [alert show];
+    }
 }
 
 #pragma mark - 获取当前语言
@@ -218,11 +307,24 @@
             
             self.window.rootViewController = self.navControl;
             
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            dispatch_async(queue, ^{
+                [self logIn];
+            });
+            
             SafeRelease(shopVC);SafeRelease(orderVC);SafeRelease(customerVC);SafeRelease(saleVC);
         }
     }];
 }
-
+-(void)logIn {
+    [[WQAPIClient sharedClient] POST:@"/rest/login/userLogin" parameters:@{@"userPhone":[WQDataShare sharedService].userObj.userPhone,@"userPassword":[WQDataShare sharedService].userObj.password,@"validateCode":@""} success:^(NSURLSessionDataTask *task, id responseObject) {
+        NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:@"https://120.24.64.85:8443/rest/login/userLogin"]];
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
+        [[NSUserDefaults standardUserDefaults] setObject:data forKey:@"sessionCookies"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+    }];
+}
 #pragma mark - chatDelegate
 -(void)getNewMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
     XMPPJID *fromJid = message.from;

@@ -97,6 +97,13 @@
     
     //监测scrollview滑动到边缘
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showSidebarView:) name:@"showSidebarView" object:nil];
+    
+    if ([WQDataShare sharedService].messageArray.count>0) {
+        [self.leftBarView.customerItem.notificationHub setCount:0];
+        [self.leftBarView.customerItem.notificationHub bump];
+    }else {
+        [self.leftBarView.customerItem.notificationHub setCount:-1];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -107,7 +114,6 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"showSidebarView" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"isNewMessage" object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -464,8 +470,7 @@
     }else {
         [self.leftBarView.customerItem.notificationHub setCount:-1];
     }
-    
-    
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"newMessage" object:@"0"];
 }
 
 @end

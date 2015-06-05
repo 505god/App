@@ -103,7 +103,7 @@
     if (section==0) {
         return 2;
     }else if (section==1) {
-        return 3;
+        return 4;
     }
     return 1;
 }
@@ -203,7 +203,6 @@
                 [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
                     [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
                     if (finished) {
-                        //TODO:xmpp退出
                         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
                         [[NSUserDefaults standardUserDefaults] synchronize];
                         
@@ -280,7 +279,7 @@
 -(void)saveShopHeaderWithImg:(UIImage *)image {
     self.hud.mode = MBProgressHUDModeDeterminate;
     
-    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/img/uploadHeader" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://120.24.64.85:8443/rest/img/uploadHeader" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile.jpeg" mimeType:@"image/jpeg"];
     } error:nil];
     

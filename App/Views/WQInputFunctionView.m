@@ -72,7 +72,7 @@
     
     //输入框
     self.TextViewInput = [[WQMessageTextView alloc]initWithFrame:CGRectZero];
-    self.TextViewInput.frame = CGRectMake(45, 4, Main_Screen_Width-45-10, [WQInputFunctionView textViewLineHeight]);
+    self.TextViewInput.frame = CGRectMake(10, 4, Main_Screen_Width-45-10, [WQInputFunctionView textViewLineHeight]);
     self.TextViewInput.placeHolder = NSLocalizedString(@"NewMessage", @"");
     self.TextViewInput.backgroundColor = [UIColor clearColor];
     self.TextViewInput.layer.cornerRadius = 6.0f;

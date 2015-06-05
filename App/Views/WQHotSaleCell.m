@@ -96,7 +96,7 @@
     [self.proImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",Host,[imgArray firstObject]]] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"]];
     
     //￥ ＄ €
-    self.priceLab.text = [NSString stringWithFormat:@"%@ %@",productObj.proPrice,[self returnMoneyWithType:productObj.moneyType]];
+    self.priceLab.text = [NSString stringWithFormat:@"%@ %@",[self returnMoneyWithType:productObj.moneyType],productObj.proPrice];
     
     self.nameLab.text = productObj.proName;
 

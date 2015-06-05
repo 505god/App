@@ -75,4 +75,4 @@
 
 #define NavgationHeight 44
 
-#define Host @"https://barryhippo.xicp.net:8443"
+#define Host @"https://120.24.64.85:8443"

@@ -154,6 +154,8 @@
         //自动刷新(一进入程序就下拉刷新)
         [self.tableView.tableView headerBeginRefreshing];
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newMessage:) name:@"newMessage" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -166,6 +168,8 @@
     [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"newMessage" object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -346,6 +350,7 @@
     }
 }
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result {
+    [self dismissViewControllerAnimated:YES completion:nil];
     if (result == MessageComposeResultCancelled){
         DLog(@"Message cancelled");
     }else if (result == MessageComposeResultSent) {
@@ -514,6 +519,10 @@
         self.dataArray = [NSMutableArray arrayWithArray:array];
         [self.tableView reloadData];
     }];
+}
+
+-(void)newMessage:(NSNotification *)notification  {    
+    [self.tableView reloadData];
 }
 
 @end

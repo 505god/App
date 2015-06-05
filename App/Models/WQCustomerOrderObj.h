@@ -38,6 +38,8 @@
 @property (nonatomic, strong) NSString *productName;
 @property (nonatomic, assign) CGFloat productPrice;
 @property (nonatomic, assign) NSInteger productNumber;
+
+@property (nonatomic, assign) NSInteger productMoneyType;
 ///产品优惠  0=无  1=折扣  2＝优惠价格
 @property (nonatomic, assign) NSInteger productSaleType;
 //表店主给订单修改的价格

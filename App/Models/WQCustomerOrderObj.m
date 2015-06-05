@@ -28,6 +28,7 @@
               @"proOnSaleType": mts_key(productSaleType),
               @"disCountPrice": mts_key(productDiscount),
               @"onSalePrice": mts_key(productReducePrice),
+              @"moneyType": mts_key(productMoneyType),
               };
 }
 

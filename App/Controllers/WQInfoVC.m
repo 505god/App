@@ -115,7 +115,7 @@
         [WQPopView showWithImageName:@"picker_alert_sigh" message:msg];
     }else {
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-        self.interfaceTask = [[WQAPIClient sharedClient] POST:@"resetStorePassword" parameters:@{@"userPhone":@"18915411336",@"userPassword":self.passwordText.text} success:^(NSURLSessionDataTask *task, id responseObject) {
+        self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/login/resetStorePassword" parameters:@{@"userPhone":self.phoneNumber,@"userPassword":self.passwordText.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
             if ([responseObject isKindOfClass:[NSDictionary class]]) {

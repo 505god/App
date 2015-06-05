@@ -210,6 +210,13 @@
         self.textField.text = [dataDic objectForKey:@"name"];
         self.textField.returnKeyType = UIReturnKeyDone;
         self.textField.keyboardType = UIKeyboardTypeNamePhonePad;
+    }else if (status ==12){///货币
+        self.textField.hidden = YES;
+        self.lineView.hidden = YES;
+        self.detailLab.hidden = NO;
+        
+        self.titleLab.text = [dataDic objectForKey:@"titleName"];
+        self.detailLab.text = [dataDic objectForKey:@"coinType"];
     }else if (status ==1){///价格和库存
         self.titleLab2.hidden = NO;
         self.textField2.hidden = NO;

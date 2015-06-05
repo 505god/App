@@ -39,7 +39,7 @@
 @implementation AFHTTPRequestOperationManager
 
 + (instancetype)manager {
-    return [[self alloc] initWithBaseURL:[NSURL URLWithString:@"https://barryhippo.xicp.net:8443"]];
+    return [[self alloc] initWithBaseURL:[NSURL URLWithString:@"https://120.24.64.85:8443"]];
 }
 
 - (instancetype)init {

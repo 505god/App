@@ -21,6 +21,7 @@
 #import "WQClassVC.h"
 #import "WQColorVC.h"
 #import "WQSizeVC.h"
+#import "WQCoinVC.h"
 
 #import "JKImagePickerController.h"
 
@@ -33,7 +34,7 @@ static NSIndexPath *selectedProImageIndex = nil;
 ///二级  尺码
 static NSInteger selectedIndex = -1;
 
-@interface WQProductDetailVC ()<UITableViewDataSource, UITableViewDelegate,WQProAttributrFooterDelegate,WQProAttributeWithImgCellDelegate,WQColorVCDelegate,WQClassVCDelegate,WQSizeVCDelegate,JKImagePickerControllerDelegate,RMSwipeTableViewCellDelegate,WQProAttributeCellDelegate,WQProductSaleVCDelegate,WQNavBarViewDelegate>
+@interface WQProductDetailVC ()<UITableViewDataSource, UITableViewDelegate,WQProAttributrFooterDelegate,WQProAttributeWithImgCellDelegate,WQColorVCDelegate,WQClassVCDelegate,WQSizeVCDelegate,JKImagePickerControllerDelegate,RMSwipeTableViewCellDelegate,WQProAttributeCellDelegate,WQProductSaleVCDelegate,WQNavBarViewDelegate,WQCoinVCDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 
@@ -57,6 +58,9 @@ static NSInteger selectedIndex = -1;
 //最低价格
 @property (nonatomic, strong) NSString *lowPrice;
 @property (nonatomic, strong) NSString *salelowPrice;
+
+//货币
+@property (nonatomic, assign) NSInteger coinType;
 @end
 
 @implementation WQProductDetailVC
@@ -84,6 +88,17 @@ static NSInteger selectedIndex = -1;
     ///商品名称
     NSDictionary *aDic1 = @{@"titleName":NSLocalizedString(@"ProductDetail", @""),@"name":self.productObj.proName,@"status":@"0"};
     [self.dataArray addObject:aDic1];
+    
+    self.coinType = self.productObj.moneyType;
+    NSString *coinName = NSLocalizedString(@"USD", @"");
+    if (self.productObj.moneyType==1) {
+        coinName = NSLocalizedString(@"USD", @"");
+    }else if (self.productObj.moneyType==2) {
+        coinName = NSLocalizedString(@"EUR", @"");
+    }
+    ///货币
+    NSDictionary *aDic12 = @{@"titleName":NSLocalizedString(@"CurrencySetup", @""),@"coinType":coinName,@"status":@"12"};
+    [self.dataArray addObject:aDic12];
     
     ///尺码、价格、库存
     for (int i=0; i<self.productObj.proImgArray.count; i++) {
@@ -178,6 +193,10 @@ static NSInteger selectedIndex = -1;
             if (![[aDic objectForKey:@"name"] isEqualToString:self.productObj.proName]) {
                 return YES;
             }
+        }
+        
+        if (self.coinType != self.productObj.moneyType) {
+            return YES;
         }
   
         ///商品分类
@@ -361,7 +380,7 @@ static NSInteger selectedIndex = -1;
         if (!cell) {
             cell=[[WQProAttributeCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier ];
         }
-        if (status==3 || status==4 || status==5|| status==6 || status==7|| status==8) {
+        if (status==3 || status==4 || status==5|| status==6 || status==7|| status==8|| status==12) {
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
             if (status==5|| status==6|| status==8) {
                 cell.accessoryType = UITableViewCellAccessoryNone;
@@ -411,7 +430,15 @@ static NSInteger selectedIndex = -1;
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
     
-    if (indexPath.section == self.dataArray.count-1) {//删除
+    if (indexPath.section == 1) {//货币
+        __block WQCoinVC *coinVC = [[WQCoinVC alloc]init];
+        coinVC.isPresentVC = YES;
+        coinVC.coinType = self.coinType;
+        coinVC.delegate = self;
+        [self.view.window.rootViewController presentViewController:coinVC animated:YES completion:^{
+            SafeRelease(coinVC);
+        }];
+    }else if (indexPath.section == self.dataArray.count-1) {//删除
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
@@ -544,6 +571,23 @@ static NSInteger selectedIndex = -1;
         selectedProImageIndex = nil;
     }];
 }
+
+#pragma mark - 货币
+
+-(void)coinVC:(WQCoinVC *)coinVC selectedCoin:(NSInteger)type name:(NSString *)name {
+    [coinVC dismissViewControllerAnimated:YES completion:^{
+        ///货币
+        NSDictionary *aDic12 = @{@"titleName":NSLocalizedString(@"CurrencySetup", @""),@"coinType":name,@"status":@"12"};
+        [self.dataArray replaceObjectAtIndex:1 withObject:aDic12];
+        
+        self.coinType = type;
+        self.navBarView.rightBtn.enabled = [self checkDataArray];
+        [self.tableView beginUpdates];
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+    }];
+}
+
 #pragma mark - 添加图片
 
 -(void)selectedProductImage:(WQProAttributeWithImgCell *)cell {
@@ -988,7 +1032,11 @@ static NSInteger selectedIndex = -1;
             SafeRelease(imageArray);
         }
     }
-    
+    if (self.coinType<0) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"coinError", @"")];
+        self.postDictionary = nil;
+        return NO;
+    }
     if (isHasImage == NO) {
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"AddMarqueError", @"")];
         self.postDictionary = nil;
@@ -1036,7 +1084,7 @@ static NSInteger upLoadImgCount = 0;
 }
 -(void)postProductImg:(UIImage *)image index:(NSInteger)index {
     
-    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/img/uploadProImg" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://120.24.64.85:8443/rest/img/uploadProImg" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile.jpeg" mimeType:@"image/jpeg"];
     } error:nil];
 
@@ -1079,7 +1127,7 @@ static NSInteger upLoadImgCount = 0;
 }
 //最终创建商品
 -(void)saveProduct {
-    [self.postDictionary setObject:[NSNumber numberWithInteger:self.productObj.moneyType] forKey:@"moneyType"];
+    [self.postDictionary setObject:[NSNumber numberWithInteger:self.coinType] forKey:@"moneyType"];
     [self.postDictionary setObject:[NSNumber numberWithInteger:self.productObj.proId] forKey:@"productId"];
     
     NSString *jsonString = [self.postDictionary JSONString];

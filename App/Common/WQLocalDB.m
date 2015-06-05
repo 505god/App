@@ -20,7 +20,9 @@
     userObj.userId = [[rs stringForColumn:@"userId"] integerValue];
     userObj.userHead = [rs stringForColumn:@"userHead"];
     userObj.userName = [rs stringForColumn:@"userName"];
-    userObj.userPhone = [rs stringForColumn:@"moneyType"];
+    userObj.password = [rs stringForColumn:@"password"];
+    userObj.userPhone = [rs stringForColumn:@"userPhone"];
+    userObj.moneyType = [[rs stringForColumn:@"moneyType"]integerValue];
     return userObj;
 }
 -(WQCustomerObj *)customerModelFromLocal:(FMResultSet *)rs {
@@ -80,8 +82,9 @@
     [argumentsArray addObject:[NSString stringWithFormat:@"%@",user.userName]];
     [argumentsArray addObject:[NSString stringWithFormat:@"%@",user.userHead]];
     [argumentsArray addObject:[NSString stringWithFormat:@"%d",user.moneyType]];
-    
-    BOOL res = [self.db executeUpdate:@"insert into WQUser (userId,userName,userHead,moneyType) values (?,?,?,?)" withArgumentsInArray:argumentsArray];
+    [argumentsArray addObject:[NSString stringWithFormat:@"%@",user.password]];
+    [argumentsArray addObject:[NSString stringWithFormat:@"%@",user.userPhone]];
+    BOOL res = [self.db executeUpdate:@"insert into WQUser (userId,userName,userHead,moneyType,password,userPhone) values (?,?,?,?,?,?)" withArgumentsInArray:argumentsArray];
 
     [self.db close];
     

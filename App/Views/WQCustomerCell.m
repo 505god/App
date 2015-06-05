@@ -141,6 +141,7 @@
     
     if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%d",customerObj.customerId]]) {
         [self.notificationHub setCount:0];
+        [self.notificationHub bump];
     }else {
         [self.notificationHub setCount:-1];
     }

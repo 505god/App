@@ -208,17 +208,28 @@
     SafeRelease(_indexPath);
     
 }
+
+-(NSString *)returnMoneyWithType:(NSInteger)type {
+    if (type==0) {
+        return @"￥";
+    }else if (type==1) {
+        return @"＄";
+    }else if (type==2) {
+        return @"€";
+    }
+    return @"＄";
+}
 -(void)setOrderObj:(WQCustomerOrderObj *)orderObj {
     _orderObj = orderObj;
     
     self.codeLab.text = [NSString stringWithFormat:NSLocalizedString(@"orderCode", @""),orderObj.orderId];
     self.timeLab.text = [NSString stringWithFormat:@"%@",orderObj.orderTime];
     
-    NSString *priceString = [NSString stringWithFormat:@"%@%.2f",NSLocalizedString(@"totalPrice", @""),orderObj.orderPrice];
-    self.priceLab.text = priceString;
+    NSString *priceString = [NSString stringWithFormat:@"%@%.2f",[self returnMoneyWithType:orderObj.productMoneyType],orderObj.orderPrice];
+    self.priceLab.text = [NSString stringWithFormat:@"%@ %@%.2f",NSLocalizedString(@"totalPrice", @""),[self returnMoneyWithType:orderObj.productMoneyType],orderObj.orderPrice];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.priceLab.text];
-    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:251/255.0 green:0/255.0 blue:41/255.0 alpha:1] range:NSMakeRange(3, priceString.length-3)];
-    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:NSMakeRange(0, 3)];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:251/255.0 green:0/255.0 blue:41/255.0 alpha:1] range:NSMakeRange(self.priceLab.text.length-priceString.length, priceString.length)];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:NSMakeRange(0, self.priceLab.text.length-priceString.length)];
     self.priceLab.attributedText = attributedString;
     SafeRelease(attributedString);
     SafeRelease(priceString);
@@ -227,7 +238,7 @@
     
     self.proNameLab.text = [NSString stringWithFormat:@"%@",orderObj.productName];
     
-    self.proPriceLab.text = [NSString stringWithFormat:@"%.2f",orderObj.productPrice];
+    self.proPriceLab.text = [NSString stringWithFormat:@"%@ %.2f",[self returnMoneyWithType:orderObj.productMoneyType],orderObj.productPrice];;
     
     if (orderObj.productSaleType ==0) {
         self.proSaleLab.text = @"";

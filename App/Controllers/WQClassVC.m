@@ -318,6 +318,7 @@
                 if (levelClassObj.levelClassId==self.selectedClassBObj.levelClassId && self.selectedClassAObj.classId==classObj.classId) {
                     [cell setSelectedType:2];
                     self.selectedIdx = indexPath;
+                    self.isSelected = YES;
                 }else {
                     [cell setSelectedType:1];
                 }

@@ -207,7 +207,7 @@
             self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/login/userLogin" parameters:@{@"userPhone":self.userText.text,@"userPassword":self.passwordText.text,@"validateCode":self.codeText.text} success:^(NSURLSessionDataTask *task, id responseObject) {
                 [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
                 
-                NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:@"https://barryhippo.xicp.net:8443/rest/login/userLogin"]];
+                NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[NSURL URLWithString:@"https://120.24.64.85:8443/rest/login/userLogin"]];
                 NSData *data = [NSKeyedArchiver archivedDataWithRootObject:cookies];
                 [[NSUserDefaults standardUserDefaults] setObject:data forKey:@"sessionCookies"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
@@ -223,7 +223,7 @@
                         WQUserObj *userObj = [[WQUserObj alloc]init];
                         [userObj mts_setValuesForKeysWithDictionary:dic];
                         userObj.userPhone = self.userText.text;
-                        
+                        userObj.password = self.passwordText.text;
                         [WQDataShare sharedService].userObj = userObj;
                         
                         [[WQLocalDB sharedWQLocalDB] saveUserDataToLocal:userObj completeBlock:^(BOOL finished) {
@@ -252,13 +252,13 @@
 -(void)forgetBtnClick {
     [self.view endEditing:YES];
     
-    WQInfoVC *infoVC = [[WQInfoVC alloc]init];
-    [self.navigationController pushViewController:infoVC animated:YES];
-    SafeRelease(infoVC);
+//    WQInfoVC *infoVC = [[WQInfoVC alloc]init];
+//    [self.navigationController pushViewController:infoVC animated:YES];
+//    SafeRelease(infoVC);
     
-//    WQPhoneVC *phoneVC = [[WQPhoneVC alloc]init];
-//    [self.navigationController pushViewController:phoneVC animated:YES];
-//    SafeRelease(phoneVC);
+    WQPhoneVC *phoneVC = [[WQPhoneVC alloc]init];
+    [self.navigationController pushViewController:phoneVC animated:YES];
+    SafeRelease(phoneVC);
 }
 
 #pragma mark - UITextFieldDelegate

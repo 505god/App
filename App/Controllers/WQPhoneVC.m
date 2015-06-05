@@ -216,12 +216,13 @@
     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         __block WQCodeVC* codeVC=[[WQCodeVC alloc] init];
         NSString* str2=[self.areaCodeField.text stringByReplacingOccurrencesOfString:@"+" withString:@""];
         [codeVC setPhone:self.telField.text AndAreaCode:str2];
         
         [SMS_SDK getVerifyCodeByPhoneNumber:self.telField.text AndZone:str2 result:^(enum SMS_GetVerifyCodeResponseState state) {
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
             if (state==SMS_ResponseStateGetVerifyCodeFail) {
                 [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"codesenderrtitle", @"")];
             }else if (state==SMS_ResponseStateGetVerifyCodeSuccess) {

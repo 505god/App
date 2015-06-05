@@ -7,7 +7,6 @@
 */
 
 "confirmSelectedPro" = "颜色:%@ 尺码:%@ 数量:%ld";
-"proprice" = "单价";
 "NewMessage" = "新消息";
 "HoldtoTalk" = "按住说话";
 "ReleasetoSend" = "松开发送";
@@ -65,7 +64,7 @@
 "Search" = "搜索";
 "CustomerInfoDetail" = "详细资料";
 "CustomerInfoDetailEdit" = "资料设置";
-"ProNumber" = "数量:%ld";
+
 "ClassSelectedError" = "请选择商品分类";
 
 
@@ -91,7 +90,7 @@
 "ImageError" = "请添加商品图片";
 "ColorError" = "请选择商品颜色";
 "SizeError" = "请选择商品尺码";
-//设置
+
 "SettingVC" = "设置";
 "Header" = "头像";
 "ShopName" = "店铺名称";
@@ -101,13 +100,13 @@
 "CurrencySetup" = "货币";
 "LogOut" = "退出";
 "confirmLogOut" = "确定退出?";
-//热卖展示
+"coinError" = "请选择商品的计价单位";
 "HasSale" = "已售出";
 "NoneProducts" = "暂无商品";
 "NoneClass" = "暂无分类";
 "NewClass" = "创建分类";
 "NoneCustomer" = "暂无客户";
-//刷新控件
+
 "FooterPullToRefresh" = "上拉可以加载更多数据";
 "FooterReleaseToRefresh" = "松开立即加载更多数据";
 "Refreshing" = "正在努力加载中...";
@@ -115,16 +114,13 @@
 "HeaderReleaseToRefresh" = "松开立即刷新";
 "LastUpDate" = "最后更新:";
 
-//选择照片
 "Cancel" = "取消";
 "SelectedMaxPhoto" = "最多选择%ld张照片";
-"NextStep" = "下一步(%ld)";
-"PhotoAlert" = "严禁上传色情裸露、暴力血腥图片，一经核实，立即封号。";
+
 "Format_photo" = "%ld 张照片";
 "Format_photos" = "%ld 张照片";
 "PhotoSelectedError" = "选择图片失败";
 
-//修改名称
 "Save" = "保存";
 "Add" = "添加";
 "Finish" = "完成";
@@ -157,8 +153,6 @@
 "NoneColor" = "暂无颜色";
 "NoneSize" = "暂无尺码";
 
-"WQTextVC" = "请输入内容";
-
 "CNY" = "人民币";
 "USD" = "美元";
 "EUR" = "欧元";
@@ -166,9 +160,7 @@
 
 "InterfaceError" = "未能连接到服务器";
 
-//订单
 "orderCode" = "订单号:%@";
-"orderPrice" = "交易额:%.2f";
 "orderSale" = "价格优惠:%.2f";
 "proDiscount" = "折优惠";
 
@@ -212,7 +204,6 @@
 "confirmPassword" = "确认密码";
 "confirmPasswordError" = "两次密码不一致";
 
-"shopSelected" = "选择店铺";
 "forgetPwd" = "忘记密码?";
 "findPwd" = "找回密码";
 "logIn" = "登录";
@@ -230,14 +221,10 @@
 
 "willsendthecodeto"="我们将发送验证码短信到这个号码";
 "surephonenumber"="确认手机号码";
-"cancel"="取消";
-
 "codesenderrormsg"="验证码发送失败 请稍后重试";
 "codesenderrtitle"="发送失败";
 
 "maxcodemsg"="请求验证码超上限 请稍后重试";
-"maxcode"="超过上限";
-
 "codetoooftenmsg"="客户端请求发送短信验证过于频繁";
 
 "verifycode"="请输入验证码";
@@ -245,19 +232,9 @@
 "timelabel"="接受短信大约需要60秒";
 "repeatsms"="收不到短信验证码？";
 "submit"="提交";
-"sendingin"="正在发送中...";
 "timelablemsg"="接收验证码中...";
 "second"="秒";
-
-"verifycoderightmsg"="验证码正确";
-"verifycoderighttitle"="验证成功";
 "verifycodeerrormsg"="验证码无效 请重新获取验证码";
-"verifycodeerrortitle"="验证失败";
-
 "cannotgetsmsmsg"="我们将重新发送验证码短信到这个号码";
-
-"codedelaymsg"="验证码短信可能略有延迟,确定返回并重新开始";
-"wait"="等待";
-
 "verifycodeformaterror"="验证码格式错误,请重新填写";
 "doesnotsupportarea"="暂时不支持该地区";

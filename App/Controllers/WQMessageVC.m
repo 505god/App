@@ -66,7 +66,7 @@
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.messageInputView];
 
-    [WQDataShare sharedService].otherJID = [NSString stringWithFormat:@"%d@barryhippo.xicp.net",self.customerObj.customerId];
+    [WQDataShare sharedService].otherJID = [NSString stringWithFormat:@"%d@ubuntu",self.customerObj.customerId];
     
     [self loadBaseViewsAndData];
 }
@@ -431,7 +431,7 @@
     //生成消息对象
     NSString *siID = [XMPPStream generateUUID];
     
-    XMPPMessage *message = [XMPPMessage messageWithType:@"chat" to:[XMPPJID jidWithString:[NSString stringWithFormat:@"%d@barryhippo.xicp.net",self.customerObj.customerId]] elementID:siID];
+    XMPPMessage *message = [XMPPMessage messageWithType:@"chat" to:[XMPPJID jidWithString:[NSString stringWithFormat:@"%d@ubuntu",self.customerObj.customerId]] elementID:siID];
 
     [message addBody:msgJson];
     [message addAttributeWithName:@"xmlns" stringValue:@"jabber:client"];
@@ -446,7 +446,7 @@
 - (void)WQInputFunctionView:(WQInputFunctionView *)funcView sendPicture:(UIImage *)image {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://barryhippo.xicp.net:8443/rest/img/uploadProImg" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"https://120.24.64.85:8443/rest/img/uploadChatImg" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
             [formData appendPartWithFileData:UIImageJPEGRepresentation(image, 1)  name:@"imgFile" fileName:@"imgFile.jpeg" mimeType:@"image/jpeg"];
         } error:nil];
         

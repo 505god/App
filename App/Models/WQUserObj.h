@@ -17,6 +17,7 @@
 @property (nonatomic, strong) NSString *userHead;
 @property (nonatomic, strong) NSString *userPhone;
 
+@property (nonatomic, strong) NSString *password;
 @property (nonatomic, assign) NSInteger moneyType;
 
 @end
