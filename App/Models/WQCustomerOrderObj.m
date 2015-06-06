@@ -28,11 +28,10 @@
               @"onSalePrice": mts_key(productReducePrice),
               @"moneyType": mts_key(productMoneyType),
               
-#warning 修改字段
-              @"red": mts_key(remindPayRedPoint),
-              @"red": mts_key(deliveryRedPoint),
-              @"red": mts_key(remindDeliveryRedPoint),
-              @"red": mts_key(finishRedPoint),
+              @"paymentBadge": mts_key(remindPayRedPoint),
+              @"shipmentBadge": mts_key(deliveryRedPoint),
+              @"noticeShipmentBadge": mts_key(remindDeliveryRedPoint),
+              @"completeBadge": mts_key(finishRedPoint),
               };
 }
 

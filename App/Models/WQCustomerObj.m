@@ -22,7 +22,7 @@
               @"customerShield": mts_key(customerShield),
               @"isActive": mts_key(customerResign),
               
-              @"red":mts_key(regsinRedPoint),
+              @"userBadge":mts_key(regsinRedPoint),
               };
 }
 
