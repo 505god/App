@@ -12,6 +12,19 @@
  *  公用类方法
  */
 
+//推送类型
+typedef enum{
+    WQPushTypeLogIn = 0,                //异地登陆
+    WQPushTypeOrderRemindPay = 1,       //订单提醒付款
+    WQPushTypeOrderRemindDelivery = 2,  //订单提醒发货
+    WQPushTypeOrderDelivery = 3,        //订单发货
+    WQPushTypeOrderFinish = 4,          //订单已完成
+    WQPushTypeCustomer = 5,             //客户
+    WQPushTypeProduct = 6,              //商品
+    WQPushTypeChat = 8,                 //聊天
+    WQPushTypeNone = 9
+}WQPushType;
+
 #import "WQPopView.h"
 
 @interface Utility : NSObject

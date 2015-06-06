@@ -86,7 +86,7 @@
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.tableView.tableView headerEndRefreshing];
         [weakSelf checkDataArray];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+//        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -330,6 +330,12 @@
     }else {
         WQCustomerObj *customerObj = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
         if (customerObj.customerResign) {//详细信息页面
+            customerObj.regsinRedPoint = 0;
+            
+            [self.tableView.tableView beginUpdates];
+            [self.tableView.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView.tableView endUpdates];
+            
             WQCustomerDetailVC *detailVC = [[WQCustomerDetailVC alloc]init];
             detailVC.indexPath = indexPath;
             detailVC.delegate = self;

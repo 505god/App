@@ -122,12 +122,16 @@ static NSInteger showCount = 0;
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    if (showCount>0 && self.isFirstShow) {
-        self.isFirstShow = NO;
+    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
         [self.tableView headerBeginRefreshing];
+        self.isFirstShow = NO;
+    }else {
+        if (showCount>0 && self.isFirstShow) {
+            self.isFirstShow = NO;
+            [self.tableView headerBeginRefreshing];
+        }
+        showCount ++;
     }
-    showCount ++;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

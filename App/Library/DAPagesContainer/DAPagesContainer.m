@@ -156,7 +156,7 @@
 #pragma mark * Overwritten setters
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
-    [self setSelectedIndex:selectedIndex animated:NO];
+    [self setSelectedIndex:selectedIndex animated:YES];
 }
 
 - (void)setViewControllers:(NSArray *)viewControllers {
@@ -213,6 +213,8 @@
 
 - (void)itemAtIndex:(NSUInteger)index didSelectInPagesContainerTopBar:(DAPagesContainerTopBar *)bar {
     [self setSelectedIndex:index animated:YES];
+    
+    self.pageIndicatorView.center = CGPointMake([self.topBar centerForSelectedItemAtIndex:self.selectedIndex].x,self.pageIndicatorView.center.y);
 }
 
 #pragma mark - UIScrollView delegate

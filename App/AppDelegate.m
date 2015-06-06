@@ -25,6 +25,7 @@
 #import "MobClick.h"
 #import "BlockAlertView.h"
 
+#import "WQMessageVC.h"
 @interface AppDelegate ()<ChatDelegate>
 
 @property (strong, nonatomic) Reachability *hostReach;//网络监听所用
@@ -82,10 +83,6 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     
-    WQInitVC *initVC = [[WQInitVC alloc]init];
-    self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
-    self.window.rootViewController = self.navControl;
-    
     //获取未读信息
     NSFileManager *fileManage = [NSFileManager defaultManager];
     NSString *path = [Utility returnPath];
@@ -104,9 +101,13 @@
     [defaults setInteger:1 forKey:@"isOn"];
     [defaults synchronize];
     
+    [WQDataShare sharedService].isPushing = NO;
+    [WQDataShare sharedService].pushType = WQPushTypeNone;
     //点击推送进入App
     NSDictionary *pushDict = [launchOptions objectForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"];
     if (pushDict) {
+        [WQDataShare sharedService].isPushing = YES;
+        [WQDataShare sharedService].pushType = [[pushDict objectForKey:@"type"]intValue];
     }
     SafeRelease(pushDict);
     
@@ -114,9 +115,12 @@
     
     [self getCurrentLanguage];
     
+    
+    WQInitVC *initVC = [[WQInitVC alloc]init];
+    self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
+    self.window.rootViewController = self.navControl;
+    
     [self.window makeKeyAndVisible];
-    
-    
     return YES;
 }
 
@@ -216,7 +220,7 @@
     
     NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
     int type = [[userInfo objectForKey:@"type"]intValue];
-    if (type==0) {//异地登陆
+    if (type==WQPushTypeLogIn) {//异地登陆
         [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
             if (finished) {
                 //TODO:xmpp退出
@@ -236,6 +240,14 @@
         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:nil];
         [alert show];
+    }else {
+        [WQDataShare sharedService].pushType = type;
+        if (isOn == 1) {//app登录
+            
+        }else if (isOn == 2) {//app从后台进入前台
+            [WQDataShare sharedService].isPushing = YES;
+            [self showRootVC];
+        }
     }
 }
 
@@ -301,11 +313,29 @@
             WQSaleVC *saleVC = [[WQSaleVC alloc]init];
             
             self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
-            
-            [self.mainVC setCurrentPageVC:0];
             self.navControl = [[UINavigationController alloc]initWithRootViewController:self.mainVC];
             
             self.window.rootViewController = self.navControl;
+            
+            [WQDataShare sharedService].isPushing = YES;
+            [WQDataShare sharedService].pushType = WQPushTypeChat;
+            if ([WQDataShare sharedService].isPushing) {
+                [WQDataShare sharedService].isPushing = NO;
+                
+                if ([WQDataShare sharedService].pushType==WQPushTypeOrderRemindDelivery || [WQDataShare sharedService].pushType==WQPushTypeOrderFinish) {
+                    [self.mainVC setCurrentPageVC:1];
+                }else if ([WQDataShare sharedService].pushType==WQPushTypeCustomer) {
+                    [self.mainVC setCurrentPageVC:2];
+                }else if ([WQDataShare sharedService].pushType==WQPushTypeChat) {
+                    [self.mainVC setCurrentPageVC:2];
+                    
+                    WQMessageVC *messageVC = [[WQMessageVC alloc]init];
+                    [customerVC.navigationController pushViewController:messageVC animated:YES];
+                    SafeRelease(messageVC);
+                }
+            }else {
+                [self.mainVC setCurrentPageVC:0];
+            }
             
             dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
             dispatch_async(queue, ^{

@@ -9,6 +9,7 @@
 #import "WQCustomerOrderCell.h"
 
 #import "WQTapImg.h"
+#import "RKNotificationHub.h"
 
 @interface WQCustomerOrderCell ()<WQTapImgDelegate>
 
@@ -35,6 +36,7 @@
 
 @property (nonatomic, strong) UIImageView *lineView;
 
+@property (nonatomic, strong) RKNotificationHub *notificationHub;
 @end
 
 @implementation WQCustomerOrderCell
@@ -93,6 +95,8 @@
         self.lineView.image = [UIImage imageNamed:@"line"];
         [self.contentView addSubview:self.lineView];
         
+        self.notificationHub = [[RKNotificationHub alloc]initWithView:self.contentView];
+        [self.notificationHub setCount:-1];
     }
     return self;
 }
@@ -137,6 +141,9 @@
     [self.timeLab sizeToFit];
     [self.priceLab sizeToFit];
     self.codeLab.frame = (CGRect){10,20,self.codeLab.width,15};
+    
+    [self.notificationHub setCircleAtFrame:(CGRect){self.codeLab.right,self.codeLab.top-10,10,10}];
+    
     self.lineView1.frame = (CGRect){10,self.codeLab.bottom+9,self.width-20,2};
     
     
@@ -172,7 +179,7 @@
     self.proPriceLab.text = @"";
     self.proSaleLab.text = @"";
     self.proTypeLab.text = @"";
-    
+    [self.notificationHub setCount:-1];
     [self.cancelBtn removeFromSuperview];
     [self.payBtn removeFromSuperview];
     [self.alertBtn removeFromSuperview];
@@ -249,6 +256,15 @@
     }
     
     self.proTypeLab.text = [NSString stringWithFormat:NSLocalizedString(@"confirmSelectedPro", @""),orderObj.productColor,orderObj.productSize,orderObj.productNumber];
+    
+    
+    if (orderObj.remindDeliveryRedPoint==1 || orderObj.finishRedPoint==1) {
+        [self.notificationHub setCount:0];
+        [self.notificationHub bump];
+    }else {
+        [self.notificationHub setCount:-1];
+    }
+    
 }
 
 #pragma mark -

@@ -46,4 +46,13 @@
 @property (nonatomic, assign) CGFloat productDiscount;
 //优惠价
 @property (nonatomic, assign) CGFloat productReducePrice;
+
+//订单被提醒付款
+@property (nonatomic, assign) NSInteger remindPayRedPoint;
+//订单已发货
+@property (nonatomic, assign) NSInteger deliveryRedPoint;
+//订单被提醒发货
+@property (nonatomic, assign) NSInteger remindDeliveryRedPoint;
+//订单已完成
+@property (nonatomic, assign) NSInteger finishRedPoint;
 @end

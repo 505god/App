@@ -33,4 +33,6 @@
 
 ///客户注册
 @property (nonatomic, assign) BOOL customerResign;
+
+@property (nonatomic, assign) NSInteger regsinRedPoint;
 @end

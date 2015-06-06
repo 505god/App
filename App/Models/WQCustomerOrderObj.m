@@ -14,10 +14,8 @@
               @"orderTime": mts_key(orderTime),
               @"orderPrice": mts_key(orderPrice),
               @"orderStatus": mts_key(orderStatus),
-
               @"userId": mts_key(customerId),
               @"userName": mts_key(customerName),
-              
               @"productId": mts_key(productId),
               @"productImg": mts_key(productImg),
               @"detailColorName": mts_key(productColor),
@@ -29,6 +27,12 @@
               @"disCountPrice": mts_key(productDiscount),
               @"onSalePrice": mts_key(productReducePrice),
               @"moneyType": mts_key(productMoneyType),
+              
+#warning 修改字段
+              @"red": mts_key(remindPayRedPoint),
+              @"red": mts_key(deliveryRedPoint),
+              @"red": mts_key(remindDeliveryRedPoint),
+              @"red": mts_key(finishRedPoint),
               };
 }
 

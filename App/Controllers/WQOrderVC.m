@@ -96,6 +96,14 @@
     
     self.pagesContainer.viewControllers = @[payVC,deliveryVC,receivingVC,finishVC];
     SafeRelease(deliveryVC);SafeRelease(payVC);SafeRelease(finishVC);SafeRelease(receivingVC);
+    
+    if ([WQDataShare sharedService].pushType == WQPushTypeOrderRemindDelivery) {
+        self.pagesContainer.selectedIndex = 1;
+    }else if ([WQDataShare sharedService].pushType == WQPushTypeOrderFinish) {
+        self.pagesContainer.selectedIndex = 3;
+    }else {
+        self.pagesContainer.selectedIndex = 0;
+    }
 }
 
 #pragma mark - 导航栏代理

@@ -93,9 +93,6 @@
     
     
     self.headerImg.frame = (CGRect){10,(self.contentView.height-40)/2,40,40};
-    
-    [self.notificationHub setCircleAtFrame:(CGRect){self.headerImg.right-5,self.headerImg.top-5,10,10}];
-    
     self.shieldImg.frame = (CGRect){self.headerImg.right-12,self.headerImg.bottom-12,10,10};
     
     [self.nameLab sizeToFit];
@@ -103,6 +100,7 @@
     
     self.nameLab.frame = (CGRect){self.headerImg.right+10,self.headerImg.top+(self.headerImg.height-self.nameLab.height-self.phoneLab.height)/3,self.nameLab.width,self.nameLab.height};
     
+    [self.notificationHub setCircleAtFrame:(CGRect){self.nameLab.right,self.nameLab.top-5,10,10}];
     
     self.phoneLab.frame = (CGRect){self.headerImg.right+10,self.nameLab.bottom+(self.headerImg.height-self.nameLab.height-self.phoneLab.height)/3,self.phoneLab.width,self.phoneLab.height};
     
@@ -138,8 +136,7 @@
         [self.shieldImg setHidden:NO];
     }
     
-    
-    if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%d",customerObj.customerId]]) {
+    if ([[WQDataShare sharedService].messageArray containsObject:[NSString stringWithFormat:@"%d",customerObj.customerId]] || customerObj.regsinRedPoint==1) {
         [self.notificationHub setCount:0];
         [self.notificationHub bump];
     }else {

@@ -44,7 +44,9 @@ typedef void(^CompleteBlock)(NSArray *array);
 //客户户列表
 @property (nonatomic, strong) NSMutableArray *customerArray;//用于搜索
 
-
+//判断是否是点击推送进来的
+@property (nonatomic, assign) BOOL isPushing;
+@property (nonatomic, assign) WQPushType pushType;
 
 + (WQDataShare *)sharedService;
 

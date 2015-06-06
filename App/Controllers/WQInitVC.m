@@ -33,30 +33,40 @@
     initView.delegate = self;
     [self.view addSubview:initView];
 
-    ///判断登录与否
-    self.interfaceTask  = [[WQAPIClient sharedClient] GET:@"/rest/login/checkLogin" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
-        if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            NSDictionary *jsonData=(NSDictionary *)responseObject;
-            
-            NSInteger status = [[jsonData objectForKey:@"status"]integerValue];
-            if (status==0) {
-                [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-                    [initView startAnimation];
-                    SafeRelease(initView);
-                }];
-            }else {
+    if ([WQDataShare sharedService].isPushing) {
+        [WQDataShare sharedService].isPushing = NO;
+        if ([WQDataShare sharedService].pushType==WQPushTypeLogIn) {
+            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
                 [initView startAnimation];
                 SafeRelease(initView);
-            }
+            }];
         }
-        
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-            [initView startAnimation];
-            SafeRelease(initView);
+    }else {
+        ///判断登录与否
+        self.interfaceTask  = [[WQAPIClient sharedClient] GET:@"/rest/login/checkLogin" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+            
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                NSInteger status = [[jsonData objectForKey:@"status"]integerValue];
+                if (status==0) {
+                    [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                        [initView startAnimation];
+                        SafeRelease(initView);
+                    }];
+                }else {
+                    [initView startAnimation];
+                    SafeRelease(initView);
+                }
+            }
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                [initView startAnimation];
+                SafeRelease(initView);
+            }];
         }];
-    }];
+    }
 }
 
 -(void)viewWillAppear:(BOOL)animated {
