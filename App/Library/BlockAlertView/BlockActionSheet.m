@@ -245,4 +245,20 @@ static UIFont *buttonFont = nil;
 //    [self dismissWithClickedButtonIndex:buttonIndex animated:YES];
 }
 
+- (void)performDismissal {
+    CGPoint center = _view.center;
+    center.y += _view.bounds.size.height;
+    [UIView animateWithDuration:0.4
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseIn
+                     animations:^{
+                         _view.center = center;
+                         [[BlockBackground sharedInstance] reduceAlphaIfEmpty];
+                     } completion:^(BOOL finished) {
+                         [[BlockBackground sharedInstance] removeView:_view];
+                         [_view release]; _view = nil;
+                         [self autorelease];
+                     }];
+}
+
 @end

@@ -191,11 +191,14 @@
             SafeRelease(coinVC);
         }
     }else {
-        
+        [Utility checkAlert];
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"confirmLogOut", @"")];
         
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"LogOut", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
             
             [[WQAPIClient sharedClient] POST:@"/rest/login/logout" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -219,6 +222,7 @@
             }];
         }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
     }
 }
 

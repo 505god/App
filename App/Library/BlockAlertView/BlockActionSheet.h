@@ -34,4 +34,5 @@
 
 - (NSUInteger)buttonCount;
 
+- (void)performDismissal;
 @end

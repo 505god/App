@@ -12,7 +12,7 @@
 
 #import "WQCustomerOrderCell.h"
 
-#import "BlockAlertView.h"
+
 #import "BlockTextPromptAlertView.h"
 
 static NSInteger showCount = 0;
@@ -235,15 +235,18 @@ static NSInteger showCount = 0;
 //修改当前订单的价格
 -(void)editPriceOrderWithCell:(WQCustomerOrderCell *)cell orderObj:(WQCustomerOrderObj *)orderObj {
     WQCustomerOrderObj *orderObject = (WQCustomerOrderObj *)self.dataArray[cell.indexPath.row];
-    
+    [Utility checkAlert];
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"orderChangePrice", @"") message:nil textField:&textField type:1 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
         [[WQAPIClient sharedClient] POST:@"/rest/order/changeOrderPrice" parameters:@{@"orderId":orderObj.orderId,@"price":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -265,19 +268,22 @@ static NSInteger showCount = 0;
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 //提醒买家付款
 -(void)alertOrderWithCell:(WQCustomerOrderCell *)cell orderObj:(WQCustomerOrderObj *)orderObj {
-
+    [Utility checkAlert];
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"orderRemind", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        
+        [[WQDataShare sharedService].alertArray removeAllObjects];
         [[WQAPIClient sharedClient] POST:@"/rest/order/noticeOrderPay" parameters:@{@"orderId":orderObj.orderId,@"message":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -295,6 +301,7 @@ static NSInteger showCount = 0;
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 
 @end

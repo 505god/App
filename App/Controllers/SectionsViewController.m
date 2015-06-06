@@ -219,10 +219,15 @@ sectionForSectionIndexTitle:(NSString *)title
     
     if (!compareResult)
     {
+        [Utility checkAlert];
         BlockAlertView *alert = [BlockAlertView alertWithTitle:NSLocalizedString(@"notice", nil) message:NSLocalizedString(@"doesnotsupportarea", @"")];
         
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
+        
         return;
     }
     

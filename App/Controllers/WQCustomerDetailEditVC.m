@@ -150,15 +150,19 @@
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
     BOOL res = [self checkNavRight];
     if (res) {
+        [Utility checkAlert];
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"SaveEdit", @"")];
         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"DontSave", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
             [self.navigationController popViewControllerAnimated:YES];
         }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
             [self saveCustomerInfo];
         }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
     }else {
         [self.navigationController popViewControllerAnimated:YES];
     }

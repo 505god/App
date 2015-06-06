@@ -314,10 +314,15 @@ static NSInteger selectedIndex = -1;
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     if (point.x < 0 && (0-point.x) >= 60) {
         swipeTableViewCell.shouldAnimateCellReset = YES;
+        
+        [Utility checkAlert];
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
         
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
             NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
             
             swipeTableViewCell.shouldAnimateCellReset = NO;
@@ -335,6 +340,7 @@ static NSInteger selectedIndex = -1;
              ];
         }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
     }
 }
 

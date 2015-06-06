@@ -12,9 +12,6 @@
 
 #import "WQCustomerOrderCell.h"
 
-#import "BlockAlertView.h"
-#import "BlockTextPromptAlertView.h"
-
 static NSInteger showCount = 0;
 
 @interface WQOrderReceivingVC ()<UITableViewDelegate,UITableViewDataSource,WQCustomerOrderCellDelegate>

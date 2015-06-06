@@ -402,10 +402,15 @@ static NSInteger selectedIndex = -1;
 -(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
     if (point.x < 0 && (0-point.x) >= 60) {
         swipeTableViewCell.shouldAnimateCellReset = YES;
+        
+        [Utility checkAlert];
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
         
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
             NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
             
             swipeTableViewCell.shouldAnimateCellReset = NO;
@@ -423,6 +428,7 @@ static NSInteger selectedIndex = -1;
              ];
         }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
     }
 }
 
@@ -439,10 +445,15 @@ static NSInteger selectedIndex = -1;
             SafeRelease(coinVC);
         }];
     }else if (indexPath.section == self.dataArray.count-1) {//删除
+        [Utility checkAlert];
         BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
         
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+            
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
             [[WQAPIClient sharedClient] POST:@"/rest/product/delProduct" parameters:@{@"productId":[NSNumber numberWithInteger:self.productObj.proId]} success:^(NSURLSessionDataTask *task, id responseObject) {
                 
@@ -465,6 +476,8 @@ static NSInteger selectedIndex = -1;
             }];
         }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
+        
     }else if (indexPath.section == self.dataArray.count-4){//优惠方式
         __block WQProductSaleVC *saleVC = [[WQProductSaleVC alloc]init];
         saleVC.delegate = self;

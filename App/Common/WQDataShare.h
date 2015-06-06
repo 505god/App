@@ -48,6 +48,8 @@ typedef void(^CompleteBlock)(NSArray *array);
 @property (nonatomic, assign) BOOL isPushing;
 @property (nonatomic, assign) WQPushType pushType;
 
+@property (nonatomic, strong) NSMutableArray *alertArray;
+
 + (WQDataShare *)sharedService;
 
 -(void)sortCustomers:(NSArray *)customers CompleteBlock:(CompleteBlock)complet;

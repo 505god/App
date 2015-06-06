@@ -198,15 +198,18 @@
 }
 //右侧边栏的代理-------增加颜色
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
+    [Utility checkAlert];
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatColor", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        
+        [[WQDataShare sharedService].alertArray removeAllObjects];
         [[WQAPIClient sharedClient] POST:@"/rest/store/addColor" parameters:@{@"colorName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -237,6 +240,7 @@
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 #pragma mark - UITableViewDataSource
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -329,10 +333,15 @@
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ColorDelete", @"")];
         }else {
             swipeTableViewCell.shouldAnimateCellReset = YES;
+            
+            [Utility checkAlert];
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
-            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
+            }];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
                 [UIView animateWithDuration:0.25
                                       delay:0
                                     options:UIViewAnimationOptionCurveLinear
@@ -369,19 +378,24 @@
                  ];
             }];
             [alert show];
+            [[WQDataShare sharedService].alertArray addObject:alert];
         }
     }
 }
 //修改颜色
 -(void)editDidLongPressedOption:(RMSwipeTableViewCell *)cell {
+    [Utility checkAlert];
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditColor", @"") message:nil defaultText:[(WQRightCell *)cell colorObj].colorName textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
         WQColorObj *colorObj = (WQColorObj *)self.dataArray[[[(WQRightCell *)cell indexPath] row]];
         
         [[WQAPIClient sharedClient] POST:@"/rest/store/updateColor" parameters:@{@"colorId":[NSNumber numberWithInteger:colorObj.colorId],@"colorName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -405,6 +419,7 @@
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 //确认选择
 -(void)toolControlPressed {

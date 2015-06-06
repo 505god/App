@@ -16,8 +16,6 @@
 #import "WQClassHeader.h"
 #import "WQClassCell.h"
 
-#import "BlockAlertView.h"
-
 #import "WQProductVC.h"
 
 @interface WQClassifyVC ()<UITableViewDataSource, UITableViewDelegate,RMSwipeTableViewCellDelegate,WQSwipTableHeaderDelegate,WQProductVCDelegate>
@@ -251,47 +249,6 @@
         }
     }
 }
-/*
-#pragma mark - Swipe Table View Cell Delegate
--(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
-    
-    if (point.x < 0 && -point.x >= CGRectGetHeight(swipeTableViewCell.frame)) {
-        
-        NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
-        WQClassObj *classObj = (WQClassObj *)self.dataArray[indexPath.section];
-        WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[indexPath.row];
-        
-        if (levelClassObj.productCount>0) {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassBDelete", @"")];
-        }else {
-            swipeTableViewCell.shouldAnimateCellReset = YES;
-            BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
-            
-            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
-            [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-                swipeTableViewCell.shouldAnimateCellReset = NO;
-                [UIView animateWithDuration:0.25
-                                      delay:0
-                                    options:UIViewAnimationOptionCurveLinear
-                                 animations:^{
-                                     swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
-                                 }
-                                 completion:^(BOOL finished) {
-                                     [self.dataArray removeObjectAtIndex:indexPath.row];
-                                     [swipeTableViewCell setHidden:YES];
-                                     
-                                     [self.tableView beginUpdates];
-                                     [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                                     [self.tableView endUpdates];
-                                 }
-                 ];
-            }];
-            [alert show];
-        }
-    }
-}
-*/
-
 #pragma mark - section事件
 //展开分类
 -(void)editDidTapPressedOption:(WQSwipTableHeader *)Header {

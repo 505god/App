@@ -215,15 +215,18 @@
 //右侧边栏的代理 ---------//添加一级分类
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
     __unsafe_unretained typeof(self) weakSelf = self;
-    
+    [Utility checkAlert];
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
         weakSelf.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/store/addClassA" parameters:@{@"classAName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *jsonData=(NSDictionary *)responseObject;
@@ -252,6 +255,7 @@
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 #pragma mark - tableView
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -340,14 +344,18 @@
     
     if (self.isPresentVC) {
         if (indexPath.row==classObj.levelClassList.count) {//添加更多子分类
+            [Utility checkAlert];
             UITextField *textField;
             BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
                 [alert.textField resignFirstResponder];
                 return YES;
             }];
             
-            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
+            }];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
                 [[WQAPIClient sharedClient] POST:@"/rest/store/addClassB" parameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} success:^(NSURLSessionDataTask *task, id responseObject) {
                     
                     if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -382,6 +390,8 @@
                 }];
             }];
             [alert show];
+            [[WQDataShare sharedService].alertArray addObject:alert];
+            
         }else {
             WQRightCell *cell = (WQRightCell *)[tableView cellForRowAtIndexPath:indexPath];
             if (!self.isSelected) {
@@ -416,14 +426,19 @@
         }
     }else {
         if (indexPath.row == classObj.levelClassList.count) {//添加更多子分类
+            [Utility checkAlert];
+            
             UITextField *textField;
             BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"CreatClass", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
                 [alert.textField resignFirstResponder];
                 return YES;
             }];
             
-            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
+            }];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
                 [[WQAPIClient sharedClient] POST:@"/rest/store/addClassB" parameters:@{@"classBName":textField.text,@"classAId":[NSNumber numberWithInteger:classObj.classId]} success:^(NSURLSessionDataTask *task, id responseObject) {
                     
                     if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -458,6 +473,7 @@
                 }];
             }];
             [alert show];
+            [[WQDataShare sharedService].alertArray addObject:alert];
         }
     }
 }
@@ -472,10 +488,14 @@
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassBDelete", @"")];
         }else {
             swipeTableViewCell.shouldAnimateCellReset = YES;
+            [Utility checkAlert];
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
-            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
+            }];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
                 swipeTableViewCell.shouldAnimateCellReset = NO;
                 [UIView animateWithDuration:0.25
                                       delay:0
@@ -507,6 +527,7 @@
                  ];
             }];
             [alert show];
+            [[WQDataShare sharedService].alertArray addObject:alert];
         }
     }
 }
@@ -523,10 +544,14 @@
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"ClassDelete", @"")];
         }else {
             header.shouldAnimateCellReset = YES;
+            [Utility checkAlert];
             BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
             
-            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+            [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
+            }];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+                [[WQDataShare sharedService].alertArray removeAllObjects];
                 header.shouldAnimateCellReset = NO;
                 [UIView animateWithDuration:0.25
                                       delay:0
@@ -561,21 +586,26 @@
                                  }];
             }];
             [alert show];
+            [[WQDataShare sharedService].alertArray addObject:alert];
         }
     }
 }
 //修改二级分类
 -(void)editDidLongPressedOption:(RMSwipeTableViewCell *)cell {//修改子分类
+    [Utility checkAlert];
+    
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditClass", @"") message:nil defaultText:[(WQRightCell *)cell levelClassObj].levelClassName textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        DLog(@"Text: %@", textField.text);
-        
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+
         WQClassObj *classObj = (WQClassObj *)self.dataArray[[[(WQRightCell *)cell indexPath] section]];
         WQClassLevelObj *levelClassObj = (WQClassLevelObj *)classObj.levelClassList[[[(WQRightCell *)cell indexPath] row]];
         
@@ -600,6 +630,7 @@
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 
 //确认选择
@@ -652,14 +683,18 @@
 -(void)editDidLongPressedHeaderOption:(WQSwipTableHeader *)Header {
     WQClassHeader *header = (WQClassHeader *)Header;
     
+    [Utility checkAlert];
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"EditClass", @"") message:nil defaultText:header.classObj.className textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
     
-    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
+    [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+        [[WQDataShare sharedService].alertArray removeAllObjects];
         WQClassObj *classObj = (WQClassObj *)self.dataArray[header.aSection];
         
         [[WQAPIClient sharedClient] POST:@"/rest/store/updateClassA" parameters:@{@"classAId":[NSNumber numberWithInteger:classObj.classId ],@"classAName":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -683,6 +718,7 @@
         }];
     }];
     [alert show];
+    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 
 @end

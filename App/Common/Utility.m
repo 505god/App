@@ -10,6 +10,8 @@
 #import <objc/runtime.h>
 
 #import <CommonCrypto/CommonDigest.h>
+#import "BlockAlertView.h"
+#import "BlockActionSheet.h"
 
 @interface Utility ()
 
@@ -236,4 +238,23 @@ static UIImageView *orginImageView;
         backgroundView.alpha=0;
     }];
 }
+
++(void)checkAlert {
+    if ([WQDataShare sharedService].alertArray.count>0) {
+        
+        id object = [WQDataShare sharedService].alertArray[0];
+        
+        if ([object isKindOfClass:[BlockAlertView class]]) {
+            BlockAlertView *alertTemp = (BlockAlertView *)object;
+            [alertTemp performDismissal];
+            
+            [[NSNotificationCenter defaultCenter] removeObserver:alertTemp name:UIKeyboardWillShowNotification object:nil];
+        }else if ([object isKindOfClass:[BlockActionSheet class]]) {
+            BlockActionSheet *alertTemp = (BlockActionSheet *)object;
+            [alertTemp performDismissal];
+        }
+        [[WQDataShare sharedService].alertArray removeAllObjects];
+    }
+}
+
 @end

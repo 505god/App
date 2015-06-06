@@ -100,6 +100,7 @@
 		5D5536F51AC04B44008636F6 /* UIImageView+LBBlurredImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D5536F31AC04B44008636F6 /* UIImageView+LBBlurredImage.m */; };
 		5D5C09701AED33F600E17610 /* WQNewCustomerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D5C096F1AED33F600E17610 /* WQNewCustomerVC.m */; };
 		5D646CB61AE289F90030078E /* WQOrderSearchVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D646CB51AE289F90030078E /* WQOrderSearchVC.m */; };
+		5D69F1781B228CF2004AF88A /* sound.caf in Resources */ = {isa = PBXBuildFile; fileRef = 5D69F1771B228CF2004AF88A /* sound.caf */; };
 		5D6B93A81AD39D070044FA1A /* WQEditNameVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D6B93A71AD39D070044FA1A /* WQEditNameVC.m */; };
 		5D6B93AB1AD3A61D0044FA1A /* WQClassVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D6B93AA1AD3A61D0044FA1A /* WQClassVC.m */; };
 		5D6B93AE1AD3A63E0044FA1A /* WQCoinVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D6B93AD1AD3A63E0044FA1A /* WQCoinVC.m */; };
@@ -686,6 +687,7 @@
 		5D5C096F1AED33F600E17610 /* WQNewCustomerVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQNewCustomerVC.m; sourceTree = "<group>"; };
 		5D646CB41AE289F90030078E /* WQOrderSearchVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQOrderSearchVC.h; sourceTree = "<group>"; };
 		5D646CB51AE289F90030078E /* WQOrderSearchVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQOrderSearchVC.m; sourceTree = "<group>"; };
+		5D69F1771B228CF2004AF88A /* sound.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound.caf; sourceTree = "<group>"; };
 		5D6B93A61AD39D070044FA1A /* WQEditNameVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQEditNameVC.h; sourceTree = "<group>"; };
 		5D6B93A71AD39D070044FA1A /* WQEditNameVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WQEditNameVC.m; sourceTree = "<group>"; };
 		5D6B93A91AD3A61D0044FA1A /* WQClassVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WQClassVC.h; sourceTree = "<group>"; };
@@ -1905,6 +1907,7 @@
 		5D7323FE1A7EFB1200949D93 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5D69F1771B228CF2004AF88A /* sound.caf */,
 				5D81877E1A82075400DF3BFA /* multipy_unicode.dat */,
 				5D73242A1A7EFC6B00949D93 /* app.pch */,
 				5D7FF2061AFCEF7D00A8A2CE /* PushConfig.plist */,
@@ -3422,6 +3425,7 @@
 				5D6C6CDD1ACD23AB002E3252 /* ClassList.json in Resources */,
 				5DDCA11F1AE880C900FAD464 /* mainNavRight@2x.png in Resources */,
 				5D0762E71A87A34500F8576C /* ProductList.json in Resources */,
+				5D69F1781B228CF2004AF88A /* sound.caf in Resources */,
 				5D3CB92A1AF1268300C52784 /* chat_ipunt_message.png in Resources */,
 				5D6D81EF1ABC215A00071116 /* WQLeftBarView.xib in Resources */,
 				5DDCA13E1AE8877F00FAD464 /* customerMoreNormal@2x.png in Resources */,

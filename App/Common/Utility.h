@@ -53,4 +53,6 @@ typedef enum{
 +(NSString *)returnPath;
 
 +(void)showImage:(UIImageView*)avatarImageView;
+
++(void)checkAlert;
 @end

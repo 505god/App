@@ -362,8 +362,38 @@ static UIFont *buttonFont = nil;
 {
     /* Run the button's block */
     UIButton *btn = (UIButton *)sender;
-    int buttonIndex = [btn tag] - 1;
+    NSInteger buttonIndex = [btn tag] - 1;
     [self dismissWithClickedButtonIndex:buttonIndex animated:YES];
+}
+
+
+- (void)performDismissal
+{
+    [UIView animateWithDuration:0.1
+                          delay:0.0
+                        options:0
+                     animations:^{
+                         CGPoint center = _view.center;
+                         center.y += 20;
+                         _view.center = center;
+                     }
+                     completion:^(BOOL finished) {
+                         [UIView animateWithDuration:0.3
+                                               delay:0.0
+                                             options:UIViewAnimationOptionCurveEaseIn
+                                          animations:^{
+                                              CGRect frame = _view.frame;
+                                              frame.origin.y = -frame.size.height;
+                                              _view.frame = frame;
+                                              
+                                          }
+                                          completion:^(BOOL finished) {
+                                              [[BlockBackground sharedInstance] reduceAlphaIfEmpty];
+                                              [[BlockBackground sharedInstance] removeView:_view];
+                                              [_view release]; _view = nil;
+                                              [self autorelease];
+                                          }];
+                     }];
 }
 
 @end

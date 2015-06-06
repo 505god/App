@@ -26,6 +26,8 @@
 #import "BlockAlertView.h"
 
 #import "WQMessageVC.h"
+
+#import <AudioToolbox/AudioToolbox.h>
 @interface AppDelegate ()<ChatDelegate>
 
 @property (strong, nonatomic) Reachability *hostReach;//网络监听所用
@@ -146,10 +148,11 @@
         [fileManage removeItemAtPath:filenameMessage error:nil];
     }
     [NSKeyedArchiver archiveRootObject:[WQDataShare sharedService].messageArray toFile:filenameMessage];
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    [application setApplicationIconBadgeNumber:0];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -214,12 +217,16 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    AudioServicesPlaySystemSound(1007);
     
     [APService handleRemoteNotification:userInfo];
     completionHandler(UIBackgroundFetchResultNewData);
     
     NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
     int type = [[userInfo objectForKey:@"type"]intValue];
+    NSDictionary *apsDic = (NSDictionary *)[userInfo objectForKey:@"aps"];
+    
     if (type==WQPushTypeLogIn) {//异地登陆
         [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
             if (finished) {
@@ -236,10 +243,14 @@
             }
         }];
         
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
+        [Utility checkAlert];
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:apsDic[@"alert"]];
         
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:nil];
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
         [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
     }else {
         [WQDataShare sharedService].pushType = type;
         if (isOn == 1) {//app登录
@@ -251,6 +262,50 @@
     }
 }
 
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    AudioServicesPlaySystemSound(1007);
+    
+    [APService handleRemoteNotification:userInfo];
+
+    NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
+    int type = [[userInfo objectForKey:@"type"]intValue];
+    NSDictionary *apsDic = (NSDictionary *)[userInfo objectForKey:@"aps"];
+    
+    if (type==WQPushTypeLogIn) {//异地登陆
+        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+            if (finished) {
+                //TODO:xmpp退出
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [self.xmppManager goOffline];
+                [self.xmppManager teardownStream];
+                self.xmppManager = nil;
+                [WQDataShare sharedService].userObj = nil;
+                
+                [self showRootVC];
+            }
+        }];
+        [Utility checkAlert];
+        
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:apsDic[@"alert"]];
+        
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            [[WQDataShare sharedService].alertArray removeAllObjects];
+        }];
+        [alert show];
+        [[WQDataShare sharedService].alertArray addObject:alert];
+    }else {
+        [WQDataShare sharedService].pushType = type;
+        if (isOn == 1) {//app登录
+            
+        }else if (isOn == 2) {//app从后台进入前台
+            [WQDataShare sharedService].isPushing = YES;
+            [self showRootVC];
+        }
+    }
+}
 #pragma mark - 获取当前语言
 - (void)getCurrentLanguage {
     NSArray *languages = [NSLocale preferredLanguages];
@@ -317,8 +372,8 @@
             
             self.window.rootViewController = self.navControl;
             
-            [WQDataShare sharedService].isPushing = YES;
-            [WQDataShare sharedService].pushType = WQPushTypeChat;
+//            [WQDataShare sharedService].isPushing = YES;
+//            [WQDataShare sharedService].pushType = WQPushTypeChat;
             if ([WQDataShare sharedService].isPushing) {
                 [WQDataShare sharedService].isPushing = NO;
                 
@@ -357,6 +412,9 @@
 }
 #pragma mark - chatDelegate
 -(void)getNewMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    AudioServicesPlaySystemSound(1007);
+    
     XMPPJID *fromJid = message.from;
     
     NSDictionary *aDic = [message.body objectFromJSONString];

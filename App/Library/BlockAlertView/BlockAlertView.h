@@ -27,4 +27,5 @@
 @property (nonatomic, readonly) UIView *view;
 @property (nonatomic, readwrite) BOOL vignetteBackground;
 
+- (void)performDismissal;
 @end
