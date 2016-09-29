@@ -118,7 +118,7 @@
                     }];
                 }
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.tableView reloadData];
@@ -129,7 +129,6 @@
         [weakSelf.tableView.tableView removeHeader];
         [weakSelf.tableView.tableView headerEndRefreshing];
         [weakSelf checkDataArray];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
     }];
 }
@@ -375,18 +374,18 @@
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[cell.indexPath.section]];
     NSMutableArray *mutableArray = [[NSMutableArray alloc]initWithArray:[dic objectForKey:@"object"]];
     WQCustomerOrderObj *orderObject = (WQCustomerOrderObj *)mutableArray[cell.indexPath.row];
-    [Utility checkAlert];
+     
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"orderChangePrice", @"") message:nil textField:&textField type:1 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
-    
+     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
     }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
         [[WQAPIClient sharedClient] POST:@"/rest/order/changeOrderPrice" parameters:@{@"orderId":orderObj.orderId,@"price":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -397,30 +396,28 @@
                     
                     [self.tableView.tableView reloadData];
                 }else {
-                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                 }
             }
             
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];
-    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 -(void)alertOrderWithCell:(WQCustomerOrderCell *)cell orderObj:(WQCustomerOrderObj *)orderObj {
-    [Utility checkAlert];
+     
     UITextField *textField;
     BlockTextPromptAlertView *alert = [BlockTextPromptAlertView promptWithTitle:NSLocalizedString(@"orderRemind", @"") message:nil textField:&textField type:0 block:^(BlockTextPromptAlertView *alert){
         [alert.textField resignFirstResponder];
         return YES;
     }];
-    
+     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
     }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
         [[WQAPIClient sharedClient] POST:@"/rest/order/noticeOrder" parameters:@{@"orderId":orderObj.orderId,@"message":textField.text} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -429,16 +426,14 @@
                 if ([[jsonData objectForKey:@"status"]integerValue]==1) {
                     [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"remindAlert", @"")];
                 }else {
-                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                 }
             }
             
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
     }];
     [alert show];
-    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 
 -(void)deliveryOrderWithCell:(WQCustomerOrderCell *)cell orderObj:(WQCustomerOrderObj *)orderObj {
@@ -446,48 +441,14 @@
     NSMutableArray *mutableArray = [[NSMutableArray alloc]initWithArray:[dic objectForKey:@"object"]];
     WQCustomerOrderObj *orderObject = (WQCustomerOrderObj *)mutableArray[cell.indexPath.row];
     
-    [mutableArray removeObjectAtIndex:cell.indexPath.row];
-    if (mutableArray.count==0) {
-        [self.dataArray removeObjectAtIndex:cell.indexPath.section];
-    }else {
-        [dic setObject:mutableArray forKey:@"object"];
-        [self.dataArray replaceObjectAtIndex:cell.indexPath.section withObject:dic];
-    }
-    
-    BOOL isExit = NO;
-    for (int i=0; i<self.dataArray.count; i++) {
-        NSMutableDictionary *aDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[i]];
-        NSInteger status = [[aDic objectForKey:@"status"]integerValue];
-        if (status==4) {
-            isExit = YES;
-            
-            NSMutableArray *aMutableArray = [[NSMutableArray alloc]initWithArray:[aDic objectForKey:@"object"]];
-            orderObject.orderStatus = 4;
-            [aMutableArray addObject:orderObject];
-            [aDic setObject:aMutableArray forKey:@"object"];
-            [self.dataArray replaceObjectAtIndex:i withObject:aDic];
-            break;
-        }
-    }
-    if (isExit==NO) {
-        orderObject.orderStatus = 4;
-        NSArray *array = @[orderObject];
-        NSDictionary *dic = @{@"name":NSLocalizedString(@"orderFinish", @""),@"status":@"4",@"object":array};
-        [self.dataArray addObject:dic];
-    }
-    
-    [self.tableView reloadData];
-    
-    return;
-    
-    [Utility checkAlert];
-    BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"deliveryOrder", @"")];
-    
+     
+    BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"deliveryOrder", @"")];
+     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
     }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
         [[WQAPIClient sharedClient] POST:@"/rest/order/delOrder" parameters:@{@"orderId":orderObj.orderId} success:^(NSURLSessionDataTask *task, id responseObject) {
             
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -526,17 +487,15 @@
                     
                     [self.tableView reloadData];
                 }else {
-                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                 }
             }
             
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
         }];
         
     }];
     [alert show];
-    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 
 

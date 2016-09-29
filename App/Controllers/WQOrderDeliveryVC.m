@@ -85,7 +85,7 @@ static NSInteger showCount = 0;
                 }
             }else {
                 weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.tableView reloadData];
@@ -97,7 +97,6 @@ static NSInteger showCount = 0;
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
         [weakSelf checkDataArray];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -122,16 +121,16 @@ static NSInteger showCount = 0;
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
-        [self.tableView headerBeginRefreshing];
-        self.isFirstShow = NO;
-    }else {
+//    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
+//        [self.tableView headerBeginRefreshing];
+//        self.isFirstShow = NO;
+//    }else {
         if (showCount>0 && self.isFirstShow) {
             self.isFirstShow = NO;
             [self.tableView headerBeginRefreshing];
         }
         showCount ++;
-    }
+//    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -214,7 +213,7 @@ static NSInteger showCount = 0;
     return self.dataArray.count;
 }
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 220;
+    return 235;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -239,37 +238,36 @@ static NSInteger showCount = 0;
 #pragma mark -
 //卖家发货后修改订单状态为发货
 -(void)deliveryOrderWithCell:(WQCustomerOrderCell *)cell orderObj:(WQCustomerOrderObj *)orderObj {
-    [Utility checkAlert];
-    BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"deliveryOrder", @"")];
-    
+     
+    BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"deliveryOrder", @"")];
+     
     [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
     }];
     [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-        [[WQDataShare sharedService].alertArray removeAllObjects];
+         
+        
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [[WQAPIClient sharedClient] POST:@"/rest/order/orderShipment" parameters:@{@"orderId":orderObj.orderId} success:^(NSURLSessionDataTask *task, id responseObject) {
-            
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
             if ([responseObject isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *jsonData=(NSDictionary *)responseObject;
                 
                 if ([[jsonData objectForKey:@"status"]integerValue]==1) {
                     [self.dataArray removeObjectAtIndex:cell.indexPath.row];
-                    if (self.dataArray.count==0) {
-                        [self setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
-                    }
+                    [self checkDataArray];
                     [self.tableView reloadData];
                 }else {
-                    [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                 }
             }
             
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         }];
         
     }];
     [alert show];
-    [[WQDataShare sharedService].alertArray addObject:alert];
 }
 
 @end

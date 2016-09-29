@@ -11,6 +11,8 @@
 
 @interface WQMessageObj : NSObject
 
+@property (nonatomic, strong) NSString *messageId;
+
 ///消息来自
 @property (nonatomic, assign) NSInteger messageFrom;
 ///消息发送到

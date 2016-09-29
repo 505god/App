@@ -52,13 +52,13 @@ static WQXMPPManager *sharedManager;
 #pragma mark - xmpp链接
 - (BOOL)myConnect{
     //设置用户
-    XMPPJID *myjid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d@ubuntu",[WQDataShare sharedService].userObj.userId]];
+    XMPPJID *myjid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d_sale@ubuntu",[WQDataShare sharedService].userObj.userId]];
     NSError *error ;
     [self.xmppStream setMyJID:myjid];
     if (![self.xmppStream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
-        DLog(@"连接失败 : %@",error.description);
         return NO;
     }
+
     return YES;
 }
 
@@ -81,7 +81,7 @@ static WQXMPPManager *sharedManager;
 
 //发送下线状态
 - (void)goOffline{
-    [self getOffLineMessage];
+//    [self getOffLineMessage];
     
     XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
     [self.xmppStream sendElement:presence];
@@ -95,7 +95,8 @@ static WQXMPPManager *sharedManager;
 
 #pragma mark - 获取离线消息
 -(void)getOffLineMessage {
-    NSString *jid = [NSString stringWithFormat:@"%d@ubuntu",[WQDataShare sharedService].userObj.userId];
+    
+    NSString *jid = [NSString stringWithFormat:@"%d_sale@ubuntu",[WQDataShare sharedService].userObj.userId];
     XMPPIQ *iq = [[XMPPIQ alloc] initWithXMLString:[NSString stringWithFormat:@"<presence from='%@'><priority>1</priority></presence>",jid]error:nil];
     [self.xmppStream sendElement:iq];
 }
@@ -132,22 +133,20 @@ static WQXMPPManager *sharedManager;
         }
     }else {
         if ([self.xmppStream isConnected] && [self.xmppStream supportsInBandRegistration]) {
-            XMPPJID *myJID = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d@ubuntu",[WQDataShare sharedService].userObj.userId]];
+            XMPPJID *myJID = [XMPPJID jidWithString:[NSString stringWithFormat:@"%d_sale@ubuntu",[WQDataShare sharedService].userObj.userId]];
             [self.xmppStream setMyJID:myJID];
             
             NSError *error ;
             [WQDataShare sharedService].idRegister = [self.xmppStream registerWithPassword:@"111111" error:&error];
-            if (![WQDataShare sharedService].idRegister) {
-                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"register"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-            }
+            [[NSUserDefaults standardUserDefaults] setBool:[WQDataShare sharedService].idRegister forKey:[NSString stringWithFormat:@"register_%ld",[WQDataShare sharedService].userObj.userId]];
+            [[NSUserDefaults standardUserDefaults] synchronize];
         }
     }
 }
 
 //注册成功，则授权
 - (void)xmppStreamDidRegister:(XMPPStream *)sender {
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"register"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:[NSString stringWithFormat:@"register_%ld",[WQDataShare sharedService].userObj.userId]];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSError *error ;
@@ -155,7 +154,7 @@ static WQXMPPManager *sharedManager;
     }
 }
 - (void)xmppStream:(XMPPStream *)sender didNotRegister:(NSXMLElement *)error{
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"register"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:[NSString stringWithFormat:@"register_%ld",[WQDataShare sharedService].userObj.userId]];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     if (![self.xmppStream authenticateWithPassword:@"111111" error:nil]) {
@@ -167,56 +166,40 @@ static WQXMPPManager *sharedManager;
     [self getOffLineMessage];
 }
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error {
-    DLog(@"didNotAuthenticate:%@",error.description);
 }
 //好友列表
 - (BOOL)xmppStream:(XMPPStream *)sender didReceiveIQ:(XMPPIQ *)iq {
     return YES;
 }
 //收到消息
-- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
-{
-    DLog(@"收到信息:%@",message.description);
-    /*
-     NSXMLElement *request = [message elementForName:@"request"];
-     if (request) {
-     if ([request.xmlns isEqualToString:@"urn:xmpp:receipts"]) {//消息回执
-     //组装消息回执
-     XMPPMessage *msg = [XMPPMessage messageWithType:[message attributeStringValueForName:@"type"] to:message.from elementID:message.elementID];
-     NSXMLElement *recieved = [NSXMLElement elementWithName:@"received" xmlns:@"urn:xmpp:receipts"];
-     [msg addChild:recieved];
-     
-     //发送回执
-     [self.xmppStream sendElement:msg];
-     
-     if ([self.chatDelegate respondsToSelector:@selector(getNewMessage:Message:)]) {
-     [self.chatDelegate getNewMessage:self Message:message];
-     }
-     }
-     }else {
-     NSXMLElement *received = [message elementForName:@"received"];
-     if (received)
-     {
-     if ([received.xmlns isEqualToString:@"urn:xmpp:receipts"])//消息回执
-     {
-     //发送成功
-     NSLog(@"message send success!");
-     }
-     }
-     }
-     */
-    NSXMLElement *received = [message elementForName:@"received"];
-    if (received) {
-        if ([received.xmlns isEqualToString:@"urn:xmpp:receipts"]){//消息回执
-            //发送成功
-            DLog(@"message send success!");
-        }
-    }else {
-        if ([self.chatDelegate respondsToSelector:@selector(getNewMessage:Message:)]) {
-            [self.chatDelegate getNewMessage:self Message:message];
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
+    
+    NSXMLElement *request = [message elementForName:@"request"];
+    if (request) {
+        if ([request.xmlns isEqualToString:@"urn:xmpp:receipts"]) {//消息回执
+            //组装消息回执
+            XMPPMessage *msg = [XMPPMessage messageWithType:[message attributeStringValueForName:@"type"] to:message.from elementID:message.elementID];
+            NSXMLElement *recieved = [NSXMLElement elementWithName:@"received" xmlns:@"urn:xmpp:receipts"];
+            [msg addChild:recieved];
+            
+            //发送回执
+            [self.xmppStream sendElement:msg];
+            
+            if ([self.chatDelegate respondsToSelector:@selector(getNewMessage:Message:)]) {
+                [self.chatDelegate getNewMessage:self Message:message];
+            }
         }
     }
-    
+    else {
+        NSXMLElement *received = [message elementForName:@"received"];
+        if (received)
+        {
+            if ([received.xmlns isEqualToString:@"urn:xmpp:receipts"])//消息回执
+            {
+                DLog(@"message send success!");
+            }
+        }
+    }
 }
 //收到好友状态
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
@@ -234,21 +217,19 @@ static WQXMPPManager *sharedManager;
     DLog(@"didSendIQ:%@",iq.description);
 }
 - (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message {
-    DLog(@"发送消息成功:%@",message.description);
-    /*
-     NSXMLElement *request = [message elementForName:@"request"];
-     if (request) {
-     if ([request.xmlns isEqualToString:@"urn:xmpp:receipts"]) {//消息回执
-     if ([self.chatDelegate respondsToSelector:@selector(didSendMessage:Message:)])
-     {
-     [self.chatDelegate didSendMessage:self Message:message];
-     }
-     }
-     }
-     */
-    if ([self.chatDelegate respondsToSelector:@selector(didSendMessage:Message:)]) {
-        [self.chatDelegate didSendMessage:self Message:message];
+    NSXMLElement *request = [message elementForName:@"request"];
+    if (request) {
+        if ([request.xmlns isEqualToString:@"urn:xmpp:receipts"]) {//消息回执
+            if ([self.chatDelegate respondsToSelector:@selector(didSendMessage:Message:)])
+            {
+                [self.chatDelegate didSendMessage:self Message:message];
+            }
+        }
     }
+    
+    //    if ([self.chatDelegate respondsToSelector:@selector(didSendMessage:Message:)]) {
+    //        [self.chatDelegate didSendMessage:self Message:message];
+    //    }
 }
 - (void)xmppStream:(XMPPStream *)sender didSendPresence:(XMPPPresence *)presence {
     DLog(@"状态改变成功:%@",presence.description);
@@ -257,13 +238,12 @@ static WQXMPPManager *sharedManager;
     DLog(@"didFailToSendIQ:%@",error.description);
 }
 - (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error {
-    DLog(@"发送消息失败:%@",error.description);
+
     if ([self.chatDelegate respondsToSelector:@selector(senMessageFailed:Message:)]) {
         [self.chatDelegate senMessageFailed:self Message:message];
     }
 }
 - (void)xmppStream:(XMPPStream *)sender didFailToSendPresence:(XMPPPresence *)presence error:(NSError *)error {
-    DLog(@"状态改变失败:%@",error.description);
 }
 - (void)xmppStreamWasToldToDisconnect:(XMPPStream *)sender {
     DLog(@"xmppStreamWasToldToDisconnect");
@@ -280,10 +260,8 @@ static WQXMPPManager *sharedManager;
 }
 #pragma mark - XMPPReconnectDelegate
 - (void)xmppReconnect:(XMPPReconnect *)sender didDetectAccidentalDisconnect:(SCNetworkReachabilityFlags)connectionFlags {
-    DLog(@"didDetectAccidentalDisconnect:%u",connectionFlags);
 }
 - (BOOL)xmppReconnect:(XMPPReconnect *)sender shouldAttemptAutoReconnect:(SCNetworkReachabilityFlags)reachabilityFlags {
-    DLog(@"shouldAttemptAutoReconnect:%u",reachabilityFlags);
     return YES;
 }
 

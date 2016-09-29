@@ -28,7 +28,7 @@
             [self addSkipBackupAttributeToItemAtURL:[NSURL fileURLWithPath:newDir]];
             
             //dbPath： 数据库路径，在Document中。
-            NSString *dbPath = [newDir stringByAppendingPathComponent:@"WQApp.db"];
+            NSString *dbPath = [newDir stringByAppendingPathComponent:@"WQSalerApp.db"];
             //创建数据库实例 db  这里说明下:如果路径中不存在"AiMeiYue.db"的文件,sqlite会自动创建"AiMeiYue.db"
             self.db = [FMDatabase databaseWithPath:dbPath] ;
             
@@ -43,7 +43,7 @@
             }
             
             //dbPath： 数据库路径，在Document中。
-            NSString *dbPath = [newDir stringByAppendingPathComponent:@"WQApp.db"];
+            NSString *dbPath = [newDir stringByAppendingPathComponent:@"WQSalerApp.db"];
             //创建数据库实例 db  这里说明下:如果路径中不存在"AiMeiYue.db"的文件,sqlite会自动创建"AiMeiYue.db"
             self.db = [FMDatabase databaseWithPath:dbPath] ;
         }
@@ -58,7 +58,7 @@
         
         if (![rs next]) {
             [rs close];
-            [self.db executeUpdate:@"CREATE TABLE WQUser (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE ,userId VARCHAR,userName VARCHAR,userHead VARCHAR,moneyType VARCHAR,password VARCHAR,userPhone VARCHAR)"];
+            [self.db executeUpdate:@"CREATE TABLE WQUser (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE ,userId VARCHAR,userName VARCHAR,userHead VARCHAR,moneyType VARCHAR,password VARCHAR,userPhone VARCHAR,ext_0 VARCHAR,ext_1 VARCHAR,ext_2 VARCHAR,ext_3 VARCHAR,ext_4 VARCHAR,ext_5 VARCHAR)"];
         }
         [rs close];
         rs = nil;
@@ -68,7 +68,7 @@
         
         if (![rsCustomer next]) {
             [rsCustomer close];
-            [self.db executeUpdate:@"CREATE TABLE WQCustomer (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE ,customerId VARCHAR,customerName VARCHAR,customerPhone VARCHAR,customerHeader VARCHAR,customerArea VARCHAR,customerDegree VARCHAR,customerCode VARCHAR,customerRemark VARCHAR,customerShield VARCHAR)"];
+            [self.db executeUpdate:@"CREATE TABLE WQCustomer (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE ,customerId VARCHAR,customerName VARCHAR,customerPhone VARCHAR,customerHeader VARCHAR,customerArea VARCHAR,customerDegree VARCHAR,customerCode VARCHAR,customerRemark VARCHAR,customerShield VARCHAR,ext_0 VARCHAR,ext_1 VARCHAR,ext_2 VARCHAR,ext_3 VARCHAR,ext_4 VARCHAR,ext_5 VARCHAR)"];
         }
         [rsCustomer close];
         rsCustomer = nil;
@@ -78,7 +78,7 @@
         
         if (![rsMessage next]) {
             [rsMessage close];
-            [self.db executeUpdate:@"CREATE TABLE WQMessage (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE ,messageFrom VARCHAR,messageTo VARCHAR,messageContent VARCHAR,messageDate VARCHAR,messageType VARCHAR)"];
+            [self.db executeUpdate:@"CREATE TABLE WQMessage (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE ,messageFrom VARCHAR,messageTo VARCHAR,messageContent VARCHAR,messageDate VARCHAR,messageType VARCHAR,messageId VARCHAR,ext_0 VARCHAR,ext_1 VARCHAR,ext_2 VARCHAR,ext_3 VARCHAR,ext_4 VARCHAR,ext_5 VARCHAR)"];
         }
         [rsMessage close];
         rsMessage = nil;

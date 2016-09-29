@@ -369,9 +369,13 @@ forHTTPHeaderField:(NSString *)field
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
         }
     }
-//    [mutableRequest setValue:[APService registrationID] forHTTPHeaderField:@"registractionid"];
-    [mutableRequest setValue:@"test" forHTTPHeaderField:@"registractionid"];
+    [mutableRequest setValue:[APService registrationID] forHTTPHeaderField:@"registractionid"];
     
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSString *version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    
+    [mutableRequest setValue:[NSString stringWithFormat:@"ios/%@/sale",version] forHTTPHeaderField:@"userAgent"];
+
     for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
         if ([self.mutableObservedChangedKeyPaths containsObject:keyPath]) {
             [mutableRequest setValue:[self valueForKeyPath:keyPath] forKey:keyPath];

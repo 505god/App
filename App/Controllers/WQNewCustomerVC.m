@@ -14,17 +14,26 @@
 #import <SMS_SDK/CountryAndAreaCode.h>
 
 #import "UICustomerBtn.h"
+#import "WQStarView.h"
 
-@interface WQNewCustomerVC ()<WQNavBarViewDelegate,UITextFieldDelegate>
-
+@interface WQNewCustomerVC ()<WQNavBarViewDelegate,UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate,WQStarViewDelegate>
+{
+    CountryAndAreaCode* _data2;
+    
+    NSString* _defaultCode;
+    NSString* _defaultCountryName;
+}
 @property (nonatomic, strong) UITextField *userText;
 @property (nonatomic, strong) UITextField *remarkText;
 
 @property (nonatomic, strong) UIButton *sureBtn;
 
-@property (nonatomic, strong) NSMutableArray *areaArray;
-
 @property (nonatomic, strong) UICustomerBtn *codeBtn;
+
+@property (nonatomic, strong) UITableView* tableView;
+
+@property (nonatomic, strong) UIView *backView;
+@property (nonatomic, strong) WQStarView *starView;
 @end
 
 @implementation WQNewCustomerVC
@@ -32,7 +41,291 @@
 -(void)dealloc {
 
 }
--(NSString *)setTheLocalAreaCode {
+
+#pragma mark - lifestyle
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    //导航栏
+    [self.navBarView setTitleString:NSLocalizedString(@"CustomerNew", @"")];
+    [self.navBarView.rightBtn setHidden:YES];
+    self.navBarView.navDelegate = self;
+    self.navBarView.isShowShadow = YES;
+    [self.view addSubview:self.navBarView];
+    
+    [self setTheLocalAreaCode];
+    
+    CGFloat centerX = [UIScreen mainScreen].bounds.size.width * 0.5;
+    WQInputText *inputText = [[WQInputText alloc] init];
+    CGFloat userY = 100;
+    
+    UITableView* tableView=[[UITableView alloc] initWithFrame:CGRectMake(20, userY, self.view.width-40, NavgationHeight) style:UITableViewStylePlain];
+    tableView.backgroundColor = [UIColor clearColor];
+    tableView.scrollEnabled = NO;
+    tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.view addSubview:tableView];
+    
+    self.tableView = tableView;
+    
+    self.tableView.dataSource=self;
+    self.tableView.delegate=self;
+    
+    userY = tableView.bottom + 5;
+    //帐号
+    self.userText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:NSLocalizedString(@"CustomerPhone", @"")];
+    self.userText.delegate = self;
+    self.userText.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+    [self.userText setReturnKeyType:UIReturnKeyNext];
+    [self.view addSubview:self.userText];
+    
+    //备注
+    userY = self.userText.bottom + 5;
+    self.remarkText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:nil];
+    self.remarkText.delegate = self;
+    self.remarkText.keyboardType = UIKeyboardTypeDefault;
+    self.remarkText.placeholder = [NSString stringWithFormat:@"%@ %@",NSLocalizedString(@"CustomerRemark", @""),NSLocalizedString(@"ShopNameLimit", @"")] ;
+    [self.remarkText setReturnKeyType:UIReturnKeyDone];
+    [self.view addSubview:self.remarkText];
+    
+    //等级
+    userY = self.remarkText.bottom + 5;
+    
+    self.backView = [[UIView alloc] initWithFrame:(CGRect){20,userY,self.userText.width,self.userText.height}];
+    self.backView.backgroundColor = [UIColor whiteColor];
+    self.backView.layer.cornerRadius = 4;
+    [self.view addSubview:self.backView];
+    
+    UILabel *lab = [[UILabel alloc]initWithFrame:(CGRect){10,10,100,20}];
+    lab.font = [UIFont systemFontOfSize:16];
+    lab.text = NSLocalizedString(@"SettingLevel", @"");
+    lab.textColor=[UIColor lightGrayColor];
+    [lab sizeToFit];
+    lab.frame = (CGRect){10,10,lab.width,20};
+    [self.backView addSubview:lab];
+    
+    self.starView = [[WQStarView alloc]initWithFrame:(CGRect){lab.right-10,5,100,30} enable:YES];
+    self.starView.enable = YES;
+    self.starView.showNormal = YES;
+    self.starView.delegate = self;
+    self.starView.starNumber = 0;
+    [self.backView addSubview:self.starView];
+
+    self.codeBtn = [UICustomerBtn buttonWithType:UIButtonTypeCustom];
+    self.codeBtn.width = self.userText.width;
+    self.codeBtn.height = 40;
+    self.codeBtn.x = self.userText.left;
+    self.codeBtn.y = self.backView.bottom + 10;
+    [self.codeBtn setBackgroundColor:COLOR(244, 242, 242, 1)];
+    [self.codeBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
+    [self.codeBtn addTarget:self action:@selector(codeBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    self.codeBtn.hidden = YES;
+    self.codeBtn.layer.cornerRadius = 4;
+    [self.view addSubview:self.codeBtn];
+    
+    self.sureBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.sureBtn.width = self.userText.width;
+    self.sureBtn.height = 40;
+    self.sureBtn.x = self.userText.left;
+    self.sureBtn.y = self.backView.bottom + 10;
+    [self.sureBtn setTitle:NSLocalizedString(@"submit", @"") forState:UIControlStateNormal];
+    self.sureBtn.layer.cornerRadius = 4;
+    self.sureBtn.backgroundColor = COLOR(251, 0, 41, 1);
+    self.sureBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+    [self.sureBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.sureBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
+    [self.sureBtn addTarget:self action:@selector(submitBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.sureBtn];
+}
+
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+}
+
+-(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
+}
+
+-(void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+-(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+-(void)submitBtnClick {
+    [self.view endEditing:YES];
+    
+    NSString *msg = @"";
+    
+    if (self.userText.text.length==0) {
+        msg = NSLocalizedString(@"errorphonenumber", @"");
+    }else if (![Utility checkString:_defaultCountryName]){
+        msg = NSLocalizedString(@"countrychoose", @"");
+    }
+    
+    if (msg.length>0) {
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:msg];
+    }else {
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/user/addCustomer" parameters:@{@"userPhone":self.userText.text,@"userName":self.remarkText.text,@"zone":_defaultCode,@"userDegree":[NSNumber numberWithInteger:self.starView.starNumber]} success:^(NSURLSessionDataTask *task, id responseObject) {
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+            if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *jsonData=(NSDictionary *)responseObject;
+                
+                if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                    NSDictionary *dic = [jsonData objectForKey:@"returnObj"];
+                    NSString *code = [dic objectForKey:@"userValidate"];
+                    [self.codeBtn setTitle:code forState:UIControlStateNormal];
+                    self.codeBtn.hidden = NO;
+                    CGRect frame = self.sureBtn.frame;
+                    frame.origin.y = self.codeBtn.bottom + 10;
+                    self.sureBtn.frame = frame;
+                    
+                    WQCustomerObj *customerObj = [[WQCustomerObj alloc]init];
+                    [customerObj mts_setValuesForKeysWithDictionary:dic];
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(addNewCustomer:)]) {
+                        [self.delegate addNewCustomer:customerObj];
+                    }
+                    
+                }else {
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
+                }
+            }
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+        }];
+    }
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+    [self.view endEditing:YES];
+}
+
+-(void)codeBtnClick{
+    [self.view endEditing:YES];
+    
+    [self.codeBtn becomeFirstResponder];
+    UIMenuController *menu = [UIMenuController sharedMenuController];
+    [menu setTargetRect:self.codeBtn.frame inView:self.codeBtn.superview];
+    [menu setMenuVisible:YES animated:YES];
+}
+
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    if ([textField isEqual:self.userText]) {
+        [self.userText resignFirstResponder];
+        [self.remarkText becomeFirstResponder];
+    }else {
+        [self.remarkText resignFirstResponder];
+    }
+    return YES;
+}
+-(void)textFieldDidChange:(NSNotification *)notification {
+    UITextField *text = (UITextField *)notification.object;
+    
+    if ([text isEqual:self.remarkText]) {
+        NSInteger kMaxLength = 10;
+        
+        NSString *toBeString = text.text;
+        
+        NSString *lang = text.textInputMode.primaryLanguage;
+        if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
+            UITextRange *selectedRange = [text markedTextRange];
+            UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];
+            if (!position) {
+                if (toBeString.length > kMaxLength) {
+                    text.text = [toBeString substringToIndex:kMaxLength];
+                }
+            }
+        }else {
+            if (toBeString.length > kMaxLength) {
+                text.text = [toBeString substringToIndex:kMaxLength];
+            }
+        }
+    }
+}
+
+
+#pragma mark - 
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 1;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *identifier = @"UITableViewCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier] ;
+        
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        UIView *bgView = [[UIView alloc]init];
+        bgView.frame = CGRectMake(0, 0, self.view.width-40, 44);
+        bgView.layer.cornerRadius = 4.0;
+        bgView.layer.masksToBounds = YES;
+        bgView.backgroundColor = [UIColor whiteColor];
+        [cell.contentView addSubview:bgView];
+    }
+    cell.textLabel.text=NSLocalizedString(@"countrylable", nil);
+    cell.textLabel.textColor=[UIColor blackColor];
+    cell.imageView.image = [UIImage imageNamed:@"acount_country"];
+
+    if (_data2){
+        cell.detailTextLabel.text=_data2.countryName;
+    }else {
+        cell.detailTextLabel.text=_defaultCountryName;
+    }
+    cell.detailTextLabel.textColor=[UIColor lightGrayColor];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    
+    UIView *tempView = [[UIView alloc] init];
+    [cell setBackgroundView:tempView];
+    [cell setBackgroundColor:[UIColor clearColor]];
+    
+    return cell;
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    SectionsViewController* country2=[[SectionsViewController alloc] init];
+    country2.delegate=self;
+    [self presentViewController:country2 animated:YES completion:^{
+        ;
+    }];
+}
+
+- (void)setSecondData:(CountryAndAreaCode *)data {
+    _data2=data;
+    _defaultCode = data.areaCode;
+    _defaultCountryName = [NSString stringWithFormat:@"+%@",data.countryName];
+    [self.tableView reloadData];
+}
+
+
+-(void)setTheLocalAreaCode {
     NSLocale *locale = [NSLocale currentLocale];
     
     NSDictionary *dictCodes = [NSDictionary dictionaryWithObjectsAndKeys:@"972", @"IL",
@@ -100,213 +393,13 @@
     NSString* tt=[locale objectForKey:NSLocaleCountryCode];
     NSString* defaultCode=[dictCodes objectForKey:tt];
     
-    return defaultCode;
+    NSString* defaultCountryName=[locale displayNameForKey:NSLocaleCountryCode value:tt];
+    _defaultCode=defaultCode;
+    _defaultCountryName=defaultCountryName;
 }
 
-#pragma mark - lifestyle
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    //导航栏
-    [self.navBarView setTitleString:NSLocalizedString(@"CustomerNew", @"")];
-    [self.navBarView.rightBtn setHidden:YES];
-    self.navBarView.navDelegate = self;
-    self.navBarView.isShowShadow = YES;
-    [self.view addSubview:self.navBarView];
-    
-    
-    self.areaArray= [NSMutableArray array];
-    //获取支持的地区列表
-    [SMS_SDK getZone:^(enum SMS_ResponseState state, NSArray *array){
-        if (1==state){
-            //区号数据
-            self.areaArray=[NSMutableArray arrayWithArray:array];
-        }
-    }];
-    
-    
-    CGFloat centerX = [UIScreen mainScreen].bounds.size.width * 0.5;
-    WQInputText *inputText = [[WQInputText alloc] init];
-    CGFloat userY = 100;
-    
-    //帐号
-    self.userText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:NSLocalizedString(@"CustomerPhone", @"")];
-    self.userText.delegate = self;
-    self.userText.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-    [self.userText setReturnKeyType:UIReturnKeyNext];
-    [self.view addSubview:self.userText];
-    
-    //备注
-    userY = self.userText.bottom + 5;
-    self.remarkText = [inputText setupWithIcon:@"login_name" textY:userY centerX:centerX point:nil];
-    self.remarkText.delegate = self;
-    self.remarkText.keyboardType = UIKeyboardTypeDefault;
-    self.remarkText.placeholder = [NSString stringWithFormat:@"%@ %@",NSLocalizedString(@"CustomerRemark", @""),NSLocalizedString(@"ShopNameLimit", @"")] ;
-    [self.remarkText setReturnKeyType:UIReturnKeyDone];
-    [self.view addSubview:self.remarkText];
-
-    self.codeBtn = [UICustomerBtn buttonWithType:UIButtonTypeCustom];
-    self.codeBtn.width = self.userText.width;
-    self.codeBtn.height = 40;
-    self.codeBtn.x = self.userText.left;
-    self.codeBtn.y = self.remarkText.bottom + 10;
-    [self.codeBtn setBackgroundColor:COLOR(244, 242, 242, 1)];
-    [self.codeBtn setTitleColor:COLOR(251, 0, 41, 1) forState:UIControlStateNormal];
-    [self.codeBtn addTarget:self action:@selector(codeBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    self.codeBtn.hidden = YES;
-    [self.view addSubview:self.codeBtn];
-    
-    self.sureBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.sureBtn.width = self.userText.width;
-    self.sureBtn.height = 40;
-    self.sureBtn.x = self.userText.left;
-    self.sureBtn.y = self.remarkText.bottom + 10;
-    [self.sureBtn setTitle:NSLocalizedString(@"submit", @"") forState:UIControlStateNormal];
-    self.sureBtn.backgroundColor = COLOR(251, 0, 41, 1);
-    self.sureBtn.titleLabel.font = [UIFont systemFontOfSize:20];
-    [self.sureBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.sureBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
-    [self.sureBtn addTarget:self action:@selector(submitBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.sureBtn];
-    
-    
+-(void)startView:(WQStarView *)startView number:(NSInteger)start {
+    DLog(@"start = %d",start);
 }
-
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
-}
-
--(void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
--(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
-    [self.navigationController popToRootViewControllerAnimated:YES];
-}
-
--(void)submitBtnClick {
-    [self.view endEditing:YES];
-//    
-//    int compareResult = 0;
-//    for (int i=0; i<self.areaArray.count; i++) {
-//        NSDictionary* dict1=[self.areaArray objectAtIndex:i];
-//        NSString* code1=[dict1 valueForKey:@"zone"];
-//        if ([code1 isEqualToString:[self setTheLocalAreaCode]]) {
-//            compareResult=1;
-//            NSString* rule1=[dict1 valueForKey:@"rule"];
-//            NSPredicate* pred=[NSPredicate predicateWithFormat:@"SELF MATCHES %@",rule1];
-//            BOOL isMatch=[pred evaluateWithObject:self.userText.text];
-//            if (!isMatch){
-//                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"errorphonenumber", @"")];
-//                return;
-//            }
-//            break;
-//        }
-//    }
-//    
-//    if (compareResult==0) {
-//        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"countrychoose", @"")];
-//        return;
-//    }
-    
-    
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    self.interfaceTask = [[WQAPIClient sharedClient] POST:@"/rest/user/addCustomer" parameters:@{@"userPhone":self.userText.text,@"remark":self.remarkText.text} success:^(NSURLSessionDataTask *task, id responseObject) {
-        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-        if ([responseObject isKindOfClass:[NSDictionary class]]) {
-            NSDictionary *jsonData=(NSDictionary *)responseObject;
-            
-            if ([[jsonData objectForKey:@"status"]integerValue]==1) {
-                NSDictionary *dic = [jsonData objectForKey:@"returnObj"];
-                NSString *code = [dic objectForKey:@"storeValidate"];
-                [self.codeBtn setTitle:code forState:UIControlStateNormal];
-                self.codeBtn.hidden = NO;
-                CGRect frame = self.sureBtn.frame;
-                frame.origin.y = self.codeBtn.bottom + 10;
-                self.sureBtn.frame = frame;
-                
-                WQCustomerObj *customerObj = [[WQCustomerObj alloc]init];
-                [customerObj mts_setValuesForKeysWithDictionary:dic];
-                if (self.delegate && [self.delegate respondsToSelector:@selector(addNewCustomer:)]) {
-                    [self.delegate addNewCustomer:customerObj];
-                }
-                
-            }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
-            }
-        }
-        
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
-    }];
-}
-
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
-    [self.view endEditing:YES];
-}
-
--(void)codeBtnClick{
-    [self.view endEditing:YES];
-    
-    [self.codeBtn becomeFirstResponder];
-    UIMenuController *menu = [UIMenuController sharedMenuController];
-    [menu setTargetRect:self.codeBtn.frame inView:self.codeBtn.superview];
-    [menu setMenuVisible:YES animated:YES];
-}
-
-#pragma mark - UITextFieldDelegate
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    if ([textField isEqual:self.userText]) {
-        [self.userText resignFirstResponder];
-        [self.remarkText becomeFirstResponder];
-    }else {
-        [self.remarkText resignFirstResponder];
-    }
-    return YES;
-}
--(void)textFieldDidChange:(NSNotification *)notification {
-    UITextField *text = (UITextField *)notification.object;
-    
-    if ([text isEqual:self.remarkText]) {
-        NSInteger kMaxLength = 10;
-        
-        NSString *toBeString = text.text;
-        
-        NSString *lang = text.textInputMode.primaryLanguage;
-        if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
-            UITextRange *selectedRange = [text markedTextRange];
-            UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];
-            if (!position) {
-                if (toBeString.length > kMaxLength) {
-                    text.text = [toBeString substringToIndex:kMaxLength];
-                }
-            }
-        }else {
-            if (toBeString.length > kMaxLength) {
-                text.text = [toBeString substringToIndex:kMaxLength];
-            }
-        }
-    }
-}
-
 @end

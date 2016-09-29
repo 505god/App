@@ -42,8 +42,6 @@
     if (Platform>=7.0) {
         self.edgesForExtendedLayout=UIRectEdgeNone;
     }
-    
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated {

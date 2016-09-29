@@ -35,7 +35,6 @@
     customerObj.customerDegree = [[rs stringForColumn:@"customerDegree"]integerValue];
     customerObj.customerCode = [rs stringForColumn:@"customerCode"];
     customerObj.customerShield = [[rs stringForColumn:@"customerShield"]integerValue];
-    customerObj.customerRemark = [rs stringForColumn:@"customerRemark"];
     return customerObj;
 }
 -(WQMessageObj *)messageModelFromLocal:(FMResultSet *)rs {
@@ -45,7 +44,7 @@
     messageObj.messageContent = [rs stringForColumn:@"messageContent"];
     messageObj.messageDate = [rs stringForColumn:@"messageDate"];
     messageObj.messageType = [[rs stringForColumn:@"messageType"]integerValue];
-    
+    messageObj.messageId = [rs stringForColumn:@"messageId"];
     if (messageObj.messageFrom == [WQDataShare sharedService].userObj.userId) {
         messageObj.fromType = WQMessageFromMe;
     }else {
@@ -144,7 +143,7 @@
     [rs close];
     
     if (isExit==YES) {
-        BOOL res = [self.db executeUpdate:@"update WQCustomer set customerName=?,customerHeader=?,customerDegree=?,customerRemark=?,customerShield=? where customerId= ?",customerObj.customerName,customerObj.customerHeader,[NSString stringWithFormat:@"%d",customerObj.customerDegree],customerObj.customerRemark,[NSString stringWithFormat:@"%d",customerObj.customerShield],[NSString stringWithFormat:@"%d",customerObj.customerId]];
+        BOOL res = [self.db executeUpdate:@"update WQCustomer set customerName=?,customerHeader=?,customerDegree=?,customerShield=? where customerId= ?",customerObj.customerName,customerObj.customerHeader,[NSString stringWithFormat:@"%d",customerObj.customerDegree],[NSString stringWithFormat:@"%d",customerObj.customerShield],[NSString stringWithFormat:@"%d",customerObj.customerId]];
         
         [self.db close];
         
@@ -160,10 +159,9 @@
         [argumentsArray addObject:[NSString stringWithFormat:@"%@",customerObj.customerArea]];
         [argumentsArray addObject:[NSString stringWithFormat:@"%d",customerObj.customerDegree]];
         [argumentsArray addObject:[NSString stringWithFormat:@"%@",customerObj.customerCode]];
-        [argumentsArray addObject:[NSString stringWithFormat:@"%@",customerObj.customerRemark]];
         [argumentsArray addObject:[NSString stringWithFormat:@"%d",customerObj.customerShield]];
         
-        BOOL res = [self.db executeUpdate:@"insert into WQCustomer (customerId,customerName,customerPhone,customerHeader,customerArea,customerDegree,customerCode,customerRemark,customerShield) values (?,?,?,?,?,?,?,?,?)" withArgumentsInArray:argumentsArray];
+        BOOL res = [self.db executeUpdate:@"insert into WQCustomer (customerId,customerName,customerPhone,customerHeader,customerArea,customerDegree,customerCode,customerShield) values (?,?,?,?,?,?,?,?)" withArgumentsInArray:argumentsArray];
         
         [self.db close];
         
@@ -209,14 +207,34 @@
 -(void)saveMessageToLocal:(WQMessageObj *)messageObj completeBlock:(void (^)(BOOL finished))compleBlock {
     [self.db open];
     
-    NSMutableArray *argumentsArray = [NSMutableArray arrayWithCapacity:5];
+    //判断存在否messageId
+    FMResultSet * rs = [self.db executeQuery:@"select * from WQMessage where messageId=?",messageObj.messageId];
+    BOOL isExit = NO;
+    while ([rs next]) {
+        WQMessageObj *message = [self messageModelFromLocal:rs];
+        if (message != nil) {
+            isExit = YES;
+            break;
+        }
+    }
+    
+    if (isExit == YES) {
+        [self.db close];
+        
+        if (compleBlock) {
+            compleBlock(NO);
+        }
+        return;
+    }
+    
+    NSMutableArray *argumentsArray = [NSMutableArray arrayWithCapacity:6];
     [argumentsArray addObject:[NSString stringWithFormat:@"%d",messageObj.messageFrom]];
     [argumentsArray addObject:[NSString stringWithFormat:@"%d",messageObj.messageTo]];
     [argumentsArray addObject:[NSString stringWithFormat:@"%@",messageObj.messageContent]];
     [argumentsArray addObject:[NSString stringWithFormat:@"%@",messageObj.messageDate]];
     [argumentsArray addObject:[NSString stringWithFormat:@"%d",messageObj.messageType]];
-    
-    BOOL res = [self.db executeUpdate:@"insert into WQMessage (messageFrom,messageTo,messageContent,messageDate,messageType) values (?,?,?,?,?)" withArgumentsInArray:argumentsArray];
+    [argumentsArray addObject:[NSString stringWithFormat:@"%@",messageObj.messageId]];
+    BOOL res = [self.db executeUpdate:@"insert into WQMessage (messageFrom,messageTo,messageContent,messageDate,messageType,messageId) values (?,?,?,?,?,?)" withArgumentsInArray:argumentsArray];
     
     [self.db close];
     

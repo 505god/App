@@ -16,6 +16,8 @@
               @"storeName": mts_key(userName),
               @"storeImg": mts_key(userHead),
               @"coinType": mts_key(moneyType),
+              @"storePhone": mts_key(userPhone),
+              @"coinType": mts_key(moneyType),
               };
 }
 

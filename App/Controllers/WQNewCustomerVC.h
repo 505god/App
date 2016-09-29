@@ -9,9 +9,11 @@
 #import "BaseViewController.h"
 #import "WQCustomerObj.h"
 
+#import "SectionsViewController.h"
+
 @protocol WQNewCustomerVCDelegate;
 
-@interface WQNewCustomerVC : BaseViewController
+@interface WQNewCustomerVC : BaseViewController<SecondViewControllerDelegate>
 
 @property (nonatomic, assign) id<WQNewCustomerVCDelegate>delegate;
 

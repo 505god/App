@@ -64,7 +64,7 @@
                 
                 [WQDataShare sharedService].classArray = [[NSMutableArray alloc]initWithArray:weakSelf.dataArray];
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.tableView reloadData];
@@ -73,7 +73,7 @@
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf checkDataArray];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+
     }];
 }
 

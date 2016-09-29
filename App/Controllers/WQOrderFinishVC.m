@@ -81,7 +81,7 @@ static NSInteger showCount = 0;
                 }
             }else {
                 weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.tableView reloadData];
@@ -93,7 +93,6 @@ static NSInteger showCount = 0;
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
         [weakSelf checkDataArray];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -118,16 +117,16 @@ static NSInteger showCount = 0;
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
-        [self.tableView headerBeginRefreshing];
-        self.isFirstShow = NO;
-    }else {
+//    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
+//        [self.tableView headerBeginRefreshing];
+//        self.isFirstShow = NO;
+//    }else {
         if (showCount>0 && self.isFirstShow) {
             self.isFirstShow = NO;
             [self.tableView headerBeginRefreshing];
         }
         showCount ++;
-    }
+//    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -210,7 +209,7 @@ static NSInteger showCount = 0;
     return self.dataArray.count;
 }
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 185;
+    return 195;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -232,50 +231,4 @@ static NSInteger showCount = 0;
     return cell;
 }
 
-#pragma mark -
-/*
-#pragma mark -
--(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
-    NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
-    WQCustomerOrderObj *orderObj = (WQCustomerOrderObj *)self.dataArray[indexPath.row];
-    
-    if (point.x < 0 && -point.x >= 50) {
-        swipeTableViewCell.shouldAnimateCellReset = YES;
-        
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
-        
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:nil];
-        [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            swipeTableViewCell.shouldAnimateCellReset = NO;
-            [UIView animateWithDuration:0.25
-                                  delay:0
-                                options:UIViewAnimationOptionCurveLinear
-                             animations:^{
-                                 swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
-                             }completion:^(BOOL finished) {
-                                 [[WQAPIClient sharedClient] POST:@"/rest/order/delOrder" parameters:@{@"orderId":orderObj.orderId} success:^(NSURLSessionDataTask *task, id responseObject) {
-                                     
-                                     if ([responseObject isKindOfClass:[NSDictionary class]]) {
-                                         NSDictionary *jsonData=(NSDictionary *)responseObject;
-                                         
-                                         if ([[jsonData objectForKey:@"status"]integerValue]==1) {
-                                             [self.dataArray removeObjectAtIndex:indexPath.row];
-                                             if (self.dataArray.count==0) {
-                                                 [self setNoneText:NSLocalizedString(@"NoneOrder", @"") animated:YES];
-                                             }
-                                             [self.tableView reloadData];
-                                         }else {
-                                             [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
-                                         }
-                                     }
-                                     
-                                 } failure:^(NSURLSessionDataTask *task, NSError *error) {
-                                     [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
-                                 }];
-                             }];
-        }];
-        [alert show];
-    }
-}
-*/
 @end

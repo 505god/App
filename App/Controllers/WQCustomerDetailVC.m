@@ -86,11 +86,6 @@
         NSDictionary *dic = @{NSLocalizedString(@"CustomerPhone", @""):self.customerObj.customerPhone};
         [self.dataArray addObject:dic];
     }
-    ///备注
-    if ([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerRemark]]) {
-        NSDictionary *dic = @{NSLocalizedString(@"CustomerRemark", @""):self.customerObj.customerRemark};
-        [self.dataArray addObject:dic];
-    }
     ///地区
     if ([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerArea]]) {
         NSDictionary *dic = @{NSLocalizedString(@"customerArea", @""):self.customerObj.customerArea};
@@ -212,20 +207,19 @@
     NSString *title = array[0];
     
     if ([title isEqualToString:NSLocalizedString(@"CustomerPhone", @"")]) {
-        [Utility checkAlert];
+         
         
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"customerPhoneCall", @"")];
-        
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"customerPhoneCall", @"")];
+         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
         }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
             NSString *telStr = [NSString stringWithFormat:@"tel:%@",self.customerObj.customerPhone];
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:telStr]];
         }];
         [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
     }else if ([title isEqualToString:NSLocalizedString(@"customerOrder", @"")]){
         WQCustomerOrderVC *orderVC = [[WQCustomerOrderVC alloc]init];
         orderVC.customerObj = self.customerObj;

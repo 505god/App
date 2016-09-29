@@ -10,13 +10,10 @@
 #import "WQInputText.h"
 #import "UIView+XD.h"
 
-#import "WQPhoneVC.h"
-
 #import "WQTapImg.h"
 #import "SDImageCache.h"
 
 #import "WQLocalDB.h"
-#import "WQInfoVC.h"
 
 @interface WQLogVC ()<UITextFieldDelegate,WQTapImgDelegate>
 
@@ -52,6 +49,8 @@
                 if ([[jsonData objectForKey:@"status"]integerValue]==1) {
                     NSDictionary *aDic = (NSDictionary *)[jsonData objectForKey:@"returnObj"];
                     weakSelf.wrongNumber = [[aDic objectForKey:@"wrongNumber"] integerValue];
+                }else {
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                 }
             }
             
@@ -79,6 +78,8 @@
                             [weakSelf.codeImageView sd_setImageWithURL:[NSURL URLWithString:imageURLString] placeholderImage:[UIImage imageNamed:@"assets_placeholder_picture"] options:SDWebImageRefreshCached];
                         }];
                     }];
+                }else {
+                    [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                 }
             }
             
@@ -92,6 +93,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self addObserver:self forKeyPath:@"wrongNumber" options:0 context:nil];
+    
     [self getWrongNumber];
     
     [self setupInputRectangle];
@@ -99,8 +102,6 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [self addObserver:self forKeyPath:@"wrongNumber" options:0 context:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -161,20 +162,7 @@
     self.codeImageView.contentMode = UIViewContentModeScaleAspectFill;
     [self.view addSubview:self.codeImageView];
     [self.codeImageView setHidden:YES];
-    
-    //忘记密码
-    self.forgetBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.forgetBtn.width = 64;
-    self.forgetBtn.height = 20;
-    self.forgetBtn.x = self.passwordText.right-64;
-    self.forgetBtn.y = self.passwordText.bottom + 10;
-    [self.forgetBtn setTitle:NSLocalizedString(@"forgetPwd", @"") forState:UIControlStateNormal];
-    self.forgetBtn.titleLabel.font = [UIFont systemFontOfSize:14];
-    [self.forgetBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.forgetBtn setTitleColor:COLOR(130, 134, 137, 1) forState:UIControlStateHighlighted];
-    [self.forgetBtn addTarget:self action:@selector(forgetBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.forgetBtn];
-    
+
     //登录
     self.loginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.loginBtn.width = self.userText.width;
@@ -182,6 +170,7 @@
     self.loginBtn.x = self.passwordText.left;
     self.loginBtn.y = self.passwordText.bottom + 40;
     [self.loginBtn setTitle:NSLocalizedString(@"logIn", @"") forState:UIControlStateNormal];
+    self.loginBtn.layer.cornerRadius = 4;
     self.loginBtn.backgroundColor = COLOR(251, 0, 41, 1);
     self.loginBtn.titleLabel.font = [UIFont systemFontOfSize:20];
     [self.loginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -222,7 +211,6 @@
                         
                         WQUserObj *userObj = [[WQUserObj alloc]init];
                         [userObj mts_setValuesForKeysWithDictionary:dic];
-                        userObj.userPhone = self.userText.text;
                         userObj.password = self.passwordText.text;
                         [WQDataShare sharedService].userObj = userObj;
                         
@@ -230,16 +218,17 @@
                             if (finished) {
                                 [self.appDel showRootVC];
                             }
-                        }]; 
+                        }];
+                        
+                        [self.appDel getCurrentLanguage];
                     }else {
                         self.wrongNumber ++;
-                        [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                        [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                     }
                 }
                 
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
                 [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
             }];
         }else {
             [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"logInPasswordError", @"")];
@@ -247,18 +236,6 @@
     }else {
         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"logInNameError", @"")];
     }
-}
-
--(void)forgetBtnClick {
-    [self.view endEditing:YES];
-    
-//    WQInfoVC *infoVC = [[WQInfoVC alloc]init];
-//    [self.navigationController pushViewController:infoVC animated:YES];
-//    SafeRelease(infoVC);
-    
-    WQPhoneVC *phoneVC = [[WQPhoneVC alloc]init];
-    [self.navigationController pushViewController:phoneVC animated:YES];
-    SafeRelease(phoneVC);
 }
 
 #pragma mark - UITextFieldDelegate
@@ -281,9 +258,7 @@
                        context:(void *)context {
     if ([keyPath isEqualToString:@"wrongNumber"]) {
         if (self.wrongNumber>=3) {//错误3次
-            self.forgetBtn.frame = (CGRect){self.forgetBtn.left,self.codeText.bottom+10,self.forgetBtn.width,self.forgetBtn.height};
-            
-            self.loginBtn.frame = (CGRect){self.loginBtn.left,self.forgetBtn.bottom+10,self.loginBtn.width,self.loginBtn.height};
+            self.loginBtn.frame = (CGRect){self.loginBtn.left,self.codeText.bottom+20,self.loginBtn.width,self.loginBtn.height};
             
             [self.codeText setHidden:NO];
             [self.codeImageView setHidden:NO];

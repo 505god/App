@@ -16,9 +16,8 @@
               @"userPhone": mts_key(customerPhone),
               @"userImg": mts_key(customerHeader),
               @"userDegree": mts_key(customerDegree),
-              @"storeValidate": mts_key(customerCode),
+              @"userValidate": mts_key(customerCode),
               @"customerArea": mts_key(customerArea),
-              @"customerRemark": mts_key(customerRemark),
               @"customerShield": mts_key(customerShield),
               @"isActive": mts_key(customerResign),
               

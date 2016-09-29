@@ -81,7 +81,7 @@ static NSInteger showCount = 0;
                 }
             }else {
                 weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.tableView reloadData];
@@ -93,7 +93,6 @@ static NSInteger showCount = 0;
         [weakSelf.tableView headerEndRefreshing];
         [weakSelf.tableView footerEndRefreshing];
         [weakSelf checkDataArray];
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -118,16 +117,16 @@ static NSInteger showCount = 0;
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
-        [self.tableView headerBeginRefreshing];
-        self.isFirstShow = NO;
-    }else {
+//    if ([WQDataShare sharedService].pushType != WQPushTypeNone && self.isFirstShow) {
+//        [self.tableView headerBeginRefreshing];
+//        self.isFirstShow = NO;
+//    }else {
         if (showCount>0 && self.isFirstShow) {
             self.isFirstShow = NO;
             [self.tableView headerBeginRefreshing];
         }
         showCount ++;
-    }
+//    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -210,7 +209,7 @@ static NSInteger showCount = 0;
     return self.dataArray.count;
 }
 - (CGFloat)tableView:(UITableView *)_tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 185;
+    return 195;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

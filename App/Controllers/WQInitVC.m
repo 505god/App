@@ -7,9 +7,11 @@
 //
 
 #import "WQInitVC.h"
-#import "WQInitView.h"
 #import "WQLocalDB.h"
-@interface WQInitVC ()<WQInitViewDelegate>
+@interface WQInitVC ()
+
+@property (nonatomic, strong) UIActivityIndicatorView* activityView;
+@property (nonatomic, strong) UIImageView *loadingImg;
 
 @end
 
@@ -23,52 +25,72 @@
     }
     return self;
 }
-
+-(void)setupView {
+    self.loadingImg = [[UIImageView alloc]initWithFrame:(CGRect){(self.view.width-100)/2,(self.view.height-100)/2-30,100,100}];
+    self.loadingImg.image = [UIImage imageNamed:@"chat_voice_record"];
+    [self.view addSubview:self.loadingImg];
+    
+    UILabel *lab = [[UILabel alloc]initWithFrame:CGRectZero];
+    lab.text = NSLocalizedString(@"Refreshing", @"");
+    lab.font = [UIFont systemFontOfSize:15];
+    [lab sizeToFit];
+    lab.frame = (CGRect){(self.view.width-lab.width-30)/2+30,self.loadingImg.bottom+20,lab.width,20};
+    [self.view addSubview:lab];
+    
+    
+    self.activityView = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    self.activityView.left = lab.left-30;
+    self.activityView.top = self.loadingImg.bottom+20;
+    [self.activityView startAnimating];
+    [self.view addSubview:self.activityView];
+}
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    __block WQInitView *initView = [[WQInitView alloc]initWithBackgroundImage:nil];
-    initView.delegate = self;
-    [self.view addSubview:initView];
-
+    [self setupView];
+    
     if ([WQDataShare sharedService].isPushing) {
-        [WQDataShare sharedService].isPushing = NO;
+        
         if ([WQDataShare sharedService].pushType==WQPushTypeLogIn) {
+            [WQDataShare sharedService].isPushing = NO;
             [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-                [initView startAnimation];
-                SafeRelease(initView);
+                [self performSelectorOnMainThread:@selector(loadRootViewController) withObject:nil waitUntilDone:NO];
             }];
+        }else {
+            [self check];
         }
     }else {
-        ///判断登录与否
-        self.interfaceTask  = [[WQAPIClient sharedClient] GET:@"/rest/login/checkLogin" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-            
-            if ([responseObject isKindOfClass:[NSDictionary class]]) {
-                NSDictionary *jsonData=(NSDictionary *)responseObject;
-                
-                NSInteger status = [[jsonData objectForKey:@"status"]integerValue];
-                if (status==0) {
-                    [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-                        [initView startAnimation];
-                        SafeRelease(initView);
-                    }];
-                }else {
-                    [initView startAnimation];
-                    SafeRelease(initView);
-                }
-            }
-            
-        } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-                [initView startAnimation];
-                SafeRelease(initView);
-            }];
-        }];
+        [self check];
     }
 }
 
+-(void)check {
+    ///判断登录与否
+    self.interfaceTask  = [[WQAPIClient sharedClient] GET:@"/rest/login/checkLogin" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        
+        if ([responseObject isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *jsonData=(NSDictionary *)responseObject;
+            
+            NSInteger status = [[jsonData objectForKey:@"status"]integerValue];
+            if (status==0) {
+                [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+                    [self performSelectorOnMainThread:@selector(loadRootViewController) withObject:nil waitUntilDone:NO];
+                }];
+            }else {
+                
+                [self performSelectorOnMainThread:@selector(loadRootViewController) withObject:nil waitUntilDone:NO];
+            }
+        }
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+            
+            [self performSelectorOnMainThread:@selector(loadRootViewController) withObject:nil waitUntilDone:NO];
+        }];
+    }];
+}
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
@@ -96,13 +118,8 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - WQInitViewDelegate
-//开始
--(void)initViewDidBeginAnimating:(WQInitView *)initView {
-    
-}
-//结束
--(void)initViewDidEndAnimating:(WQInitView *) initView {
+
+-(void)loadRootViewController {
     AppDelegate *appDel = [AppDelegate shareIntance];
     
     [appDel showRootVC];

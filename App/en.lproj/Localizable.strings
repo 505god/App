@@ -18,13 +18,13 @@
 "TimeLimit" = "时间限制";
 "recordError" = "录音超时";
 "Tooshort" = "时间太短";
-
+"SettingLevel" = "设置等级:";
 "Night" = "晚上";
 "Dawn" = "凌晨";
 "Tomorrow" = "明天";
 "Today" = "今天";
 "Yesterday" = "昨天";
-
+"SettingLevel" = "设置等级:";
 "Monday" = "MON";
 "Tuesday" = "TUE";
 "Wednesday" = "WED";
@@ -213,7 +213,7 @@
 "countrylable"="国家和地区";
 "countrychoose"="选择国家或地区";
 
-"notice"="提示";
+"notice"="";
 "errorphonenumber"="手机号码非法，请重新填写";
 "sure"="好";
 

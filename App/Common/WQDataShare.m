@@ -33,13 +33,6 @@
 
 #pragma mark -property
 
--(NSMutableArray *)alertArray {
-    if (!_alertArray) {
-        _alertArray = [[NSMutableArray alloc]init];
-    }
-    return _alertArray;
-}
-
 -(NSMutableArray *)customerArray {
     if (!_customerArray) {
         _customerArray = [[NSMutableArray alloc]init];
@@ -64,6 +57,7 @@
     }
     return _sizeArray;
 }
+
 
 #pragma mark -
 /**

@@ -12,6 +12,8 @@
 
 #import "WQXMPPManager.h"
 
+//7xdfdw9g7
+//55ufkitbr
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
@@ -20,13 +22,12 @@
 
 @property (nonatomic, strong) WQXMPPManager *xmppManager;
 
-//首页
-@property (nonatomic, strong) WQMainVC *mainVC;
-
 @property (assign, nonatomic) BOOL isReachable;//网络是否连接
 
 + (AppDelegate *)shareIntance;
 
+- (void)getCurrentLanguage;
 -(void)showRootVC;
+-(void)saveMessageData;
 @end
 

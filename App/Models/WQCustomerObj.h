@@ -25,8 +25,6 @@
 @property (nonatomic, assign) NSInteger customerDegree;
 ///客户邀请码
 @property (nonatomic, strong) NSString *customerCode;//+1
-///客户备注
-@property (nonatomic, strong) NSString *customerRemark;//+1
 
 ///客户屏蔽
 @property (nonatomic, assign) BOOL customerShield;

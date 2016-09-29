@@ -1,0 +1,113 @@
+{
+    "status": "1",
+    "msg": "",
+    "returnObj": {
+        "0": [
+              {
+              "userId": "13",
+              "userName": "邱大侠13",
+              "customerPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "0",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              }
+              ],
+        "1": [
+              {
+              "userId": "15",
+              "userName": "邱大侠15",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "3",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              }
+              ],
+        "2": [
+              {
+              "userId": "23",
+              "userName": "邱大侠23",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "1",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              }
+              ],
+        "3": [
+              {
+              "userId": "25",
+              "userName": "邱大侠25",
+              "customerPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "2",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              },
+              {
+              "userId": "15",
+              "userName": "邱大侠15",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "3",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              },
+              {
+              "userId": "15",
+              "userName": "邱大侠15",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "3",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              },
+              {
+              "userId": "15",
+              "userName": "邱大侠15",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "3",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              },
+              {
+              "userId": "15",
+              "userName": "邱大侠15",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "3",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              },
+              {
+              "userId": "15",
+              "userName": "邱大侠15",
+              "userPhone": "13876483992",
+              "customerHeader": "http://",
+              "userDegree": "3",
+              "customerRemark": "邱成西",
+              "customerArea": "江苏  苏州",
+              "customerCode": "PDMS083JMSK",
+              "customerShield": 0
+              }
+              ]
+    }
+}

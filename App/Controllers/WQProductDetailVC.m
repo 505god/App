@@ -113,19 +113,33 @@ static NSInteger selectedIndex = -1;
             sizeObj.sizeId = [[sizeDic objectForKey:@"productSizeId"]integerValue];
             sizeObj.sizeName = [sizeDic objectForKey:@"productSizeName"];
             
-            //设置最低价格
-            if ([self predicateText:[NSString stringWithFormat:@"%@",[sizeDic objectForKey:@"productPrice"]] regex:@"^[0-9]+(.[0-9]{1,2})?$"]){
-                if (self.lowPrice==nil) {
-                    self.lowPrice = [sizeDic objectForKey:@"productPrice"];
-                }else {
-                    if ([self.lowPrice floatValue]-[[sizeDic objectForKey:@"productPrice"] floatValue]>0.00001) {
-                        self.lowPrice =[sizeDic objectForKey:@"productPrice"];
+            NSMutableDictionary *priceDic = [NSMutableDictionary dictionary];
+            
+            [priceDic setObject:NSLocalizedString(@"ProductSize", @"") forKey:@"sizeTitle"];
+            [priceDic setObject:sizeObj forKey:@"sizeDetail"];
+            [priceDic setObject:NSLocalizedString(@"ProductPrice", @"") forKey:@"priceTitle"];
+            [priceDic setObject:NSLocalizedString(@"ProductStock", @"") forKey:@"stockTitle"];
+            [priceDic setObject:[sizeDic objectForKey:@"productStock"] forKey:@"stockDetail"];
+
+            for (int j=0; j<4; j++) {
+                NSString *key = [NSString stringWithFormat:@"price%d",j];
+                NSString *key2 = [NSString stringWithFormat:@"productPrice%d",j];
+                
+                //设置最低价格
+                if ([self predicateText:[NSString stringWithFormat:@"%@",[sizeDic objectForKey:key2]] regex:@"^[0-9]+(.[0-9]{1,2})?$"]){
+                    if (self.lowPrice==nil) {
+                        self.lowPrice = [sizeDic objectForKey:key2];
+                    }else {
+                        if ([self.lowPrice floatValue]-[[sizeDic objectForKey:key2] floatValue]>0.00001) {
+                            self.lowPrice =[sizeDic objectForKey:key2];
+                        }
                     }
                 }
+                
+                [priceDic setObject:[sizeDic objectForKey:key2] forKey:key];
             }
             
-            NSDictionary *dicc = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":sizeObj,@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"priceDetail":[sizeDic objectForKey:@"productPrice"],@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":[sizeDic objectForKey:@"productStock"]};
-            [tempArray addObject:dicc];
+            [tempArray addObject:priceDic];
         }
         
         WQColorObj *colorObj = [[WQColorObj alloc]init];
@@ -346,7 +360,7 @@ static NSInteger selectedIndex = -1;
     if ([[aDic objectForKey:@"status"]integerValue]==2) {
         NSArray *array = [aDic objectForKey:@"property"];
         ///尺码、库存、价格 30；  添加更多规格30；  图片60
-        return array.count*3*30+30+60;
+        return array.count*6*30+30+60;
     }
     return 40;
 }
@@ -403,14 +417,14 @@ static NSInteger selectedIndex = -1;
     if (point.x < 0 && (0-point.x) >= 60) {
         swipeTableViewCell.shouldAnimateCellReset = YES;
         
-        [Utility checkAlert];
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
-        
+         
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"ConfirmDelete", @"")];
+         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
         }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
             NSIndexPath *indexPath = [self.tableView indexPathForCell:swipeTableViewCell];
             
             swipeTableViewCell.shouldAnimateCellReset = NO;
@@ -428,7 +442,6 @@ static NSInteger selectedIndex = -1;
              ];
         }];
         [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
     }
 }
 
@@ -445,14 +458,14 @@ static NSInteger selectedIndex = -1;
             SafeRelease(coinVC);
         }];
     }else if (indexPath.section == self.dataArray.count-1) {//删除
-        [Utility checkAlert];
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"ConfirmDelete", @"")];
-        
+         
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"ConfirmDelete", @"")];
+         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
         }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
             
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
             [[WQAPIClient sharedClient] POST:@"/rest/product/delProduct" parameters:@{@"productId":[NSNumber numberWithInteger:self.productObj.proId]} success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -467,16 +480,14 @@ static NSInteger selectedIndex = -1;
                         }
                         [self.navigationController popViewControllerAnimated:YES];
                     }else {
-                        [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                        [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
                     }
                 }
                 
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
             }];
         }];
         [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
         
     }else if (indexPath.section == self.dataArray.count-4){//优惠方式
         __block WQProductSaleVC *saleVC = [[WQProductSaleVC alloc]init];
@@ -521,7 +532,7 @@ static NSInteger selectedIndex = -1;
     [self.view.subviews makeObjectsPerformSelector:@selector(endEditing:)];
     
     ///尺码、价格、库存
-    NSDictionary *aDic = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"priceDetail":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
+    NSDictionary *aDic = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"price0":@"",@"price1":@"",@"price2":@"",@"price3":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
     NSArray *array = @[aDic];
     
     NSDictionary *aDic2 = @{@"image":@"",@"color":@"",@"property":array,@"status":@"2"};
@@ -746,7 +757,7 @@ static NSInteger selectedIndex = -1;
     ///更改数据
     NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[addBtn.idxPath.section]];
     NSMutableArray *mutableArray = [NSMutableArray arrayWithArray:[mutableDic objectForKey:@"property"]];
-    NSDictionary *aDic = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"priceDetail":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
+    NSDictionary *aDic = @{@"sizeTitle":NSLocalizedString(@"ProductSize", @""),@"sizeDetail":@"",@"priceTitle":NSLocalizedString(@"ProductPrice", @""),@"price0":@"",@"price1":@"",@"price2":@"",@"price3":@"",@"stockTitle":NSLocalizedString(@"ProductStock", @""),@"stockDetail":@""};
     [mutableArray addObject:aDic];
     [mutableDic setObject:mutableArray forKey:@"property"];
     [self.dataArray replaceObjectAtIndex:addBtn.idxPath.section withObject:mutableDic];
@@ -880,7 +891,10 @@ static NSInteger selectedIndex = -1;
                 index = text.tag-PriceTextFieldTag;
                 
                 NSMutableDictionary *aDic = [[NSMutableDictionary alloc]initWithDictionary:array[index]];
-                [aDic setObject:text.text forKey:@"priceDetail"];
+                
+                NSInteger starNum = text.startNum;
+                NSString *key = [NSString stringWithFormat:@"price%ld",starNum];
+                [aDic setObject:text.text forKey:key];
                 [array replaceObjectAtIndex:index withObject:aDic];
                 
                 //设置最低价格
@@ -915,8 +929,27 @@ static NSInteger selectedIndex = -1;
             [text resignFirstResponder];
         }else if (text.returnKeyType == UIReturnKeyNext){
             WQProAttributeCell *cell = (WQProAttributeCell *)[self.tableView cellForRowAtIndexPath:text.idxPath];
-            WQProductText *textNext = (WQProductText *)[cell.contentView viewWithTag:(text.tag-PriceTextFieldTag+StockTextFieldTag)];
-            [textNext becomeFirstResponder];
+            
+            NSInteger starNum = text.startNum;
+            
+            if (starNum==3) {
+                WQProductText *textNext = (WQProductText *)[cell.contentView viewWithTag:(text.tag-PriceTextFieldTag+StockTextFieldTag)];
+                [textNext becomeFirstResponder];
+            }else {
+                
+                NSArray *subViews = [cell.contentView subviews];
+                
+                for (UIView *view in subViews) {
+                    if ([view isKindOfClass:[WQProductText class]]) {
+                        WQProductText *textNext = (WQProductText *)view;
+                        
+                        if (textNext.tag==text.tag && textNext.startNum==text.startNum+1) {
+                            [textNext becomeFirstResponder];
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
     return YES;
@@ -996,27 +1029,31 @@ static NSInteger selectedIndex = -1;
                     return NO;
                 }
                 ///价格
-                NSString *priceString = [NSString stringWithFormat:@"%@",[dic objectForKey:@"priceDetail"]];
-                if (priceString.length==0) {
-                    [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"PriceError", @"")];
-                    self.postDictionary = nil;
-                    return NO;
-                }else {
-                    if ([self predicateText:priceString regex:@"^[0-9]+(.[0-9]{1,2})?$"]) {
-                        
-                        if (([priceString floatValue]-[self.salelowPrice floatValue])<0.00001) {
-                            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"pricesaleConfirmError", @"")];
-                            self.postDictionary = nil;
-                            return NO;
-                        }else {
-                            [sizeDic setObject:priceString forKey:@"productPrice"];
-                        }
-                    }else {
+                for (int j=0; j<4; j++) {
+                    NSString *key = [NSString stringWithFormat:@"price%d",j];
+                    NSString *key2 = [NSString stringWithFormat:@"productPrice%d",j];
+                    NSString *priceString = [NSString stringWithFormat:@"%@",[dic objectForKey:key]];
+                    if (priceString.length==0) {
                         [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"PriceError", @"")];
                         self.postDictionary = nil;
                         return NO;
+                    }else {
+                        if ([self predicateText:priceString regex:@"^[0-9]+(.[0-9]{1,2})?$"]) {
+                            if (([priceString floatValue]-[self.salelowPrice floatValue])<0.00001) {
+                                [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"pricesaleConfirmError", @"")];
+                                self.postDictionary = nil;
+                                return NO;
+                            }else {
+                                [sizeDic setObject:priceString forKey:key2];
+                            }
+                        }else {
+                            [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"PriceError", @"")];
+                            self.postDictionary = nil;
+                            return NO;
+                        }
                     }
                 }
+                
                 ///库存
                 NSString *stockString = [NSString stringWithFormat:@"%@",[dic objectForKey:@"stockDetail"]];
                 if (stockString.length==0) {
@@ -1160,14 +1197,13 @@ static NSInteger upLoadImgCount = 0;
                 }
                 [self.navigationController popViewControllerAnimated:YES];
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.appDel.window.rootViewController.view animated:YES];
         upLoadImgCount = 0;
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 

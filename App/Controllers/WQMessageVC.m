@@ -66,7 +66,7 @@
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.messageInputView];
 
-    [WQDataShare sharedService].otherJID = [NSString stringWithFormat:@"%d@ubuntu",self.customerObj.customerId];
+    [WQDataShare sharedService].otherJID = [NSString stringWithFormat:@"%d_customer@ubuntu",self.customerObj.customerId];
     
     [self loadBaseViewsAndData];
 }
@@ -76,7 +76,7 @@
     
     self.originalTableViewContentInset = self.tableView.contentInset;
     //xmpp连接
-    if ([self.appDel.xmppManager.xmppStream isConnected]) {
+    if (![self.appDel.xmppManager.xmppStream isConnected]) {
         [self.appDel.xmppManager myConnect];
     }
     
@@ -378,7 +378,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    [self.view endEditing:YES];
+//    [self.view endEditing:YES];
 }
 
 //tableView Scroll to bottom
@@ -431,8 +431,7 @@
     //生成消息对象
     NSString *siID = [XMPPStream generateUUID];
     
-    XMPPMessage *message = [XMPPMessage messageWithType:@"chat" to:[XMPPJID jidWithString:[NSString stringWithFormat:@"%d@ubuntu",self.customerObj.customerId]] elementID:siID];
-
+    XMPPMessage *message = [XMPPMessage messageWithType:@"chat" to:[XMPPJID jidWithString:[NSString stringWithFormat:@"%d_customer@ubuntu",self.customerObj.customerId]] elementID:siID];
     [message addBody:msgJson];
     [message addAttributeWithName:@"xmlns" stringValue:@"jabber:client"];
     
@@ -530,10 +529,11 @@
 
 #pragma mark - chatDelegate
 -(void)getNewMessage:(NSNotification *)notification {
+    
     WQMessageObj *messageObj = (WQMessageObj *)notification.object;
     
     //列表展示
-    [self dealTheFunctionData:messageObj];
+    [self dealTheFunctionData:messageObj type:0];
 }
 -(void)sendNewMessage:(NSNotification *)notification {
     WQMessageObj *messageObj = (WQMessageObj *)notification.object;
@@ -542,12 +542,12 @@
     [[WQLocalDB sharedWQLocalDB] saveCustomerDataToLocal:self.customerObj completeBlock:^(BOOL finished) {
     }];
     
-    [self dealTheFunctionData:messageObj];
+    [self dealTheFunctionData:messageObj type:1];
     
 }
 //列表展示
--(void)dealTheFunctionData:(WQMessageObj *)messageObj {
-    if (self.isShowKeyboard) {
+-(void)dealTheFunctionData:(WQMessageObj *)messageObj type:(NSInteger)type{
+    if (self.isShowKeyboard && type==1) {
         self.messageInputView.TextViewInput.text = nil;
         [self textViewDidChange:self.messageInputView.TextViewInput];
     }

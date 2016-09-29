@@ -66,6 +66,8 @@
     [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"mainNavRight"] forState:UIControlStateNormal];
     [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"mainNavRightNormal"] forState:UIControlStateHighlighted];
     self.navBarView.backgroundColor = [UIColor clearColor];
+    self.navBarView.titleLab.text = @"";
+    self.navBarView.isShowShadow = NO;
     [self.view addSubview:self.navBarView];
     
     //设置左边栏   侧边栏打开状态
@@ -88,6 +90,10 @@
     [self configureViewBlurWith:self.view.width scale:0.1 type:0];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isNewMessage:) name:@"isNewMessage" object:nil];
+    
+    if ([WQDataShare sharedService].pushType != WQPushTypeNone) {
+        [self.navBarView setHidden:YES];
+    }
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -162,21 +168,11 @@
     if (self.currentPage != page) {
         [self.leftBarView defaultSelected];
         self.currentPage = page;
-        [self setTitleWithPage];
+       
         [self changeFromController:self.currentViewController toController:[self.childenControllerArray objectAtIndex:self.currentPage]];
     }
 }
-//设置标题
--(void)setTitleWithPage {
-    if (self.currentPage==0) {
-        [self.navBarView setHidden:NO];
-        self.navBarView.titleLab.text = @"";
-        self.navBarView.backgroundColor = [UIColor clearColor];
-        self.navBarView.isShowShadow = NO;
-    }else {
-        [self.navBarView setHidden:YES];
-    }
-}
+
 #pragma mark - 子controller之间切换
 -(void)addOneController:(UIViewController*)childController{
     if (!childController) {
@@ -201,9 +197,15 @@
         
     } completion:^(BOOL finished) {
         self.currentViewController = to;
-        [self setTitleWithPage];
-        [self.view bringSubviewToFront:self.navBarView];
-
+        
+        
+        if (self.currentPage==0) {
+            [self.navBarView setHidden:NO];
+            [self.view bringSubviewToFront:self.navBarView];
+        }else {
+            [self.navBarView setHidden:YES];
+        }
+        
         if(self.mainBackgroundIV != nil){
             [self.view bringSubviewToFront:self.mainBackgroundIV];
         }

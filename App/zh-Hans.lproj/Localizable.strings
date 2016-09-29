@@ -6,6 +6,10 @@
   Copyright (c) 2015年 苏州瑞鹏科技有限公司. All rights reserved.
 */
 
+"cusGroupVC" = "客户分类";
+"selectedStar" = "按星级筛选";
+"changeCusGroup" = "设置等级:";
+
 "confirmSelectedPro" = "颜色:%@ 尺码:%@ 数量:%ld";
 "NewMessage" = "新消息";
 "HoldtoTalk" = "按住说话";
@@ -67,11 +71,11 @@
 
 "ClassSelectedError" = "请选择商品分类";
 
-
+"SettingLevel" = "设置等级:";
 "CustomerPhone" = "手机";
-"CustomerRemark" = "备注";
+"CustomerRemark" = "昵称";
 "customerArea" = "地区";
-"customerCode" = "邀请码";
+"customerCode" = "口令";
 "customerOrder" = "订单记录";
 "customerChat" = "发消息";
 "customerPhoneCall" = "确定拨打客户电话?";
@@ -120,6 +124,7 @@
 "Format_photo" = "%ld 张照片";
 "Format_photos" = "%ld 张照片";
 "PhotoSelectedError" = "选择图片失败";
+
 
 "Save" = "保存";
 "Add" = "添加";
@@ -195,46 +200,16 @@
 "saleEndTime" = "结束时间";
 "productLimit" = "产品数量限制";
 
-
 "logInCode" = "右边图片的内容";
 "logInName" = "帐号";
 "logInNameError" = "请输入帐号";
 "logInPassword" = "密码";
 "logInPasswordError" = "请输入密码";
-"confirmPassword" = "确认密码";
-"confirmPasswordError" = "两次密码不一致";
 
-"forgetPwd" = "忘记密码?";
-"findPwd" = "找回密码";
 "logIn" = "登录";
-"resign" = "注册";
-
-"labelnotice"="请确认你的国家或地区并输入手机号";
-"telfield"="请填写手机号码";
-"nextbtn"="下一步";
 "countrylable"="国家和地区";
 "countrychoose"="选择国家或地区";
-
-"notice"="提示";
 "errorphonenumber"="手机号码非法，请重新填写";
-"sure"="好";
 
-"willsendthecodeto"="我们将发送验证码短信到这个号码";
-"surephonenumber"="确认手机号码";
-"codesenderrormsg"="验证码发送失败 请稍后重试";
-"codesenderrtitle"="发送失败";
 
-"maxcodemsg"="请求验证码超上限 请稍后重试";
-"codetoooftenmsg"="客户端请求发送短信验证过于频繁";
 
-"verifycode"="请输入验证码";
-"verifylabel"="我们已发送验证码到这个号码";
-"timelabel"="接受短信大约需要60秒";
-"repeatsms"="收不到短信验证码？";
-"submit"="提交";
-"timelablemsg"="接收验证码中...";
-"second"="秒";
-"verifycodeerrormsg"="验证码无效 请重新获取验证码";
-"cannotgetsmsmsg"="我们将重新发送验证码短信到这个号码";
-"verifycodeformaterror"="验证码格式错误,请重新填写";
-"doesnotsupportarea"="暂时不支持该地区";

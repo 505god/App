@@ -198,35 +198,34 @@ sectionForSectionIndexTitle:(NSString *)title
     country.countryName=countryName;
     country.areaCode=areaCode;
     
-    NSLog(@"%@ %@",countryName,areaCode);
+//    NSLog(@"%@ %@",countryName,areaCode);
     
     [self.view endEditing:YES];
     
-    int compareResult = 0;
+    int compareResult = 1;
     
-    for (int i=0; i<_areaArray.count; i++)
-    {
-        NSDictionary* dict1=[_areaArray objectAtIndex:i];
-        
-        [dict1 objectForKey:areaCode];
-        NSString* code1 = [dict1 valueForKey:@"zone"];
-        if ([code1 isEqualToString:areaCode])
-        {
-            compareResult=1;
-            break;
-        }
-    }
+//    for (int i=0; i<_areaArray.count; i++)
+//    {
+//        NSDictionary* dict1=[_areaArray objectAtIndex:i];
+//        
+//        [dict1 objectForKey:areaCode];
+//        NSString* code1 = [dict1 valueForKey:@"zone"];
+//        if ([code1 isEqualToString:areaCode])
+//        {
+//            compareResult=1;
+//            break;
+//        }
+//    }
     
     if (!compareResult)
     {
-        [Utility checkAlert];
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:NSLocalizedString(@"notice", nil) message:NSLocalizedString(@"doesnotsupportarea", @"")];
-        
+         
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"doesnotsupportarea", @"")];
+         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
         }];
         [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
         
         return;
     }

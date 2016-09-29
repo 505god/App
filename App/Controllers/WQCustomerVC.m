@@ -25,7 +25,12 @@
 #import "WQNewCustomerVC.h"
 #import <MessageUI/MFMessageComposeViewController.h>
 
-@interface WQCustomerVC ()<WQCustomerTableDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate,WQNewCustomerVCDelegate,MFMessageComposeViewControllerDelegate>
+#import "WQCustomerGroupVC.h"
+
+#import "DXPopover.h"
+#import "WQCusFunctionCell.h"
+
+@interface WQCustomerVC ()<WQCustomerTableDelegate,WQNavBarViewDelegate,WQCustomerDetailVCDelegate,WQNewCustomerVCDelegate,MFMessageComposeViewControllerDelegate,WQCusGroupVCDelegate,RMSwipeTableViewCellDelegate>
 
 //通讯录列表
 @property (nonatomic, strong) WQCustomerTable *tableView;
@@ -33,6 +38,8 @@
 @property (nonatomic, strong) NSMutableArray *dataArray;
 
 
+@property (nonatomic, strong) UITableView *popTableView;
+@property (nonatomic, strong) DXPopover *popover;
 @end
 
 @implementation WQCustomerVC
@@ -45,6 +52,10 @@
     SafeRelease(_tableView);
     SafeRelease(_customerList);
     SafeRelease(_dataArray);
+    SafeRelease(_popover);
+    SafeRelease(_popTableView.delegate);
+    SafeRelease(_popTableView.dataSource);
+    SafeRelease(_popTableView);
 }
 
 #pragma mark - 获取客户列表
@@ -77,7 +88,7 @@
                     }];
                 }
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.tableView reloadData];
@@ -86,7 +97,6 @@
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.tableView.tableView headerEndRefreshing];
         [weakSelf checkDataArray];
-//        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
@@ -98,18 +108,7 @@
     }
 }
 
--(void)addNewCustomer:(WQCustomerObj *)customerObj {
-    [self.customerList addObject:customerObj];
-    [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:self.customerList];
-    
-    if (self.customerList.count>0) {
-        [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
-            self.dataArray = [NSMutableArray arrayWithArray:array];
-            [self.tableView setHeaderAnimated:YES];
-        }];
-    }
-    [self.tableView reloadData];
-}
+
 #pragma mark - lifestyle
 
 - (void)viewDidLoad {
@@ -117,8 +116,10 @@
     
     //导航栏
     [self.navBarView setTitleString:NSLocalizedString(@"CustomerVC", @"")];
-    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addProperty"] forState:UIControlStateNormal];
-    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"addPropertyNormal"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"customerMore"] forState:UIControlStateNormal];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"customerMoreNormal"] forState:UIControlStateHighlighted];
+    [self.navBarView.rightBtn setImage:[UIImage imageNamed:@"customerMoreNormal"] forState:UIControlStateDisabled];
+    
     [self.navBarView.leftBtn setHidden:YES];
     self.navBarView.navDelegate = self;
     self.navBarView.isShowShadow = YES;
@@ -136,6 +137,7 @@
     if (self.isPresentVC) {
         [self.navBarView setTitleString:NSLocalizedString(@"SelectedProCustomers", @"")];
         [self.navBarView.leftBtn setHidden:NO];
+        [self.navBarView.rightBtn setHidden:YES];
         [self setToolImage:@"" text:NSLocalizedString(@"Finish", @"") animated:YES];
         
         self.toolControl.enabled = self.selectedList.count>0?YES:NO;
@@ -215,11 +217,19 @@
 }
 //右侧边栏的代理---添加客户
 -(void)rightBtnClickByNavBarView:(WQNavBarView *)navView {
-    WQNewCustomerVC *customerVC = [[WQNewCustomerVC alloc]init];
-    customerVC.delegate = self;
-    [self.navigationController pushViewController:customerVC animated:YES];
-    SafeRelease(customerVC);
+    self.navBarView.rightBtn.enabled = NO;
+    CGPoint startPoint = CGPointMake(self.navBarView.rightBtn.right-15,self.navBarView.rightBtn.bottom+10);
+    
+    [self.popover showAtPoint:startPoint popoverPostion:DXPopoverPositionDown withContentView:self.popTableView inView:self.view];
+    
+    __weak typeof(self)weakSelf = self;
+    self.popover.didDismissHandler = ^{
+        weakSelf.navBarView.rightBtn.enabled = YES;
+        [weakSelf bounceTargetView:weakSelf.navBarView.rightBtn];
+    };
 }
+
+
 #pragma mark - property
 
 -(WQCustomerTable *)tableView {
@@ -241,8 +251,28 @@
 -(void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath {
     _selectedIndexPath = selectedIndexPath;
 }
+
+-(DXPopover *)popover {
+    if (!_popover) {
+        _popover = [DXPopover new];
+    }
+    return _popover;
+}
+
+-(UITableView *)popTableView {
+    if (!_popTableView) {
+        _popTableView = [[UITableView alloc] initWithFrame:(CGRect){0,0,120,88} style:UITableViewStylePlain];
+        _popTableView.dataSource = self;
+        _popTableView.delegate = self;
+        _popTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    }
+    return _popTableView;
+}
 #pragma mark - UITableViewDataSource
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if ([tableView isEqual:self.popTableView]) {
+        return 0;
+    }
     return 15;
 }
 - (NSArray *)sectionIndexTitlesForWQCustomerTable:(WQCustomerTable *)tableView {
@@ -254,6 +284,9 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if ([tableView isEqual:self.popTableView]) {
+        return nil;
+    }
     UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.tableView.width, 15)];
     customView.backgroundColor = COLOR(230, 230, 230, 1);
     
@@ -271,86 +304,132 @@
 
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
+    if ([tableView isEqual:self.popTableView]){
+        return 1;
+    }
     return self.dataArray.count;
 }
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if ([tableView isEqual:self.popTableView]) {
+        return 2;
+    }
     NSDictionary *aDic = (NSDictionary *)self.dataArray[section];
     NSArray *array = (NSArray *)aDic[@"data"];
     return [array count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString * CellIdentifier = @"customer_cell";
-    
-    WQCustomerCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[WQCustomerCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                     reuseIdentifier:CellIdentifier];
-    }
-    
-    [cell setSelectedType:0];
-    
-    WQCustomerObj *customer = nil;
-    customer = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
-    [cell setCustomerObj:customer];
-    
-    
-    //判断选择客户列表
-    if (self.isPresentVC) {
-        if ([self.selectedList containsObject:[NSString stringWithFormat:@"%d",customer.customerId]]) {
-            [cell setSelectedType:2];
-        }else {
-            [cell setSelectedType:1];
+    if ([tableView isEqual:self.popTableView]) {
+        static NSString * identifier = @"WQCusFunctionViewCell";
+        
+        WQCusFunctionCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+        if (cell == nil) {
+            cell = [[WQCusFunctionCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         }
+        
+        if (indexPath.row==0) {
+            cell.textLabel.text = NSLocalizedString(@"selectedStar", @"");
+        }else if (indexPath.row==1) {
+            cell.textLabel.text = NSLocalizedString(@"CustomerNew", @"");
+        }
+
+        return cell;
+    }else {
+        static NSString * CellIdentifier = @"customer_cell";
+        
+        WQCustomerCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[WQCustomerCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+                                         reuseIdentifier:CellIdentifier];
+        }
+        
+        [cell setSelectedType:0];
+        
+        WQCustomerObj *customer = nil;
+        customer = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
+        [cell setCustomerObj:customer];
+        
+        cell.delegate = self;
+        cell.revealDirection = RMSwipeTableViewCellRevealDirectionRight;
+        
+        //判断选择客户列表
+        if (self.isPresentVC) {
+            if ([self.selectedList containsObject:[NSString stringWithFormat:@"%ld",customer.customerId]]) {
+                [cell setSelectedType:2];
+            }else {
+                [cell setSelectedType:1];
+            }
+        }
+        
+        return cell;
     }
-    
-    return cell;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([tableView isEqual:self.popTableView]) {
+        return 44;
+    }
     return 50;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    if (self.isPresentVC) {
-        //选择客户
-        WQCustomerCell *cell = (WQCustomerCell *)[tableView cellForRowAtIndexPath:indexPath];
-        
-        WQCustomerObj *customer = nil;
-        customer = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
-        if ([self.selectedList containsObject:[NSString stringWithFormat:@"%d",customer.customerId]]) {
-            [cell setSelectedType:1];
-            [self.selectedList removeObject:[NSString stringWithFormat:@"%d",customer.customerId]];
+    if ([tableView isEqual:self.popTableView]) {
+        [self.popover dismiss];
+        if (indexPath.row==0) {
+            WQCustomerGroupVC *groupVC = [[WQCustomerGroupVC alloc]init];
+            groupVC.delegate = self;
+            [self.navigationController pushViewController:groupVC animated:YES];
+            SafeRelease(groupVC);
         }else {
-            [cell setSelectedType:2];
-            [self.selectedList addObject:[NSString stringWithFormat:@"%d",customer.customerId]];
+            WQNewCustomerVC *customerVC = [[WQNewCustomerVC alloc]init];
+            customerVC.delegate = self;
+            [self.navigationController pushViewController:customerVC animated:YES];
+            SafeRelease(customerVC);
         }
-        self.toolControl.enabled = self.selectedList.count>0?YES:NO;
     }else {
-        WQCustomerObj *customerObj = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
-        if (customerObj.customerResign) {//详细信息页面
-            customerObj.regsinRedPoint = 0;
+        if (self.isPresentVC) {
+            //选择客户
+            WQCustomerCell *cell = (WQCustomerCell *)[tableView cellForRowAtIndexPath:indexPath];
             
-            [self.tableView.tableView beginUpdates];
-            [self.tableView.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableView.tableView endUpdates];
-            
-            WQCustomerDetailVC *detailVC = [[WQCustomerDetailVC alloc]init];
-            detailVC.indexPath = indexPath;
-            detailVC.delegate = self;
-            detailVC.customerVC = self;
-            detailVC.customerObj = customerObj;
-            [self.navigationController pushViewController:detailVC animated:YES];
-            SafeRelease(detailVC);
-        }else {//发短信
-            MFMessageComposeViewController *controller = [[MFMessageComposeViewController alloc] init];
-            if([MFMessageComposeViewController canSendText])
-            {
-                controller.body = @"hi";
-                controller.recipients = @[customerObj.customerPhone];
-                controller.messageComposeDelegate = self;
-                [self presentViewController:controller animated:YES completion:nil];
+            WQCustomerObj *customer = nil;
+            customer = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
+            if ([self.selectedList containsObject:[NSString stringWithFormat:@"%ld",customer.customerId]]) {
+                [cell setSelectedType:1];
+                [self.selectedList removeObject:[NSString stringWithFormat:@"%ld",customer.customerId]];
+            }else {
+                [cell setSelectedType:2];
+                [self.selectedList addObject:[NSString stringWithFormat:@"%ld",customer.customerId]];
+            }
+            self.toolControl.enabled = self.selectedList.count>0?YES:NO;
+        }else {
+            WQCustomerObj *customerObj = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
+            if (customerObj.customerResign) {//详细信息页面
+                customerObj.regsinRedPoint = 0;
+                
+                [self.tableView.tableView beginUpdates];
+                [self.tableView.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                [self.tableView.tableView endUpdates];
+                
+                WQCustomerDetailVC *detailVC = [[WQCustomerDetailVC alloc]init];
+                detailVC.indexPath = indexPath;
+                detailVC.delegate = self;
+                detailVC.customerVC = self;
+                detailVC.customerObj = customerObj;
+                [self.navigationController pushViewController:detailVC animated:YES];
+                SafeRelease(detailVC);
+            }else {//发短信
+                [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+                MFMessageComposeViewController *controller = [[MFMessageComposeViewController alloc] init];
+                if([MFMessageComposeViewController canSendText])
+                {
+                    controller.body = [NSString stringWithFormat:@"%@:%@",NSLocalizedString(@"customerCode",nil),customerObj.customerCode];
+                    controller.recipients = @[customerObj.customerPhone];
+                    controller.messageComposeDelegate = self;
+                    [self presentViewController:controller animated:YES completion:^{
+                        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+                    }];
+                }
             }
         }
     }
@@ -529,6 +608,124 @@
 
 -(void)newMessage:(NSNotification *)notification  {    
     [self.tableView reloadData];
+}
+
+#pragma mark - 事件
+- (void)bounceTargetView:(UIView *)targetView {
+    targetView.transform = CGAffineTransformMakeScale(0.9, 0.9);
+    [UIView animateWithDuration:0.5 delay:0.0 usingSpringWithDamping:0.3 initialSpringVelocity:5 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        targetView.transform = CGAffineTransformIdentity;
+    } completion:nil];
+}
+#pragma mark - 新客户代理
+
+-(void)addNewCustomer:(WQCustomerObj *)customerObj {
+    [self.customerList addObject:customerObj];
+    [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:self.customerList];
+    
+    if (self.customerList.count>0) {
+        [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
+            self.dataArray = [NSMutableArray arrayWithArray:array];
+            [self.tableView setHeaderAnimated:YES];
+        }];
+    }
+    [self.tableView reloadData];
+}
+
+#pragma mark - 分星级显示客户  客户信息被修改
+
+-(void)changeCustomerInfo:(WQCustomerObj *)customer {
+    
+    for (int i=0; i<self.customerList.count; i++) {
+        WQCustomerObj *cusObj = (WQCustomerObj *)self.customerList[i];
+        
+        if (cusObj.customerId==customer.customerId) {
+            
+            [self.customerList replaceObjectAtIndex:i withObject:customer];
+            [WQDataShare sharedService].customerArray = nil;
+            [WQDataShare sharedService].customerArray = [NSMutableArray arrayWithArray:self.customerList];
+            
+            [[WQDataShare sharedService] sortCustomers:[WQDataShare sharedService].customerArray CompleteBlock:^(NSArray *array) {
+                self.dataArray = [NSMutableArray arrayWithArray:array];
+                [self.tableView reloadData];
+            }];
+        }
+    }
+}
+
+
+
+//删除颜色
+-(void)swipeTableViewCellWillResetState:(RMSwipeTableViewCell *)swipeTableViewCell fromPoint:(CGPoint)point animation:(RMSwipeTableViewCellAnimationType)animation velocity:(CGPoint)velocity {
+    if (point.x < 0 && (0-point.x) >= swipeTableViewCell.contentView.height) {
+        
+        NSIndexPath *indexPath = [self.tableView.tableView indexPathForCell:swipeTableViewCell];
+        
+        WQCustomerObj *customer = nil;
+        customer = (WQCustomerObj *)self.dataArray[indexPath.section][@"data"][indexPath.row];
+        
+        swipeTableViewCell.shouldAnimateCellReset = YES;
+        
+        __unsafe_unretained typeof(self) weakSelf = self;
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"DeleteCustomer", @"")];
+        
+        [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
+            
+        }];
+        [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
+            
+            [UIView animateWithDuration:0.25
+                                  delay:0
+                                options:UIViewAnimationOptionCurveLinear
+                             animations:^{
+                                 swipeTableViewCell.contentView.frame = CGRectOffset(swipeTableViewCell.contentView.bounds, swipeTableViewCell.contentView.frame.size.width, 0);
+                             }
+                             completion:^(BOOL finished) {
+                                 [[WQAPIClient sharedClient] POST:@"/rest/user/delCustomer" parameters:@{@"userId":[NSNumber numberWithInteger:customer.customerId]} success:^(NSURLSessionDataTask *task, id responseObject) {
+                                     
+                                     if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                                         NSDictionary *jsonData=(NSDictionary *)responseObject;
+                                         
+                                         if ([[jsonData objectForKey:@"status"]integerValue]==1) {
+                                             NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:weakSelf.dataArray[indexPath.section]];
+                                             
+                                             NSMutableArray *mutableArray = [[NSMutableArray alloc]initWithArray:mutableDic[@"data"]];
+                                             
+                                             [mutableArray removeObjectAtIndex:indexPath.row];
+                                             
+                                             if (mutableArray.count==0) {
+                                                 [weakSelf.dataArray removeObjectAtIndex:indexPath.section];
+                                             }else {
+                                                 [mutableDic setObject:mutableArray forKey:@"data"];
+                                                 
+                                                 [weakSelf.dataArray replaceObjectAtIndex:indexPath.section withObject:mutableDic];
+                                             }
+                                             [weakSelf.tableView reloadData];
+                                             
+                                             
+                                             for (int i=0; i<weakSelf.customerList.count; i++) {
+                                                 WQCustomerObj *customerObj = (WQCustomerObj *)weakSelf.customerList[i];
+                                                 if (customerObj.customerId == customer.customerId) {
+                                                     [weakSelf.customerList removeObjectAtIndex:i];
+                                                     [[WQDataShare sharedService].customerArray removeObjectAtIndex:i];
+                                                     break;
+                                                 }
+                                             }
+                                             
+                                             SafeRelease(mutableDic);SafeRelease(mutableArray);
+                                             
+                                         }else {
+                                             [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
+                                         }
+                                     }
+                                     
+                                 } failure:^(NSURLSessionDataTask *task, NSError *error) {
+
+                                 }];
+                             }];
+        }];
+        [alert show];
+    }
 }
 
 @end

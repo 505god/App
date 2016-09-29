@@ -12,6 +12,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "BlockAlertView.h"
 #import "BlockActionSheet.h"
+#import "WQLocalDB.h"
 
 @interface Utility ()
 
@@ -23,6 +24,50 @@
 static UIImageView *orginImageView;
 
 @implementation Utility
+
+-(AppDelegate *)appDel {
+    if (!_appDel) {
+        _appDel = [AppDelegate shareIntance];
+    }
+    return _appDel;
+}
+- (id)init{
+    self = [super init];
+    if (self) {
+    }
+    return self;
+}
++ (Utility *)sharedService {
+    static dispatch_once_t once;
+    static Utility *dataService = nil;
+    
+    dispatch_once(&once, ^{
+        dataService = [[super alloc] init];
+    });
+    return dataService;
+}
+
++(void)interfaceWithStatus:(NSInteger)status msg:(NSString *)msg {
+    if (status==0) {
+        
+    }else if (status==101 || status==100) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+            [[Utility sharedService].appDel.xmppManager getOffLineMessage];
+            [[Utility sharedService].appDel.xmppManager goOffline];
+            [[Utility sharedService].appDel.xmppManager teardownStream];
+            [Utility sharedService].appDel.xmppManager = nil;
+            
+            [[Utility sharedService].appDel saveMessageData];
+            [Utility dataShareClear];
+            
+            [[Utility sharedService].appDel showRootVC];
+        }];
+    }
+    [WQPopView showWithImageName:@"picker_alert_sigh" message:msg];
+}
 
 #pragma mark - 获取当前时间
 + (NSString *)getNowDateFromatAnDate {
@@ -239,22 +284,15 @@ static UIImageView *orginImageView;
     }];
 }
 
-+(void)checkAlert {
-    if ([WQDataShare sharedService].alertArray.count>0) {
-        
-        id object = [WQDataShare sharedService].alertArray[0];
-        
-        if ([object isKindOfClass:[BlockAlertView class]]) {
-            BlockAlertView *alertTemp = (BlockAlertView *)object;
-            [alertTemp performDismissal];
-            
-            [[NSNotificationCenter defaultCenter] removeObserver:alertTemp name:UIKeyboardWillShowNotification object:nil];
-        }else if ([object isKindOfClass:[BlockActionSheet class]]) {
-            BlockActionSheet *alertTemp = (BlockActionSheet *)object;
-            [alertTemp performDismissal];
-        }
-        [[WQDataShare sharedService].alertArray removeAllObjects];
-    }
++(void)dataShareClear {
+    [WQDataShare sharedService].userObj = nil;
+    [WQDataShare sharedService].otherJID = nil;
+    [WQDataShare sharedService].getLanguage = nil;
+    [WQDataShare sharedService].isInMessageView= NO;
+    [WQDataShare sharedService].classArray = nil;
+    [WQDataShare sharedService].colorArray = nil;
+    [WQDataShare sharedService].sizeArray = nil;
+    [WQDataShare sharedService].customerArray = nil;
+    [WQDataShare sharedService].messageArray = nil;
 }
-
 @end

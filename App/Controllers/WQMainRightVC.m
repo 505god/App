@@ -191,14 +191,14 @@
             SafeRelease(coinVC);
         }
     }else {
-        [Utility checkAlert];
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"confirmLogOut", @"")];
-        
+         
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"confirmLogOut", @"")];
+         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"Cancel", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
         }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"LogOut", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
             
             [[WQAPIClient sharedClient] POST:@"/rest/login/logout" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -209,11 +209,15 @@
                         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
                         [[NSUserDefaults standardUserDefaults] synchronize];
                         
+                        [self.appDel.xmppManager getOffLineMessage];
                         [self.appDel.xmppManager goOffline];
                         [self.appDel.xmppManager teardownStream];
                         self.appDel.xmppManager = nil;
-                        [WQDataShare sharedService].userObj = nil;
                         
+                        [self.appDel saveMessageData];
+                        
+                        [Utility dataShareClear];
+
                         [self.appDel showRootVC];
                     }
                 }];
@@ -222,7 +226,6 @@
             }];
         }];
         [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
     }
 }
 

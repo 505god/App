@@ -108,12 +108,11 @@
                 }];
                 
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 //左侧边栏的代理
@@ -122,19 +121,18 @@
         [self dismissViewControllerAnimated:YES completion:nil];
     }else {
         if (self.selectedIndex != [WQDataShare sharedService].userObj.moneyType && self.selectedIndex>=0) {
-            [Utility checkAlert];
-            BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"SaveEdit", @"")];
-            
+             
+            BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"SaveEdit", @"")];
+             
             [alert setCancelButtonWithTitle:NSLocalizedString(@"DontSave", @"") block:^{
-                [[WQDataShare sharedService].alertArray removeAllObjects];
+                 
                 [self.navigationController popViewControllerAnimated:YES];
             }];
             [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-                [[WQDataShare sharedService].alertArray removeAllObjects];
+                 
                 [self changeTheCoin];
             }];
             [alert show];
-            [[WQDataShare sharedService].alertArray addObject:alert];
         }else {
             [self.navigationController popViewControllerAnimated:YES];
         }

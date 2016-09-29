@@ -5,6 +5,7 @@
 //  Created by 邱成西 on 15/2/2.
 //  Copyright (c) 2015年 Just Do It. All rights reserved.
 //
+//15106130784     123456
 
 #import "AppDelegate.h"
 #import <SMS_SDK/SMS_SDK.h>
@@ -28,6 +29,8 @@
 #import "WQMessageVC.h"
 
 #import <AudioToolbox/AudioToolbox.h>
+
+#import "JSONKit.h"
 @interface AppDelegate ()<ChatDelegate>
 
 @property (strong, nonatomic) Reachability *hostReach;//网络监听所用
@@ -71,11 +74,7 @@
 #endif
     [APService setupWithOption:launchOptions];
     
-    
-    //短信
-    [SMS_SDK registerApp:@"46c880df3c3f" withSecret:@"e5d8a4bb450b2e2f2076bffdf57b2ec7"];
-    [SMS_SDK enableAppContactFriends:NO];
-    
+
     //开启网络状况的监听
     _isReachable = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
@@ -85,50 +84,31 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     
-    //获取未读信息
-    NSFileManager *fileManage = [NSFileManager defaultManager];
-    NSString *path = [Utility returnPath];
-    NSString *filenameMessage = [path stringByAppendingPathComponent:@"message.plist"];
-    if (![fileManage fileExistsAtPath:filenameMessage]) {
-        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithCapacity:0];
-    }else {
-        NSArray *arr = [NSKeyedUnarchiver unarchiveObjectWithFile:filenameMessage];
-        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithArray:arr];
-        SafeRelease(arr);
-    }
-    SafeRelease(filenameMessage);
-    SafeRelease(path);
-    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:1 forKey:@"isOn"];
     [defaults synchronize];
     
     [WQDataShare sharedService].isPushing = NO;
     [WQDataShare sharedService].pushType = WQPushTypeNone;
-    //点击推送进入App
-    NSDictionary *pushDict = [launchOptions objectForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"];
-    if (pushDict) {
-        [WQDataShare sharedService].isPushing = YES;
-        [WQDataShare sharedService].pushType = [[pushDict objectForKey:@"type"]intValue];
-    }
-    SafeRelease(pushDict);
-    
-    [WQDataShare sharedService].idRegister = [[[NSUserDefaults standardUserDefaults] objectForKey:@"register"]boolValue];
     
     [self getCurrentLanguage];
     
+    NSDictionary *pushDict = [launchOptions objectForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"];
+    if (pushDict) {
+        [WQDataShare sharedService].isPushing = YES;
+        [WQDataShare sharedService].pushType = [pushDict[@"WQPushType"]integerValue];
+    }
     
     WQInitVC *initVC = [[WQInitVC alloc]init];
-    self.navControl = [[UINavigationController alloc]initWithRootViewController:initVC];
-    self.window.rootViewController = self.navControl;
+    self.window.rootViewController = initVC;
+    SafeRelease(initVC);
     
     [self.window makeKeyAndVisible];
     return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -136,18 +116,15 @@
     [defaults setInteger:2 forKey:@"isOn"];
     [defaults synchronize];
     
+    [self.xmppManager getOffLineMessage];
     [self.xmppManager goOffline];
     [self.xmppManager teardownStream];
     self.xmppManager = nil;
     
-    NSFileManager *fileManage = [NSFileManager defaultManager];
-    NSString *path = [Utility returnPath];
-    //保存未读消息的数组
-    NSString *filenameMessage = [path stringByAppendingPathComponent:@"message.plist"];
-    if ([fileManage fileExistsAtPath:filenameMessage]) {
-        [fileManage removeItemAtPath:filenameMessage error:nil];
-    }
-    [NSKeyedArchiver archiveRootObject:[WQDataShare sharedService].messageArray toFile:filenameMessage];
+    
+    [self saveMessageData];
+    [WQDataShare sharedService].userObj = nil;
+    [WQDataShare sharedService].messageArray = nil;
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
@@ -157,58 +134,48 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setInteger:1 forKey:@"isOn"];
-    [defaults synchronize];
-    
-    [[WQLocalDB sharedWQLocalDB] getLocalUserDataWithCompleteBlock:^(NSArray *array) {
-        if (array.count==0) {//未登录
-        }else {//已登录
-            [WQDataShare sharedService].userObj = (WQUserObj *)[array firstObject];
-            
-            //登录成功之后连接XMPP
-            self.xmppManager = [WQXMPPManager sharedInstance];
-            
-            [self.xmppManager setupStream];
-            self.xmppManager.chatDelegate = self;
-            //xmpp连接
-            if (![self.xmppManager.xmppStream isConnected]) {
-                [self.xmppManager myConnect];
+    NSInteger isOn = [defaults integerForKey:@"isOn"];
+    if (isOn==2) {
+        [defaults setInteger:1 forKey:@"isOn"];
+        [defaults synchronize];
+        
+        [[WQLocalDB sharedWQLocalDB] getLocalUserDataWithCompleteBlock:^(NSArray *array) {
+            if (array.count==0) {//未登录
+            }else {//已登录
+                [WQDataShare sharedService].userObj = (WQUserObj *)[array firstObject];
+                
+                [self getShareData];
+                
+                if (self.xmppManager && [self.xmppManager.xmppStream isConnected]) {
+                    
+                }else {
+                    //登录成功之后连接XMPP
+                    self.xmppManager = [WQXMPPManager sharedInstance];
+                    
+                    [self.xmppManager setupStream];
+                    self.xmppManager.chatDelegate = self;
+                    //xmpp连接
+                    [self.xmppManager myConnect];
+                }
             }
-        }
-    }];
-    
-    //获取未读信息
-    NSFileManager *fileManage = [NSFileManager defaultManager];
-    NSString *path = [Utility returnPath];
-    NSString *filenameMessage = [path stringByAppendingPathComponent:@"message.plist"];
-    if (![fileManage fileExistsAtPath:filenameMessage]) {
-        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithCapacity:0];
-    }else {
-        NSArray *arr = [NSKeyedUnarchiver unarchiveObjectWithFile:filenameMessage];
-        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithArray:arr];
-        SafeRelease(arr);
+        }];
     }
-    SafeRelease(filenameMessage);
-    SafeRelease(path);
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:0 forKey:@"isOn"];
     [defaults synchronize];
     
+    [self.xmppManager getOffLineMessage];
     [self.xmppManager goOffline];
     [self.xmppManager teardownStream];
     self.xmppManager = nil;
     
-    NSFileManager *fileManage = [NSFileManager defaultManager];
-    NSString *path = [Utility returnPath];
-    //保存未读消息的数组
-    NSString *filenameMessage = [path stringByAppendingPathComponent:@"message.plist"];
-    if ([fileManage fileExistsAtPath:filenameMessage]) {
-        [fileManage removeItemAtPath:filenameMessage error:nil];
-    }
-    [NSKeyedArchiver archiveRootObject:[WQDataShare sharedService].messageArray toFile:filenameMessage];
+    [self saveMessageData];
+    [Utility dataShareClear];
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
@@ -217,95 +184,55 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-    AudioServicesPlaySystemSound(1007);
     
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    
+    
+    NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
+    int type = [[userInfo objectForKey:@"WQPushType"]intValue];
+    NSDictionary *apsDic = (NSDictionary *)[userInfo objectForKey:@"aps"];
+    
+    if (type==WQPushTypeLogIn) {//异地登陆
+        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
+            if (finished) {
+                //TODO:xmpp退出
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [self.xmppManager getOffLineMessage];
+                [self.xmppManager goOffline];
+                [self.xmppManager teardownStream];
+                self.xmppManager = nil;
+                
+                [self saveMessageData];
+                [Utility dataShareClear];
+                
+                [self showRootVC];
+            }
+        }];
+         
+        [WQPopView showWithImageName:@"picker_alert_sigh" message:apsDic[@"alert"]];
+    }else if (type==7) {
+        [WQDataShare sharedService].pushType = type;
+        [WQDataShare sharedService].isPushing = YES;
+        
+        NSString *JSONString = userInfo[@"userInfo"];
+        if ([Utility checkString:JSONString] && isOn == 2 && [WQDataShare sharedService].isInMessageView == NO) {
+            [self showRootVC];
+        }
+    }else {
+        [WQDataShare sharedService].isPushing = YES;
+        [WQDataShare sharedService].pushType = type;
+        if (isOn == 2) {//app从后台进入前台
+            [self showRootVC];
+            [WQPopView showWithImageName:@"picker_alert_sigh" message:apsDic[@"alert"]];
+        }
+    }
     [APService handleRemoteNotification:userInfo];
     completionHandler(UIBackgroundFetchResultNewData);
-    
-    NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
-    int type = [[userInfo objectForKey:@"type"]intValue];
-    NSDictionary *apsDic = (NSDictionary *)[userInfo objectForKey:@"aps"];
-    
-    if (type==WQPushTypeLogIn) {//异地登陆
-        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-            if (finished) {
-                //TODO:xmpp退出
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                [self.xmppManager goOffline];
-                [self.xmppManager teardownStream];
-                self.xmppManager = nil;
-                [WQDataShare sharedService].userObj = nil;
-                
-                [self showRootVC];
-            }
-        }];
-        
-        [Utility checkAlert];
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:apsDic[@"alert"]];
-        
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
-        }];
-        [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
-    }else {
-        [WQDataShare sharedService].pushType = type;
-        if (isOn == 1) {//app登录
-            
-        }else if (isOn == 2) {//app从后台进入前台
-            [WQDataShare sharedService].isPushing = YES;
-            [self showRootVC];
-        }
-    }
 }
 
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-    AudioServicesPlaySystemSound(1007);
-    
-    [APService handleRemoteNotification:userInfo];
-
-    NSInteger isOn = [[NSUserDefaults standardUserDefaults] integerForKey:@"isOn"];
-    int type = [[userInfo objectForKey:@"type"]intValue];
-    NSDictionary *apsDic = (NSDictionary *)[userInfo objectForKey:@"aps"];
-    
-    if (type==WQPushTypeLogIn) {//异地登陆
-        [[WQLocalDB sharedWQLocalDB] deleteLocalUserWithCompleteBlock:^(BOOL finished) {
-            if (finished) {
-                //TODO:xmpp退出
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sessionCookies"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                [self.xmppManager goOffline];
-                [self.xmppManager teardownStream];
-                self.xmppManager = nil;
-                [WQDataShare sharedService].userObj = nil;
-                
-                [self showRootVC];
-            }
-        }];
-        [Utility checkAlert];
-        
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:apsDic[@"alert"]];
-        
-        [alert setCancelButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
-        }];
-        [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
-    }else {
-        [WQDataShare sharedService].pushType = type;
-        if (isOn == 1) {//app登录
-            
-        }else if (isOn == 2) {//app从后台进入前台
-            [WQDataShare sharedService].isPushing = YES;
-            [self showRootVC];
-        }
-    }
-}
 #pragma mark - 获取当前语言
 - (void)getCurrentLanguage {
     NSArray *languages = [NSLocale preferredLanguages];
@@ -339,8 +266,34 @@
 }
 
 #pragma mark - 加载RootViewController
--(void)showRootVC {
+-(void)saveMessageData {
+    NSFileManager *fileManage = [NSFileManager defaultManager];
+    NSString *path = [Utility returnPath];
+    //保存未读消息的数组
+    NSString *filenameMessage = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"message_%d.plist",[WQDataShare sharedService].userObj.userId]];
+    if ([fileManage fileExistsAtPath:filenameMessage]) {
+        [fileManage removeItemAtPath:filenameMessage error:nil];
+    }
+    [NSKeyedArchiver archiveRootObject:[WQDataShare sharedService].messageArray toFile:filenameMessage];
+}
+-(void)getShareData {
+    //获取未读信息
+    NSFileManager *fileManage = [NSFileManager defaultManager];
+    NSString *path = [Utility returnPath];
+    NSString *filenameMessage = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"message_%d.plist",[WQDataShare sharedService].userObj.userId]];
+    if (![fileManage fileExistsAtPath:filenameMessage]) {
+        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithCapacity:0];
+    }else {
+        NSArray *arr = [NSKeyedUnarchiver unarchiveObjectWithFile:filenameMessage];
+        [WQDataShare sharedService].messageArray = [NSMutableArray arrayWithArray:arr];
+        SafeRelease(arr);
+    }
+    SafeRelease(filenameMessage);
+    SafeRelease(path);
     
+    [WQDataShare sharedService].idRegister = [[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"register_%d",[WQDataShare sharedService].userObj.userId]]boolValue];
+}
+-(void)showRootVC {
     [[WQLocalDB sharedWQLocalDB] getLocalUserDataWithCompleteBlock:^(NSArray *array) {
         if (array.count==0) {//未登录
             WQLogVC *logVC = [[WQLogVC alloc]init];
@@ -350,46 +303,42 @@
             
         }else {//已登录
             [WQDataShare sharedService].userObj = (WQUserObj *)[array firstObject];
+
+            [self getShareData];
             
-            //登录成功之后连接XMPP
-            self.xmppManager = [WQXMPPManager sharedInstance];
-            
-            [self.xmppManager setupStream];
-            self.xmppManager.chatDelegate = self;
-            //xmpp连接
-            if (![self.xmppManager.xmppStream isConnected]) {
+            if (self.xmppManager && [self.xmppManager.xmppStream isConnected]) {
+                
+            }else {
+                //登录成功之后连接XMPP
+                self.xmppManager = [WQXMPPManager sharedInstance];
+                
+                [self.xmppManager setupStream];
+                self.xmppManager.chatDelegate = self;
+                //xmpp连接
                 [self.xmppManager myConnect];
             }
-            
-            self.mainVC = [[WQMainVC alloc]init];
+
+            WQMainVC *mainVC = [[WQMainVC alloc]init];
             WQShopVC *shopVC = [[WQShopVC alloc]init];
             WQOrderVC *orderVC = [[WQOrderVC alloc]init];
             WQCustomerVC *customerVC = [[WQCustomerVC alloc]init];
             WQSaleVC *saleVC = [[WQSaleVC alloc]init];
             
-            self.mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
-            self.navControl = [[UINavigationController alloc]initWithRootViewController:self.mainVC];
-            
+            mainVC.childenControllerArray = @[shopVC,orderVC,customerVC,saleVC];
+            self.navControl = [[UINavigationController alloc]initWithRootViewController:mainVC];
             self.window.rootViewController = self.navControl;
+
             
-//            [WQDataShare sharedService].isPushing = YES;
-//            [WQDataShare sharedService].pushType = WQPushTypeChat;
             if ([WQDataShare sharedService].isPushing) {
                 [WQDataShare sharedService].isPushing = NO;
                 
                 if ([WQDataShare sharedService].pushType==WQPushTypeOrderRemindDelivery || [WQDataShare sharedService].pushType==WQPushTypeOrderFinish) {
-                    [self.mainVC setCurrentPageVC:1];
+                    [mainVC setCurrentPageVC:1];
                 }else if ([WQDataShare sharedService].pushType==WQPushTypeCustomer) {
-                    [self.mainVC setCurrentPageVC:2];
+                    [mainVC setCurrentPageVC:2];
                 }else if ([WQDataShare sharedService].pushType==WQPushTypeChat) {
-                    [self.mainVC setCurrentPageVC:2];
-                    
-                    WQMessageVC *messageVC = [[WQMessageVC alloc]init];
-                    [customerVC.navigationController pushViewController:messageVC animated:YES];
-                    SafeRelease(messageVC);
+                    [mainVC setCurrentPageVC:2];
                 }
-            }else {
-                [self.mainVC setCurrentPageVC:0];
             }
             
             dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -397,7 +346,7 @@
                 [self logIn];
             });
             
-            SafeRelease(shopVC);SafeRelease(orderVC);SafeRelease(customerVC);SafeRelease(saleVC);
+            SafeRelease(shopVC);SafeRelease(orderVC);SafeRelease(customerVC);SafeRelease(saleVC);SafeRelease(mainVC);
         }
     }];
 }
@@ -412,53 +361,53 @@
 }
 #pragma mark - chatDelegate
 -(void)getNewMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-    AudioServicesPlaySystemSound(1007);
-    
+
     XMPPJID *fromJid = message.from;
     
     NSDictionary *aDic = [message.body objectFromJSONString];
     WQMessageObj *messageObj = [WQMessageObj messageFromDictionary:aDic];
-    
+    messageObj.messageId = [message elementID];
     [[WQLocalDB sharedWQLocalDB] saveMessageToLocal:messageObj completeBlock:^(BOOL finished) {
-    }];
-    
-    if ([WQDataShare sharedService].isInMessageView) {
-        if ([[fromJid bare] isEqualToString:[WQDataShare sharedService].otherJID]){
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"GetNewMessage" object:messageObj userInfo:nil];
-        }else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"isNewMessage" object:@"1" userInfo:nil];
-            
-            NSString *str = [NSString stringWithFormat:@"%d",messageObj.messageFrom];
-            if (![[WQDataShare sharedService].messageArray containsObject:str]) {
-                [[WQDataShare sharedService].messageArray addObject:str];
+        if (finished) {
+            if ([WQDataShare sharedService].isInMessageView) {
+                if ([[fromJid bare] isEqualToString:[WQDataShare sharedService].otherJID]){
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetNewMessage" object:messageObj userInfo:nil];
+                }else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"isNewMessage" object:@"1" userInfo:nil];
+                    
+                    NSString *str = [NSString stringWithFormat:@"%d",messageObj.messageFrom];
+                    if (![[WQDataShare sharedService].messageArray containsObject:str]) {
+                        [[WQDataShare sharedService].messageArray addObject:str];
+                    }
+                }
+            }else {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"isNewMessage" object:@"1" userInfo:nil];
+                
+                NSString *str = [NSString stringWithFormat:@"%d",messageObj.messageFrom];
+                if (![[WQDataShare sharedService].messageArray containsObject:str]) {
+                    [[WQDataShare sharedService].messageArray addObject:str];
+                }
             }
         }
-    }else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"isNewMessage" object:@"1" userInfo:nil];
-        
-        NSString *str = [NSString stringWithFormat:@"%d",messageObj.messageFrom];
-        if (![[WQDataShare sharedService].messageArray containsObject:str]) {
-            [[WQDataShare sharedService].messageArray addObject:str];
-        }
-    }
+    }];
 }
 
 -(void)didSendMessage:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
     NSDictionary *aDic = [message.body objectFromJSONString];
     WQMessageObj *messageObj = [WQMessageObj messageFromDictionary:aDic];
-    
+    messageObj.messageId = [message elementID];
     [[WQLocalDB sharedWQLocalDB] saveMessageToLocal:messageObj completeBlock:^(BOOL finished) {
-    }];
-    
-    if ([WQDataShare sharedService].isInMessageView) {
-        XMPPJID *fromJid = message.to;
-        if ([[fromJid bare] isEqualToString:[WQDataShare sharedService].otherJID]){
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"SendNewMessage" object:messageObj userInfo:nil];
-        }else {
-            //do nothing
+        if (finished) {
+            if ([WQDataShare sharedService].isInMessageView) {
+                XMPPJID *fromJid = message.to;
+                if ([[fromJid bare] isEqualToString:[WQDataShare sharedService].otherJID]){
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendNewMessage" object:messageObj userInfo:nil];
+                }else {
+                    //do nothing
+                }
+            }
         }
-    }
+    }];
 }
 -(void)senMessageFailed:(WQXMPPManager *)xmppManager Message:(XMPPMessage *)message {
     DLog(@"send message error");

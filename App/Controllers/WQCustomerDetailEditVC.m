@@ -56,8 +56,6 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -69,8 +67,6 @@
     [WQAPIClient cancelConnection];
     [self.interfaceTask cancel];
     self.interfaceTask = nil;
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -92,10 +88,6 @@
 -(void)setArrayData {
     self.dataArray = [[NSMutableArray alloc]init];
     
-    ///备注
-    NSDictionary *aDic1 = @{@"title":NSLocalizedString(@"CustomerRemark", @""),@"detail":([Utility checkString:[NSString stringWithFormat:@"%@",self.customerObj.customerRemark]]?self.customerObj.customerRemark:@""),@"status":@"0",@"isEdit":@"0"};
-    [self.dataArray addObject:aDic1];
-    
     ///评级
     NSDictionary *aDic2 = @{@"title":NSLocalizedString(@"CustomerLevel", @""),@"detail":[NSNumber numberWithInteger:self.customerObj.customerDegree],@"status":@"1",@"isEdit":@"0"};
     [self.dataArray addObject:aDic2];
@@ -105,8 +97,6 @@
     [self.dataArray addObject:aDic3];
     
     [self.tableView reloadData];
-    
-    SafeRelease(aDic1);
     SafeRelease(aDic2);
     SafeRelease(aDic3);
 }
@@ -150,19 +140,18 @@
 -(void)leftBtnClickByNavBarView:(WQNavBarView *)navView {
     BOOL res = [self checkNavRight];
     if (res) {
-        [Utility checkAlert];
-        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"Alert Title" message:NSLocalizedString(@"SaveEdit", @"")];
-        
+         
+        BlockAlertView *alert = [BlockAlertView alertWithTitle:@"" message:NSLocalizedString(@"SaveEdit", @"")];
+         
         [alert setCancelButtonWithTitle:NSLocalizedString(@"DontSave", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
             [self.navigationController popViewControllerAnimated:YES];
         }];
         [alert setDestructiveButtonWithTitle:NSLocalizedString(@"Confirm", @"") block:^{
-            [[WQDataShare sharedService].alertArray removeAllObjects];
+             
             [self saveCustomerInfo];
         }];
         [alert show];
-        [[WQDataShare sharedService].alertArray addObject:alert];
     }else {
         [self.navigationController popViewControllerAnimated:YES];
     }
@@ -180,7 +169,7 @@
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 2;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return 1;
@@ -243,50 +232,6 @@
     self.navBarView.rightBtn.enabled = [self checkNavRight];
 }
 
--(void)textFieldDidChange:(NSNotification *)notification {
-    WQProductText *text = (WQProductText *)notification.object;
-
-    //数据更新
-    NSMutableDictionary *mutableDic = [[NSMutableDictionary alloc]initWithDictionary:self.dataArray[text.idxPath.section]];
-    
-    [mutableDic setObject:text.text forKey:@"detail"];
-    
-    if ([text.text isEqualToString:[NSString stringWithFormat:@"%@",self.customerObj.customerRemark]]) {
-        [mutableDic setObject:@"0" forKey:@"isEdit"];
-    }else {
-        [mutableDic setObject:@"1" forKey:@"isEdit"];
-    }
-    [self.dataArray replaceObjectAtIndex:text.idxPath.section withObject:mutableDic];
-    
-    self.navBarView.rightBtn.enabled = [self checkNavRight];
-    
-    //字数限制
-    NSInteger kMaxLength = 10;
-    
-    NSString *toBeString = text.text;
-    NSString *lang = text.textInputMode.primaryLanguage;
-    if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入
-        UITextRange *selectedRange = [text markedTextRange];
-        UITextPosition *position = [text positionFromPosition:selectedRange.start offset:0];
-        if (!position) {
-            if (toBeString.length > kMaxLength) {
-                text.text = [toBeString substringToIndex:kMaxLength];
-            }
-        }
-    }else {
-        if (toBeString.length > kMaxLength) {
-            text.text = [toBeString substringToIndex:kMaxLength];
-        }
-    }
-}
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if ([textField isKindOfClass:[WQProductText class]]) {
-        WQProductText *text = (WQProductText *)textField;
-        [text resignFirstResponder];
-    }
-    return YES;
-}
-
 -(BOOL)checkNavRight {
     BOOL isEditing = NO;
     for (int i=0; i<self.dataArray.count; i++) {
@@ -337,12 +282,12 @@
                 [weakSelf.navigationController popViewControllerAnimated:YES];
                 SafeRelease(mutableDic);
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
+
     }];
 }
 
@@ -365,12 +310,11 @@
                 
                 [weakSelf.navigationController popToRootViewControllerAnimated:YES];
             }else {
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 @end

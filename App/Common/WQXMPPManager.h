@@ -35,6 +35,9 @@
 - (void)getOffLineMessage;
 
 +(WQXMPPManager *)sharedInstance;
+
+// 获取离线消息
+-(void)getOffLineMessage;
 @end
 
 

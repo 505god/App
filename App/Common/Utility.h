@@ -21,14 +21,16 @@ typedef enum{
     WQPushTypeOrderFinish = 4,          //订单已完成
     WQPushTypeCustomer = 5,             //客户
     WQPushTypeProduct = 6,              //商品
-    WQPushTypeChat = 8,                 //聊天
-    WQPushTypeNone = 9
+    WQPushTypeChat = 7,                 //聊天
+    WQPushTypeNone = 8
 }WQPushType;
 
 #import "WQPopView.h"
 
 @interface Utility : NSObject
+@property (nonatomic, strong) AppDelegate *appDel;
 
++ (Utility *)sharedService;
 
 + (NSString *)getNowDateFromatAnDate;
 
@@ -54,5 +56,7 @@ typedef enum{
 
 +(void)showImage:(UIImageView*)avatarImageView;
 
-+(void)checkAlert;
++(void)dataShareClear;
+
++(void)interfaceWithStatus:(NSInteger)status msg:(NSString *)msg;
 @end

@@ -84,7 +84,7 @@
                 }
             }else {
                 weakSelf.start = (weakSelf.start-weakSelf.limit)<0?0:weakSelf.start-weakSelf.limit;
-                [WQPopView showWithImageName:@"picker_alert_sigh" message:[jsonData objectForKey:@"msg"]];
+                [Utility interfaceWithStatus:[[jsonData objectForKey:@"status"]integerValue] msg:[jsonData objectForKey:@"msg"]];
             }
         }
         [weakSelf.collectionView reloadData];
@@ -96,18 +96,16 @@
         [weakSelf.collectionView headerEndRefreshing];
         [weakSelf.collectionView footerEndRefreshing];
         [weakSelf checkDataArray];
-        
-        [WQPopView showWithImageName:@"picker_alert_sigh" message:NSLocalizedString(@"InterfaceError", @"")];
     }];
 }
 
 -(void)checkDataArray {
     if (self.dataArray.count==0) {
         [self setNoneText:NSLocalizedString(@"NoneProducts", @"") animated:YES];
-        [self setToolImage:@"" text:NSLocalizedString(@"NewProductVC", @"") animated:YES];
+//        [self setToolImage:@"" text:NSLocalizedString(@"NewProductVC", @"") animated:YES];
     }else {
         [self setNoneText:nil animated:NO];
-        [self setToolImage:@"" text:NSLocalizedString(@"NewProductVC", @"") animated:NO];
+//        [self setToolImage:@"" text:NSLocalizedString(@"NewProductVC", @"") animated:NO];
     }
 }
 
@@ -250,9 +248,9 @@
 }
 
 #pragma mark - toolBar事件
--(void)toolControlPressed {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"HotSaleVCShowNewProductVC" object:nil];
-}
+//-(void)toolControlPressed {
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"HotSaleVCShowNewProductVC" object:nil];
+//}
 
 #pragma mark - WQProductDetailVCDelegate
 -(void)editWQProductDetailVC:(WQProductDetailVC *)productDetailVC indexPath:(NSIndexPath *)indexPath {
@@ -283,7 +281,7 @@
     
     if (self.dataArray.count==0) {
         [self setNoneText:NSLocalizedString(@"NewProductVC", @"") animated:YES];
-        [self setToolImage:@"" text:NSLocalizedString(@"NewProductVC", @"") animated:YES];
+//        [self setToolImage:@"" text:NSLocalizedString(@"NewProductVC", @"") animated:YES];
     }
 }
 

@@ -168,14 +168,7 @@ static UIFont *buttonFont = nil;
             // Let's check if they fit on the same line.
             
              CGSize size = [title boundingRectWithSize:CGSizeMake(_view.bounds.size.width-kAlertViewBorder*2 , CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:buttonFont,NSFontAttributeName, nil] context:nil].size;
-            
-            
-//            CGSize size = [title sizeWithFont:buttonFont
-//                                  minFontSize:10 
-//                               actualFontSize:nil
-//                                     forWidth:_view.bounds.size.width-kAlertViewBorder*2 
-//                                lineBreakMode:NSLineBreakByClipping];
-            
+
             if (size.width < maxHalfWidth - kAlertViewBorder)
             {
                 // It might fit. Check the next Button
@@ -183,12 +176,6 @@ static UIFont *buttonFont = nil;
                 NSString *title2 = [block2 objectAtIndex:1];
                 
                 size = [title2 boundingRectWithSize:CGSizeMake(_view.bounds.size.width-kAlertViewBorder*2 , CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:buttonFont,NSFontAttributeName, nil] context:nil].size;
-                
-//                size = [title2 sizeWithFont:buttonFont 
-//                                minFontSize:10 
-//                             actualFontSize:nil
-//                                   forWidth:_view.bounds.size.width-kAlertViewBorder*2 
-//                              lineBreakMode:NSLineBreakByClipping];
                 
                 if (size.width < maxHalfWidth - kAlertViewBorder)
                 {
@@ -204,12 +191,6 @@ static UIFont *buttonFont = nil;
             
             CGSize size = [title boundingRectWithSize:CGSizeMake(_view.bounds.size.width-kAlertViewBorder*2 , CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:buttonFont,NSFontAttributeName, nil] context:nil].size;
             
-//            CGSize size = [title sizeWithFont:buttonFont 
-//                                  minFontSize:10 
-//                               actualFontSize:nil
-//                                     forWidth:_view.bounds.size.width-kAlertViewBorder*2 
-//                                lineBreakMode:NSLineBreakByClipping];
-
             size.width = MAX(size.width, 80);
             if (size.width + 2 * kAlertViewBorder < width)
             {
